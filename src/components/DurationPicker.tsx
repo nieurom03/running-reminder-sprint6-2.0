@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useI18n } from '@/i18n';
+import { useTheme } from '@/context/ThemeContext';
 
 export const durationSecToText=(value:number|null|undefined)=>{
   const total=Math.max(0,Math.floor(value??0));
@@ -11,6 +12,7 @@ export const durationSecToText=(value:number|null|undefined)=>{
 
 export function DurationPicker({value,onChange}:{value:number;onChange:(sec:number)=>void}){
   const {t}=useI18n();
+  const {colors}=useTheme();
   const [open,setOpen]=useState(false);
   const sixty=useMemo(()=>Array.from({length:60},(_,i)=>i),[]);
   const hours=useMemo(()=>Array.from({length:13},(_,i)=>i),[]);
@@ -20,32 +22,33 @@ export function DurationPicker({value,onChange}:{value:number;onChange:(sec:numb
   const openPicker=()=>{const v=Math.max(0,Math.floor(value||0)); setH(Math.floor(v/3600)); setM(Math.floor((v%3600)/60)); setS(v%60); setOpen(true);};
   const choose=()=>{onChange(h*3600+m*60+s); setOpen(false);};
   return <>
-    <Pressable style={styles.field} onPress={openPicker}>
+    <Pressable style={[styles.field,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder}]} onPress={openPicker}>
       <View>
-        <Text style={styles.value}>{durationSecToText(value)}</Text>
-        <Text style={styles.help}>{t('durationTap')}</Text>
+        <Text style={[styles.value,{color:colors.textPrimary}]}>{durationSecToText(value)}</Text>
+        <Text style={[styles.help,{color:colors.textSecondary}]}>{t('durationTap')}</Text>
       </View>
-      <View style={styles.iconCircle}><Ionicons name="time-outline" size={20} color="#027A48" /></View>
+      <View style={[styles.iconCircle,{backgroundColor:colors.rowIconBg}]}><Ionicons name="time-outline" size={20} color={colors.accent} /></View>
     </Pressable>
     <Modal visible={open} transparent animationType="fade" onRequestClose={()=>setOpen(false)}>
-      <View style={styles.overlay}><View style={styles.modal}>
-        <View style={styles.modalHeader}><Text style={styles.title}>{t('duration')}</Text><View style={styles.modalIcon}><Ionicons name="time-outline" size={18} color="#027A48"/></View></View>
+      <View style={styles.overlay}><View style={[styles.modal,{backgroundColor:colors.bgRoot,borderWidth:1,borderColor:colors.bgCardBorder}]}>
+        <View style={styles.modalHeader}><Text style={[styles.title,{color:colors.textPrimary}]}>{t('duration')}</Text><View style={[styles.modalIcon,{backgroundColor:colors.rowIconBg}]}><Ionicons name="time-outline" size={18} color={colors.accent}/></View></View>
         <View style={styles.pickers}>
           <Wheel values={hours} value={h} onChange={setH} suffix="h" />
-          <Text style={styles.colon}>:</Text>
+          <Text style={[styles.colon,{color:colors.textPrimary}]}>:</Text>
           <Wheel values={sixty} value={m} onChange={setM} suffix="m" />
-          <Text style={styles.colon}>:</Text>
+          <Text style={[styles.colon,{color:colors.textPrimary}]}>:</Text>
           <Wheel values={sixty} value={s} onChange={setS} suffix="s" />
         </View>
-        <Text style={styles.preview}>{durationSecToText(h*3600+m*60+s)}</Text>
-        <View style={styles.actions}><Pressable style={styles.cancel} onPress={()=>setOpen(false)}><Text style={styles.cancelText}>{t('cancel')}</Text></Pressable><Pressable style={styles.done} onPress={choose}><Text style={styles.doneText}>{t('done')}</Text></Pressable></View>
+        <Text style={[styles.preview,{color:colors.textPrimary}]}>{durationSecToText(h*3600+m*60+s)}</Text>
+        <View style={styles.actions}><Pressable style={[styles.cancel,{borderColor:colors.bgCardBorder}]} onPress={()=>setOpen(false)}><Text style={[styles.cancelText,{color:colors.textPrimary}]}>{t('cancel')}</Text></Pressable><Pressable style={[styles.done,{backgroundColor:colors.accent}]} onPress={choose}><Text style={styles.doneText}>{t('done')}</Text></Pressable></View>
       </View></View>
     </Modal>
   </>;
 }
 
 function Wheel({values,value,onChange,suffix}:{values:number[];value:number;onChange:(n:number)=>void;suffix:string}){
-  return <ScrollView style={styles.wheel} contentContainerStyle={styles.wheelContent} showsVerticalScrollIndicator={false}>{values.map(v=><Pressable key={v} onPress={()=>onChange(v)} style={[styles.option,v===value&&styles.optionOn]}><Text style={[styles.optionText,v===value&&styles.optionTextOn]}>{String(v).padStart(2,'0')}{suffix}</Text></Pressable>)}</ScrollView>;
+  const {colors}=useTheme();
+  return <ScrollView style={styles.wheel} contentContainerStyle={styles.wheelContent} showsVerticalScrollIndicator={false}>{values.map(v=><Pressable key={v} onPress={()=>onChange(v)} style={[styles.option,v===value&&[styles.optionOn,{backgroundColor:colors.rowIconBg}]]}><Text style={[styles.optionText,{color:colors.textSecondary},v===value&&[styles.optionTextOn,{color:colors.accent}]]}>{String(v).padStart(2,'0')}{suffix}</Text></Pressable>)}</ScrollView>;
 }
 
 const styles=StyleSheet.create({

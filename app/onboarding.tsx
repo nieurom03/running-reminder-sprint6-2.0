@@ -6,6 +6,7 @@ import { router } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { setSetting } from "@/db/repository";
 import { useI18n } from "@/i18n";
+import { useTheme } from "@/context/ThemeContext";
 const icons = [
   "calendar-outline",
   "create-outline",
@@ -14,6 +15,7 @@ const icons = [
 export default function Onboarding() {
   const db = useSQLiteContext();
   const { t } = useI18n();
+  const { colors, isDark } = useTheme();
   const [step, setStep] = useState(0);
   const titles = [
     t("onboarding1Title"),
@@ -30,7 +32,10 @@ export default function Onboarding() {
     router.replace("/(tabs)");
   };
   return (
-    <SafeAreaView edges={["top", "bottom", "left", "right"]} style={s.root}>
+    <SafeAreaView
+      edges={["top", "bottom", "left", "right"]}
+      style={[s.root, { backgroundColor: colors.bgRoot }]}
+    >
       <View style={s.content}>
         {/* <Image
           source={require("../assets/images/icon.png")}
@@ -38,30 +43,59 @@ export default function Onboarding() {
           resizeMode="contain"
         />
         <Text style={s.brand}>RUNNING REMINDER</Text> */}
-        <View style={s.hero}>
+        <View
+          style={[
+            s.hero,
+            {
+              backgroundColor: colors.bgCard,
+              borderColor: colors.bgCardBorder,
+            },
+          ]}
+        >
           <Image
             source={require("../assets/images/icon.png")}
             style={s.heroLogo}
             resizeMode="contain"
           />
-          <View style={s.heroBadge}>
-            <Ionicons name={icons[step]} size={20} color="#111827" />
+          <View
+            style={[
+              s.heroBadge,
+              {
+                backgroundColor: colors.rowIconBg,
+                borderColor: colors.bgCardBorder,
+              },
+            ]}
+          >
+            <Ionicons name={icons[step]} size={20} color={colors.rowIcon} />
           </View>
         </View>
-        <Text style={s.title}>{titles[step]}</Text>
-        <Text style={s.text}>{texts[step]}</Text>
+        <Text style={[s.title, { color: colors.textPrimary }]}>{titles[step]}</Text>
+        <Text style={[s.text, { color: colors.textSecondary }]}>{texts[step]}</Text>
         <View style={s.dots}>
           {icons.map((_, i) => (
-            <View key={i} style={[s.dot, i === step && s.dotOn]} />
+            <View
+              key={i}
+              style={[
+                s.dot,
+                { backgroundColor: colors.divider },
+                i === step && [
+                  s.dotOn,
+                  { backgroundColor: isDark ? colors.accent : "#111827" },
+                ],
+              ]}
+            />
           ))}
         </View>
       </View>
       <View style={s.footer}>
         <Pressable onPress={finish}>
-          <Text style={s.skip}>{t("skip")}</Text>
+          <Text style={[s.skip, { color: colors.textSecondary }]}>{t("skip")}</Text>
         </Pressable>
         <Pressable
-          style={s.next}
+          style={[
+            s.next,
+            { backgroundColor: isDark ? colors.accent : "#111827" },
+          ]}
           onPress={() => (step === 2 ? finish() : setStep(step + 1))}
         >
           <Text style={s.nextText}>{step === 2 ? t("start") : t("next")}</Text>

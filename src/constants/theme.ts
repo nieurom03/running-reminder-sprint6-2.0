@@ -48,13 +48,13 @@ export const darkColors = {
   bgOrb3: 'rgba(18,70,40,0.45)',
 
   // Text
-  textPrimary: '#E8F5EE',
+  textPrimary: '#FFFFFF',
   textSecondary: '#8AAF98',
   textMuted: '#6B8E7A',
   textLabel: '#7AAE90',
 
   // Settings rows
-  rowTitle: '#D4EDDE',
+  rowTitle: '#FFFFFF',
   rowValue: '#7A9E8A',
   rowIcon: '#72D9A3',
   rowIconBg: 'rgba(30,70,50,0.80)',

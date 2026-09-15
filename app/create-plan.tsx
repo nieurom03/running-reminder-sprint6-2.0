@@ -22,6 +22,7 @@ import { DateField } from "@/components/DateField";
 import { PacePicker } from "@/components/PacePicker";
 import { GoalTimePicker, goalSecToText } from "@/components/GoalTimePicker";
 import { useI18n } from "@/i18n";
+import { useTheme } from "@/context/ThemeContext";
 const distances = [5, 10, 21.1, 42.2];
 const iso = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -29,6 +30,7 @@ export default function CreatePlanScreen() {
   const db = useSQLiteContext();
   const refresh = useAppStore((s) => s.refresh);
   const { t, language } = useI18n();
+  const { colors } = useTheme();
   const future = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() + 84);
@@ -96,23 +98,23 @@ export default function CreatePlanScreen() {
   };
   return (
     <ScrollView
-      style={s.root}
+      style={[s.root, { backgroundColor: colors.bgRoot }]}
       contentContainerStyle={s.content}
       keyboardShouldPersistTaps="handled"
     >
       <View style={s.top}>
         <Pressable onPress={() => router.back()} style={s.backBtn}>
-          <Ionicons name="chevron-back" size={24} color="#101828" />
+          <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
         </Pressable>
-        <Text style={s.title}>{t("createPlanTitle")}</Text>
+        <Text style={[s.title, { color: colors.textPrimary }]}>{t("createPlanTitle")}</Text>
         <View style={s.placeholder} />
       </View>
 
-      <View style={s.card}>
-        <Text style={s.cardTitle}>{t("raceGoalOptional")}</Text>
-        <Text style={s.label}>{t("distance")}</Text>
-        <View style={s.selectorBox}>
-          <Text style={s.selectorText}>
+      <View style={[s.card, { backgroundColor: colors.bgCard, borderColor: colors.bgCardBorder }]}>
+        <Text style={[s.cardTitle, { color: colors.textPrimary }]}>{t("raceGoalOptional")}</Text>
+        <Text style={[s.label, { color: colors.textLabel }]}>{t("distance")}</Text>
+        <View style={[s.selectorBox, { backgroundColor: colors.bgCard, borderColor: colors.bgCardBorder }]}>
+          <Text style={[s.selectorText, { color: colors.textPrimary }]}>
             {distance === 42.2
               ? "Marathon (42.2 km)"
               : distance === 21.1
@@ -121,17 +123,17 @@ export default function CreatePlanScreen() {
                   ? "10K (10 km)"
                   : "5K (5 km)"}
           </Text>
-          <Ionicons name="chevron-down" size={18} color="#667085" />
+          <Ionicons name="chevron-down" size={18} color={colors.textSecondary} />
         </View>
         <View style={s.distanceRow}>
           {distances.map((d) => (
             <Pressable
               key={d}
               onPress={() => setDistance(d)}
-              style={[s.distanceChip, distance === d && s.distanceChipOn]}
+              style={[s.distanceChip, { backgroundColor: colors.rowIconBg, borderColor: colors.bgCardBorder }, distance === d && s.distanceChipOn]}
             >
               <Text
-                style={[s.distanceText, distance === d && s.distanceTextOn]}
+                style={[s.distanceText, { color: colors.textSecondary }, distance === d && s.distanceTextOn]}
               >
                 {d === 21.1 ? "21K" : d === 42.2 ? "42K" : `${d}K`}
               </Text>
@@ -139,77 +141,77 @@ export default function CreatePlanScreen() {
           ))}
         </View>
 
-        <Text style={s.label}>{t("raceDate")}</Text>
+        <Text style={[s.label, { color: colors.textLabel }]}>{t("raceDate")}</Text>
         <DateField
           value={raceDate}
           onChange={setRaceDate}
           minimumDate={new Date()}
         />
 
-        <Text style={s.label}>{t("goalTime")}</Text>
+        <Text style={[s.label, { color: colors.textLabel }]}>{t("goalTime")}</Text>
         <GoalTimePicker value={goalSec} onChange={setGoalSec} />
-        <View style={s.inlineInfo}>
-          <Ionicons name="time-outline" size={16} color="#667085" />
-          <Text style={s.inlineInfoText}>
+        <View style={[s.inlineInfo, { backgroundColor: colors.rowIconBg }]}>
+          <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
+          <Text style={[s.inlineInfoText, { color: colors.textSecondary }]}>
             {t("goalTime")}{" "}
-            <Text style={s.inlineStrong}>{goalSecToText(goalSec)}</Text>
+            <Text style={[s.inlineStrong, { color: colors.textPrimary }]}>{goalSecToText(goalSec)}</Text>
           </Text>
         </View>
       </View>
 
-      <View style={s.card}>
-        <Text style={s.cardTitle}>{t("setCurrentPace")}</Text>
-        <Text style={s.centerHint}>{t("chooseCurrentPace")}</Text>
+      <View style={[s.card, { backgroundColor: colors.bgCard, borderColor: colors.bgCardBorder }]}>
+        <Text style={[s.cardTitle, { color: colors.textPrimary }]}>{t("setCurrentPace")}</Text>
+        <Text style={[s.centerHint, { color: colors.textPrimary }]}>{t("chooseCurrentPace")}</Text>
         <PacePicker value={paceSec} onChange={setPaceSec} />
       </View>
 
-      <View style={s.card}>
-        <Text style={s.cardTitle}>{t("runningDays")}</Text>
+      <View style={[s.card, { backgroundColor: colors.bgCard, borderColor: colors.bgCardBorder }]}>
+        <Text style={[s.cardTitle, { color: colors.textPrimary }]}>{t("runningDays")}</Text>
         <View style={s.daysRow}>
           {dayNames.map((n, d) => (
             <Pressable
               key={n}
               onPress={() => toggle(d)}
-              style={[s.day, days.includes(d) && s.dayOn]}
+              style={[s.day, { backgroundColor: colors.bgCard, borderColor: colors.bgCardBorder }, days.includes(d) && s.dayOn]}
             >
-              <Text style={[s.dayText, days.includes(d) && s.dayTextOn]}>
+              <Text style={[s.dayText, { color: colors.textSecondary }, days.includes(d) && s.dayTextOn]}>
                 {n}
               </Text>
             </Pressable>
           ))}
         </View>
-        <Text style={s.helper}>{t("runningDaysHelp")}</Text>
+        <Text style={[s.helper, { color: colors.textMuted }]}>{t("runningDaysHelp")}</Text>
 
-        <Text style={s.label}>{t("longRunDay")}</Text>
+        <Text style={[s.label, { color: colors.textLabel }]}>{t("longRunDay")}</Text>
         <View style={s.daysRow}>
           {days.map((d) => (
             <Pressable
               key={d}
               onPress={() => setLongRunDay(d)}
-              style={[s.day, longRunDay === d && s.longRunDayOn]}
+              style={[s.day, { backgroundColor: colors.bgCard, borderColor: colors.bgCardBorder }, longRunDay === d && s.longRunDayOn]}
             >
-              <Text style={[s.dayText, longRunDay === d && s.dayTextOn]}>
+              <Text style={[s.dayText, { color: colors.textSecondary }, longRunDay === d && s.dayTextOn]}>
                 {dayNames[d]}
               </Text>
             </Pressable>
           ))}
         </View>
-        <Text style={s.helper}>{t("longRunDayHelp")}</Text>
+        <Text style={[s.helper, { color: colors.textMuted }]}>{t("longRunDayHelp")}</Text>
 
-        <Text style={s.label}>{t("reminderTime")}</Text>
+        <Text style={[s.label, { color: colors.textLabel }]}>{t("reminderTime")}</Text>
         <View style={s.timeRow}>
           <TextInput
             value={hour}
             onChangeText={setHour}
             keyboardType="number-pad"
-            style={s.timeInput}
+            style={[s.timeInput, { backgroundColor: colors.bgCard, borderColor: colors.bgCardBorder, color: colors.textPrimary }]}
           />
-          <Text style={s.colon}>:</Text>
+          <Text style={[s.colon, { color: colors.textPrimary }]}>:</Text>
           <TextInput
             value={minute}
             onChangeText={setMinute}
             keyboardType="number-pad"
-            style={s.timeInput}
+            style={[s.timeInput, { backgroundColor: colors.bgCard, borderColor: colors.bgCardBorder, color: colors.textPrimary }]}
           />
         </View>
       </View>

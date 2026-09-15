@@ -21,6 +21,7 @@ import { useAppStore } from "@/store/useAppStore";
 import type { Activity, RunFeeling, Workout } from "@/types/models";
 import { useI18n } from "@/i18n";
 import { DurationPicker } from "@/components/DurationPicker";
+import { useTheme } from "@/context/ThemeContext";
 
 const FEELINGS: {
   value: RunFeeling;
@@ -85,6 +86,7 @@ export default function ResultScreen() {
   const db = useSQLiteContext();
   const refresh = useAppStore((s) => s.refresh);
   const { t, language } = useI18n();
+  const { colors } = useTheme();
   const [w, setW] = useState<Workout | null>(null);
   const [existing, setExisting] = useState<Activity | null>(null);
   const [distance, setDistance] = useState("");
@@ -127,8 +129,8 @@ export default function ResultScreen() {
       : "--";
   if (!w)
     return (
-      <View style={s.loading}>
-        <Text>{t("loading")}</Text>
+      <View style={[s.loading,{backgroundColor:colors.bgRoot}]}>
+        <Text style={{color:colors.textPrimary}}>{t("loading")}</Text>
       </View>
     );
   const save = async () => {
@@ -177,32 +179,32 @@ export default function ResultScreen() {
     ]);
   return (
     <ScrollView
-      style={s.root}
+      style={[s.root,{backgroundColor:colors.bgRoot}]}
       contentContainerStyle={s.content}
       keyboardShouldPersistTaps="handled"
     >
       <Pressable onPress={() => router.back()}>
-        <Text style={s.back}>{t("back")}</Text>
+        <Text style={[s.back,{color:colors.textPrimary}]}>{t("back")}</Text>
       </Pressable>
-      <Text style={s.title}>
+      <Text style={[s.title,{color:colors.textPrimary}]}>
         {existing ? t("editResultTitle") : t("completeWorkoutTitle")}
       </Text>
-      <Text style={s.sub}>
+      <Text style={[s.sub,{color:colors.textSecondary}]}>
         {w.type.replace("_", " ")} ·{" "}
         {language === "vi" ? "kế hoạch" : "planned"} {w.distanceKm} km ·{" "}
         {w.date}
       </Text>
 
-      <View style={s.card}>
-        <Text style={s.label}>{t("actualDistance")}</Text>
+      <View style={[s.card,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder}]}>
+        <Text style={[s.label,{color:colors.textLabel}]}>{t("actualDistance")}</Text>
         <TextInput
-          style={s.input}
+          style={[s.input,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder,color:colors.textPrimary}]}
           value={distance}
           onChangeText={setDistance}
           keyboardType="decimal-pad"
           placeholder="10.2"
         />
-        <Text style={s.label}>{t("duration")}</Text>
+        <Text style={[s.label,{color:colors.textLabel}]}>{t("duration")}</Text>
         <DurationPicker
           value={Number.isFinite(seconds) ? seconds : 0}
           onChange={(v) => setDuration(formatDuration(v))}
@@ -213,12 +215,12 @@ export default function ResultScreen() {
         </View>
       </View>
 
-      <View style={s.card}>
+      <View style={[s.card,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder}]}>
         <View style={s.row}>
           <View style={s.half}>
-            <Text style={s.label}>AVG HR</Text>
+            <Text style={[s.label,{color:colors.textLabel}]}>AVG HR</Text>
             <TextInput
-              style={s.input}
+              style={[s.input,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder,color:colors.textPrimary}]}
               value={avgHr}
               onChangeText={setAvgHr}
               keyboardType="number-pad"
@@ -226,9 +228,9 @@ export default function ResultScreen() {
             />
           </View>
           <View style={s.half}>
-            <Text style={s.label}>MAX HR</Text>
+            <Text style={[s.label,{color:colors.textLabel}]}>MAX HR</Text>
             <TextInput
-              style={s.input}
+              style={[s.input,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder,color:colors.textPrimary}]}
               value={maxHr}
               onChangeText={setMaxHr}
               keyboardType="number-pad"
@@ -236,9 +238,9 @@ export default function ResultScreen() {
             />
           </View>
         </View>
-        <Text style={s.label}>Elevation (m)</Text>
+        <Text style={[s.label,{color:colors.textLabel}]}>Elevation (m)</Text>
         <TextInput
-          style={s.input}
+          style={[s.input,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder,color:colors.textPrimary}]}
           value={elevation}
           onChangeText={setElevation}
           keyboardType="decimal-pad"
@@ -246,9 +248,9 @@ export default function ResultScreen() {
         />
       </View>
 
-      <View style={s.card}>
+      <View style={[s.card,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder}]}>
         <View style={s.sectionHeader}>
-          <Text style={s.labelNoGap}>{t("feeling")}</Text>
+          <Text style={[s.labelNoGap,{color:colors.textLabel}]}>{t("feeling")}</Text>
           <View style={s.sectionIcon}>
             <Ionicons name="heart-outline" size={16} color="#F04438" />
           </View>
@@ -259,9 +261,10 @@ export default function ResultScreen() {
               key={f.value}
               style={[
                 s.feel,
+                {backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder},
                 feeling === f.value && {
                   borderColor: f.color,
-                  backgroundColor: "#fff",
+                  backgroundColor: colors.rowIconBg,
                 },
               ]}
               onPress={() => setFeeling(f.value)}
@@ -271,7 +274,7 @@ export default function ResultScreen() {
                   s.feelIconWrap,
                   {
                     backgroundColor:
-                      feeling === f.value ? `${f.color}18` : "#F2F4F7",
+                      feeling === f.value ? `${f.color}18` : colors.rowIconBg,
                   },
                 ]}
               >
@@ -280,7 +283,7 @@ export default function ResultScreen() {
               <Text
                 style={[
                   s.feelText,
-                  feeling === f.value && { color: "#101828" },
+                  {color:colors.textPrimary},
                 ]}
               >
                 {language === "vi" ? f.vi : f.en}
@@ -290,10 +293,10 @@ export default function ResultScreen() {
         </View>
       </View>
 
-      <View style={s.card}>
-        <Text style={s.labelNoGap}>{t("notes")}</Text>
+      <View style={[s.card,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder}]}>
+        <Text style={[s.labelNoGap,{color:colors.textLabel}]}>{t("notes")}</Text>
         <TextInput
-          style={[s.input, s.textarea]}
+          style={[s.input, s.textarea,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder,color:colors.textPrimary}]}
           value={notes}
           onChangeText={setNotes}
           multiline

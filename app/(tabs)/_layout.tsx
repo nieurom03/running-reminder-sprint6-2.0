@@ -83,7 +83,7 @@ export default function TabLayout() {
   );
 }
 
-const TAB_BAR_HEIGHT = 58; // 72 * 0.8 = ~58
+const TAB_BAR_HEIGHT = 68;
 const PILL_RADIUS = TAB_BAR_HEIGHT / 2;
 
 const styles = StyleSheet.create({
@@ -91,11 +91,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    marginHorizontal: 56,
-    bottom: 24,
+    marginHorizontal: 16,
+    bottom: 18,
     height: TAB_BAR_HEIGHT,
-    paddingTop: 4,
-    paddingBottom: 6,
+    paddingTop: 6,
+    paddingBottom: 7,
     borderTopWidth: 0,
     borderRadius: PILL_RADIUS,
     backgroundColor: "transparent",
@@ -123,8 +123,8 @@ const styles = StyleSheet.create({
   },
   activeHighlight: {
     position: "absolute",
-    width: "88%",
-    height: "92%",
+    width: "92%",
+    height: "94%",
     borderRadius: 28,
     backgroundColor: "rgba(255,255,255,0.13)",
     borderWidth: 1,

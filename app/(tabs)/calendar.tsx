@@ -9,6 +9,7 @@ import { statusTheme } from "@/components/WorkoutCard";
 import { AppHeader } from "@/components/AppHeader";
 import { GlassBackground, GlassCard } from "@/components/Glass";
 import { useI18n } from "@/i18n";
+import { useTheme } from "@/context/ThemeContext";
 import type { Workout } from "@/types/models";
 const monthsEn = [
   "January",
@@ -42,6 +43,7 @@ export default function CalendarScreen() {
   const db = useSQLiteContext();
   const key = useAppStore((s) => s.refreshKey);
   const { t, language } = useI18n();
+  const { colors } = useTheme();
   const [rows, setRows] = useState<Workout[]>([]);
   const first =
     rows.find((w) => w.date >= new Date().toISOString().slice(0, 10)) ??
@@ -105,19 +107,19 @@ export default function CalendarScreen() {
       >
         <GlassCard style={s.calendar}>
           <View style={s.head}>
-            <Pressable style={s.navBtn} onPress={() => move(-1)}>
-              <Ionicons name="chevron-back" size={19} color="#315B47" />
+            <Pressable style={[s.navBtn, { backgroundColor: colors.rowIconBg }]} onPress={() => move(-1)}>
+              <Ionicons name="chevron-back" size={19} color={colors.rowIcon} />
             </Pressable>
-            <Text style={s.title}>
+            <Text style={[s.title, { color: colors.textPrimary }]}>
               {months[cursor.getMonth()]} {cursor.getFullYear()}
             </Text>
-            <Pressable style={s.navBtn} onPress={() => move(1)}>
-              <Ionicons name="chevron-forward" size={19} color="#315B47" />
+            <Pressable style={[s.navBtn, { backgroundColor: colors.rowIconBg }]} onPress={() => move(1)}>
+              <Ionicons name="chevron-forward" size={19} color={colors.rowIcon} />
             </Pressable>
           </View>
           <View style={s.week}>
             {weekdays.map((x) => (
-              <Text key={x} style={s.weekTxt}>
+              <Text key={x} style={[s.weekTxt, { color: colors.textSecondary }]}>
                 {x}
               </Text>
             ))}
@@ -128,13 +130,13 @@ export default function CalendarScreen() {
               return (
                 <Pressable
                   key={i}
-                  style={[s.cell, ws.length > 0 && s.activeCell]}
+                  style={[s.cell, ws.length > 0 && [s.activeCell, { backgroundColor: colors.rowIconBg, borderColor: colors.bgCardBorder }]]}
                   disabled={!ws.length}
                   onPress={() => ws[0] && router.push(`/workout/${ws[0].id}`)}
                 >
                   {d && (
                     <>
-                      <Text style={s.day}>{d}</Text>
+                      <Text style={[s.day, { color: colors.textPrimary }]}>{d}</Text>
                       <View style={s.dots}>
                         {ws.slice(0, 3).map((w) => {
                           const th =
@@ -148,7 +150,7 @@ export default function CalendarScreen() {
                         })}
                       </View>
                       {ws[0] && (
-                        <Text numberOfLines={1} style={s.km}>
+                        <Text numberOfLines={1} style={[s.km, { color: colors.textSecondary }]}>
                           {ws[0].distanceKm} km
                         </Text>
                       )}
@@ -164,7 +166,7 @@ export default function CalendarScreen() {
           <Legend c="#F79009" t={t("skipped")} />
           <Legend c="#F04438" t={t("missed")} />
         </View>
-        <Text style={s.hint}>
+        <Text style={[s.hint, { color: colors.textSecondary }]}>
           {items.length} {t("workoutsInMonth")}
         </Text>
       </ScrollView>
@@ -172,10 +174,11 @@ export default function CalendarScreen() {
   );
 }
 function Legend({ c, t }: { c: string; t: string }) {
+  const { colors } = useTheme();
   return (
     <View style={s.legendItem}>
       <View style={[s.ldot, { backgroundColor: c }]} />
-      <Text style={s.legendText}>{t}</Text>
+      <Text style={[s.legendText, { color: colors.textSecondary }]}>{t}</Text>
     </View>
   );
 }

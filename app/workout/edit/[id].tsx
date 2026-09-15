@@ -15,6 +15,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { DateField } from "@/components/DateField";
 import { PacePicker } from "@/components/PacePicker";
 import { useI18n } from "@/i18n";
+import { useTheme } from "@/context/ThemeContext";
 import type { Workout, WorkoutType } from "@/types/models";
 const TYPES: WorkoutType[] = [
   "EASY",
@@ -29,6 +30,7 @@ export default function EditWorkoutScreen() {
   const db = useSQLiteContext();
   const refresh = useAppStore((s) => s.refresh);
   const { t, language } = useI18n();
+  const { colors } = useTheme();
   const [workout, setWorkout] = useState<Workout | null>(null);
   const [date, setDate] = useState("");
   const [type, setType] = useState<WorkoutType>("EASY");
@@ -53,8 +55,8 @@ export default function EditWorkoutScreen() {
   );
   if (!workout)
     return (
-      <View style={s.loading}>
-        <Text>{t("loading")}</Text>
+      <View style={[s.loading,{backgroundColor:colors.bgRoot}]}>
+        <Text style={{color:colors.textPrimary}}>{t("loading")}</Text>
       </View>
     );
   const save = async () => {
@@ -89,26 +91,26 @@ export default function EditWorkoutScreen() {
     ]);
   return (
     <ScrollView
-      style={s.root}
+      style={[s.root,{backgroundColor:colors.bgRoot}]}
       contentContainerStyle={s.content}
       keyboardShouldPersistTaps="handled"
     >
       <Pressable onPress={() => router.back()}>
-        <Text style={s.back}>{t("back")}</Text>
+        <Text style={[s.back,{color:colors.textPrimary}]}>{t("back")}</Text>
       </Pressable>
-      <Text style={s.title}>{t("editWorkout")}</Text>
-      <Text style={s.sub}>{t("editSub")}</Text>
-      <Text style={s.label}>{t("date")}</Text>
+      <Text style={[s.title,{color:colors.textPrimary}]}>{t("editWorkout")}</Text>
+      <Text style={[s.sub,{color:colors.textSecondary}]}>{t("editSub")}</Text>
+      <Text style={[s.label,{color:colors.textLabel}]}>{t("date")}</Text>
       <DateField value={date} onChange={setDate} />
-      <Text style={s.label}>{t("workoutType")}</Text>
+      <Text style={[s.label,{color:colors.textLabel}]}>{t("workoutType")}</Text>
       <View style={s.chips}>
         {TYPES.map((x) => (
           <Pressable
             key={x}
             onPress={() => setType(x)}
-            style={[s.chip, type === x && s.chipActive]}
+            style={[s.chip,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder}, type === x && s.chipActive]}
           >
-            <Text style={[s.chipText, type === x && s.chipTextActive]}>
+            <Text style={[s.chipText,{color:colors.textPrimary}, type === x && s.chipTextActive]}>
               {x === "EASY"
                 ? t("easy")
                 : x === "TEMPO"
@@ -124,9 +126,9 @@ export default function EditWorkoutScreen() {
           </Pressable>
         ))}
       </View>
-      <Text style={s.label}>{t("distance")} (KM)</Text>
+      <Text style={[s.label,{color:colors.textLabel}]}>{t("distance")} (KM)</Text>
       <TextInput
-        style={s.input}
+        style={[s.input,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder,color:colors.textPrimary}]}
         value={distance}
         onChangeText={setDistance}
         keyboardType="decimal-pad"
@@ -135,18 +137,18 @@ export default function EditWorkoutScreen() {
       {type !== "REST" && (
         <View style={s.row}>
           <View style={s.half}>
-            <Text style={s.label}>{t("paceFrom")}</Text>
+            <Text style={[s.label,{color:colors.textLabel}]}>{t("paceFrom")}</Text>
             <PacePicker value={paceMin} onChange={setPaceMin} compact />
           </View>
           <View style={s.half}>
-            <Text style={s.label}>{t("paceTo")}</Text>
+            <Text style={[s.label,{color:colors.textLabel}]}>{t("paceTo")}</Text>
             <PacePicker value={paceMax} onChange={setPaceMax} compact />
           </View>
         </View>
       )}
-      <Text style={s.label}>{t("notes")}</Text>
+      <Text style={[s.label,{color:colors.textLabel}]}>{t("notes")}</Text>
       <TextInput
-        style={[s.input, s.textarea]}
+        style={[s.input, s.textarea,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder,color:colors.textPrimary}]}
         value={notes}
         onChangeText={setNotes}
         multiline

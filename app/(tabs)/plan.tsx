@@ -20,6 +20,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { WorkoutCard } from "@/components/WorkoutCard";
 import { GlassBackground, GlassCard } from "@/components/Glass";
 import { useI18n } from "@/i18n";
+import { useTheme } from "@/context/ThemeContext";
 import type { TrainingPlan, Workout } from "@/types/models";
 
 export default function PlanScreen() {
@@ -27,6 +28,7 @@ export default function PlanScreen() {
   const key = useAppStore((s) => s.refreshKey);
   const refresh = useAppStore((s) => s.refresh);
   const { t, language } = useI18n();
+  const { colors } = useTheme();
   const [rows, setRows] = useState<Workout[]>([]);
   const [plan, setPlan] = useState<TrainingPlan | null>(null);
   useEffect(() => {
@@ -83,22 +85,22 @@ export default function PlanScreen() {
             <GlassCard style={s.featured}>
               <View style={s.featureTop}>
                 <View>
-                  <Text style={s.featureEyebrow}>
+                  <Text style={[s.featureEyebrow, { color: colors.accent }]}>
                     {language === "vi" ? "HIỆN TẠI" : "CURRENT"}
                   </Text>
-                  <Text style={s.featureTitle}>{plan.name}</Text>
-                  <Text style={s.featureMeta}>
+                  <Text style={[s.featureTitle, { color: colors.textPrimary }]}>{plan.name}</Text>
+                  <Text style={[s.featureMeta, { color: colors.textSecondary }]}>
                     {plan.runsPerWeek} {t("daysPerWeek")} · Race {plan.raceDate}
                   </Text>
                 </View>
-                <View style={s.progressBadge}>
-                  <Text style={s.progressText}>{progress}%</Text>
+                <View style={[s.progressBadge, { backgroundColor: colors.rowIconBg, borderColor: colors.bgCardBorder }]}>
+                  <Text style={[s.progressText, { color: colors.accent }]}>{progress}%</Text>
                 </View>
               </View>
-              <View style={s.progressTrack}>
+              <View style={[s.progressTrack, { backgroundColor: colors.divider }]}>
                 <View style={[s.progressFill, { width: `${progress}%` }]} />
               </View>
-              <Text style={s.featureQuote}>
+              <Text style={[s.featureQuote, { color: colors.textLabel }]}>
                 {language === "vi"
                   ? "“Hành trình vạn dặm bắt đầu từ những bước chân nhỏ.”"
                   : "“Every long journey begins with a small step.”"}
@@ -106,11 +108,11 @@ export default function PlanScreen() {
             </GlassCard>
 
             <View style={s.headingRow}>
-              <Text style={s.sectionTitle}>
+              <Text style={[s.sectionTitle, { color: colors.textPrimary }]}>
                 {language === "vi" ? "Bài tập sắp tới" : "Upcoming workouts"}
               </Text>
               <Pressable onPress={() => router.push("/(tabs)/calendar")}>
-                <Text style={s.link}>
+                <Text style={[s.link, { color: colors.textSecondary }]}>
                   {language === "vi" ? "Xem lịch" : "Calendar"} ›
                 </Text>
               </Pressable>
@@ -120,26 +122,26 @@ export default function PlanScreen() {
             ))}
 
             <GlassCard style={s.manage}>
-              <Text style={s.sectionTitle}>{t("planManagement")}</Text>
+              <Text style={[s.sectionTitle, { color: colors.textPrimary }]}>{t("planManagement")}</Text>
               <View style={s.actionRow}>
                 <Pressable
-                  style={s.action}
+                  style={[s.action, { backgroundColor: colors.rowIconBg, borderColor: colors.bgCardBorder }]}
                   onPress={() => router.push("/create-plan")}
                 >
-                  <View style={s.actionIcon}>
-                    <Ionicons name="add" size={21} color="#0A7D4D" />
+                  <View style={[s.actionIcon, { backgroundColor: colors.rowIconBg }]}>
+                    <Ionicons name="add" size={21} color={colors.accent} />
                   </View>
-                  <Text style={s.actionText}>{t("newPlan")}</Text>
+                  <Text style={[s.actionText, { color: colors.textPrimary }]}>{t("newPlan")}</Text>
                 </Pressable>
-                <Pressable style={s.action} onPress={reschedule}>
-                  <View style={s.actionIcon}>
+                <Pressable style={[s.action, { backgroundColor: colors.rowIconBg, borderColor: colors.bgCardBorder }]} onPress={reschedule}>
+                  <View style={[s.actionIcon, { backgroundColor: colors.rowIconBg }]}>
                     <Ionicons
                       name="notifications-outline"
                       size={19}
-                      color="#0A7D4D"
+                      color={colors.accent}
                     />
                   </View>
-                  <Text style={s.actionText}>{t("reschedule")}</Text>
+                  <Text style={[s.actionText, { color: colors.textPrimary }]}>{t("reschedule")}</Text>
                 </Pressable>
               </View>
               <Pressable style={s.delete} onPress={remove}>
@@ -148,10 +150,10 @@ export default function PlanScreen() {
               </Pressable>
             </GlassCard>
 
-            <Text style={s.allTitle}>{t("trainingPlan")}</Text>
+            <Text style={[s.allTitle, { color: colors.textPrimary }]}>{t("trainingPlan")}</Text>
             {Object.entries(grouped).map(([week, items], i) => (
               <View key={week}>
-                <Text style={s.week}>
+                <Text style={[s.week, { color: colors.textSecondary }]}>
                   {t("week")} {i + 1} · {week}
                 </Text>
                 {items.map((w) => (
@@ -162,8 +164,8 @@ export default function PlanScreen() {
           </>
         ) : (
           <GlassCard style={s.empty}>
-            <Text style={s.emptyTitle}>{t("noCurrentPlan")}</Text>
-            <Text style={s.muted}>{t("createPlanEmptyHelp")}</Text>
+            <Text style={[s.emptyTitle, { color: colors.textPrimary }]}>{t("noCurrentPlan")}</Text>
+            <Text style={[s.muted, { color: colors.textSecondary }]}>{t("createPlanEmptyHelp")}</Text>
             <Pressable
               style={s.create}
               onPress={() => router.push("/create-plan")}

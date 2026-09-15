@@ -9,11 +9,13 @@ import {
   type AppLanguage,
   type AppColorScheme,
 } from "@/store/useAppStore";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function EntryScreen() {
   const db = useSQLiteContext();
   const setLanguage = useAppStore((s) => s.setLanguage);
   const setColorScheme = useAppStore((s) => s.setColorScheme);
+  const { colors } = useTheme();
 
   useEffect(() => {
     let active = true;
@@ -44,5 +46,5 @@ export default function EntryScreen() {
     };
   }, [db, setLanguage, setColorScheme]);
 
-  return <View style={{ flex: 1, backgroundColor: "#F5F7FA" }} />;
+  return <View style={{ flex: 1, backgroundColor: colors.bgRoot }} />;
 }

@@ -8,6 +8,12 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import Svg, {
+  Circle,
+  Defs,
+  LinearGradient,
+  Stop,
+} from "react-native-svg";
 import { useSQLiteContext } from "expo-sqlite";
 import { router } from "expo-router";
 import {
@@ -28,10 +34,12 @@ import type {
   Workout,
 } from "@/types/models";
 import { RunnerIcon } from "@/components/RunnerIcon";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function Dashboard() {
   const db = useSQLiteContext();
   const { t, language } = useI18n();
+  const { colors } = useTheme();
   const refreshKey = useAppStore((s) => s.refreshKey);
   const [plan, setPlan] = useState<TrainingPlan | null>(null);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -124,7 +132,7 @@ export default function Dashboard() {
         <AppHeader title={t("dashboard")} />
         <View style={s.center}>
           <ActivityIndicator size="large" color="#079455" />
-          <Text style={s.muted}>{t("loading")}</Text>
+          <Text style={[s.muted, { color: colors.textSecondary }]}>{t("loading")}</Text>
         </View>
       </GlassBackground>
     );
@@ -133,8 +141,8 @@ export default function Dashboard() {
       <GlassBackground>
         <AppHeader title={t("dashboard")} />
         <View style={s.center}>
-          <Text style={s.error}>{t("couldNotLoad")}</Text>
-          <Text style={s.muted}>{error}</Text>
+          <Text style={[s.error, { color: colors.textPrimary }]}>{t("couldNotLoad")}</Text>
+          <Text style={[s.muted, { color: colors.textSecondary }]}>{error}</Text>
         </View>
       </GlassBackground>
     );
@@ -147,8 +155,8 @@ export default function Dashboard() {
       >
         {!plan ? (
           <GlassCard style={s.empty}>
-            <Text style={s.emptyTitle}>{t("noPlan")}</Text>
-            <Text style={s.muted}>{t("createPlanEmptyHelp")}</Text>
+            <Text style={[s.emptyTitle, { color: colors.textPrimary }]}>{t("noPlan")}</Text>
+            <Text style={[s.muted, { color: colors.textSecondary }]}>{t("createPlanEmptyHelp")}</Text>
             <Pressable
               style={s.primary}
               onPress={() => router.push("/create-plan")}
@@ -161,16 +169,16 @@ export default function Dashboard() {
             <GlassCard style={s.hero}>
               <View style={s.heroHeader}>
                 <View>
-                  <Text style={s.eyebrow}>
+                  <Text style={[s.eyebrow, { color: colors.accent }]}>
                     {language === "vi" ? "TIẾN ĐỘ TUẦN NÀY" : "THIS WEEK"}
                   </Text>
-                  <Text style={s.heroTitle}>
+                  <Text style={[s.heroTitle, { color: colors.textPrimary }]}>
                     {language === "vi"
                       ? "Chạy đều hôm nay"
                       : "Keep moving today"}
                   </Text>
                 </View>
-                <View style={s.bell}>
+                <View style={[s.bell, { backgroundColor: colors.rowIconBg, borderColor: colors.bgCardBorder }]}>
                   <Ionicons
                     name="notifications-outline"
                     size={21}
@@ -180,18 +188,18 @@ export default function Dashboard() {
               </View>
               <View style={s.heroBody}>
                 <ProgressRing percent={weekPct} size={170} stroke={11}>
-                  <Text style={s.ringValue}>
+                  <Text style={[s.ringValue, { color: colors.textPrimary }]}>
                     {totalKm.toFixed(1)}{" "}
-                    <Text style={s.ringSub}>/ {plannedWeekKm.toFixed(1)}</Text>
+                    <Text style={[s.ringSub, { color: colors.textSecondary }]}>/ {plannedWeekKm.toFixed(1)}</Text>
                   </Text>
-                  <Text style={s.ringUnit}>km</Text>
-                  <Text style={s.ringPct}>
+                  <Text style={[s.ringUnit, { color: colors.textSecondary }]}>km</Text>
+                  <Text style={[s.ringPct, { color: colors.textSecondary }]}>
                     {weekPct}% {t("completed").toLowerCase()}
                   </Text>
                 </ProgressRing>
-                <View style={s.motivation}>
+                <View style={[s.motivation, { backgroundColor: colors.rowIconBg }]}>
                   <Ionicons name="leaf-outline" size={23} color="#0C8F58" />
-                  <Text style={s.motivationText}>
+                  <Text style={[s.motivationText, { color: colors.textLabel }]}>
                     {language === "vi"
                       ? "Kiên trì mỗi ngày, bạn mạnh hơn hôm qua."
                       : "Small steps today build a stronger tomorrow."}
@@ -226,12 +234,12 @@ export default function Dashboard() {
 
             <GlassCard style={s.activityCard}>
               <View style={s.sectionHead}>
-                <Text style={s.sectionTitle}>
+                <Text style={[s.sectionTitle, { color: colors.textPrimary }]}>
                   {language === "vi"
                     ? "Hoạt động trong tuần"
                     : "Weekly activity"}
                 </Text>
-                <Text style={s.sectionLink}>
+                <Text style={[s.sectionLink, { color: colors.textSecondary }]}>
                   {language === "vi" ? "Kế hoạch / thực tế" : "Plan / actual"}
                 </Text>
               </View>
@@ -256,10 +264,10 @@ export default function Dashboard() {
                       : pct;
                   return (
                     <View key={d.date} style={s.barCol}>
-                      <Text style={s.barTop}>
+                      <Text style={[s.barTop, { color: colors.textSecondary }]}>
                         {planned > 0 ? planned.toFixed(1) : ""}
                       </Text>
-                      <View style={s.barTrack}>
+                      <View style={[s.barTrack, { backgroundColor: colors.divider }]}>
                         {fillPct > 0 && (
                           <View
                             style={[
@@ -273,7 +281,7 @@ export default function Dashboard() {
                           </View>
                         )}
                       </View>
-                      <Text style={s.day}>
+                      <Text style={[s.day, { color: colors.textSecondary }]}>
                         {language === "vi"
                           ? d.dayLabel
                           : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][
@@ -299,31 +307,31 @@ export default function Dashboard() {
               <View
                 style={[
                   s.nextIcon,
-                  { backgroundColor: "rgba(219,248,232,.8)" },
+                  { backgroundColor: colors.rowIconBg },
                 ]}
               >
                 <RunnerIcon size={26} color="#079455" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={s.nextLabel}>{t("nextRun")}</Text>
-                <Text style={s.nextName}>
+                <Text style={[s.nextLabel, { color: colors.textSecondary }]}>{t("nextRun")}</Text>
+                <Text style={[s.nextName, { color: colors.textPrimary }]}>
                   {next ? next.type.replace("_", " ") : t("noWorkouts")}
                 </Text>
                 {next && (
-                  <Text style={s.nextMeta}>
+                  <Text style={[s.nextMeta, { color: colors.textSecondary }]}>
                     {next.date} · {next.distanceKm} km
                   </Text>
                 )}
               </View>
               <Pressable
-                style={s.roundArrow}
+                style={[s.roundArrow, { backgroundColor: colors.rowIconBg }]}
                 onPress={() => router.push("/(tabs)/plan")}
               >
                 <Ionicons name="chevron-forward" size={18} color="#0B6F48" />
               </Pressable>
             </GlassCard>
 
-            <Text style={s.sectionOutside}>{t("recentPlan")}</Text>
+            <Text style={[s.sectionOutside, { color: colors.textPrimary }]}>{t("recentPlan")}</Text>
             {workouts
               .filter((w) => w.date >= todayIso)
               .slice(0, 4)
@@ -331,14 +339,14 @@ export default function Dashboard() {
                 <WorkoutCard key={w.id} workout={w} />
               ))}
             <GlassCard style={s.currentPlan}>
-              <Text style={s.eyebrow}>{t("currentPlan")}</Text>
-              <Text style={s.planName}>{plan.name}</Text>
-              <Text style={s.planMeta}>
+              <Text style={[s.eyebrow, { color: colors.accent }]}>{t("currentPlan")}</Text>
+              <Text style={[s.planName, { color: colors.textPrimary }]}>{plan.name}</Text>
+              <Text style={[s.planMeta, { color: colors.textSecondary }]}>
                 {t("race")} {plan.raceDate} · {plan.runsPerWeek}{" "}
                 {t("daysPerWeek")}
               </Text>
               <Pressable
-                style={s.glassButton}
+                style={[s.glassButton, { backgroundColor: colors.rowIconBg }]}
                 onPress={() => router.push("/(tabs)/plan")}
               >
                 <Text style={s.glassButtonText}>{t("viewPlan")}</Text>
@@ -362,14 +370,13 @@ function ProgressRing({
   stroke: number;
   children: ReactNode;
 }) {
-  const pct = Math.max(
-      0,
-      Math.min(100, Number.isFinite(percent) ? percent : 0),
-    ),
-    segments = 72,
-    active = Math.round((pct / 100) * segments),
-    len = Math.max(5, stroke * 0.8),
-    radius = (size - stroke) / 2;
+  const { colors, isDark } = useTheme();
+  const pct = Math.max(0, Math.min(100, Number.isFinite(percent) ? percent : 0));
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const progressOffset = circumference * (1 - pct / 100);
+  const trackColor = isDark ? "rgba(138,175,152,0.18)" : "#DCE8E1";
+
   return (
     <View
       style={{
@@ -379,28 +386,47 @@ function ProgressRing({
         justifyContent: "center",
       }}
     >
-      {Array.from({ length: segments }, (_, i) => {
-        const angle = (360 / segments) * i;
-        return (
-          <View
-            key={i}
-            style={{
-              position: "absolute",
-              width: stroke,
-              height: len,
-              borderRadius: stroke / 2,
-              backgroundColor: i < active ? "#12B76A" : "#DCE8E1",
-              left: size / 2 - stroke / 2,
-              top: size / 2 - len / 2,
-              transform: [{ rotate: `${angle}deg` }, { translateY: -radius }],
-            }}
+      <Svg
+        width={size}
+        height={size}
+        style={StyleSheet.absoluteFill}
+        viewBox={`0 0 ${size} ${size}`}
+      >
+        <Defs>
+          <LinearGradient id="progressGradient" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor="#39DB91" />
+            <Stop offset="1" stopColor="#0FBF73" />
+          </LinearGradient>
+        </Defs>
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={trackColor}
+          strokeWidth={stroke}
+        />
+        {pct > 0 && (
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="url(#progressGradient)"
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={`${circumference} ${circumference}`}
+            strokeDashoffset={progressOffset}
+            rotation={-90}
+            origin={`${size / 2}, ${size / 2}`}
           />
-        );
-      })}
+        )}
+      </Svg>
       <View
         style={[
           s.ringCenter,
           {
+            backgroundColor: colors.bgCard,
             width: size - stroke * 3.3,
             height: size - stroke * 3.3,
             borderRadius: (size - stroke * 3.3) / 2,
@@ -425,21 +451,23 @@ function StatusTile({
   color: string;
   bg: string;
 }) {
+  const { colors, isDark } = useTheme();
   return (
-    <GlassCard style={[s.statusTile, { backgroundColor: bg }]}>
+    <GlassCard style={[s.statusTile, { backgroundColor: isDark ? colors.bgCard : bg }]}>
       <View style={[s.statusIcon, { backgroundColor: color }]}>
         <Ionicons name={icon} size={15} color="#fff" />
       </View>
       <Text style={[s.statusValue, { color }]}>{value}</Text>
-      <Text style={s.statusLabel}>{label}</Text>
+      <Text style={[s.statusLabel, { color: colors.textSecondary }]}>{label}</Text>
     </GlassCard>
   );
 }
 function Legend({ c, text }: { c: string; text: string }) {
+  const { colors } = useTheme();
   return (
     <View style={s.legendItem}>
       <View style={[s.legendDot, { backgroundColor: c }]} />
-      <Text style={s.legendText}>{text}</Text>
+      <Text style={[s.legendText, { color: colors.textSecondary }]}>{text}</Text>
     </View>
   );
 }

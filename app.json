@@ -8,10 +8,10 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.nieu.runplan"
+      "bundleIdentifier": "com.vovannieu.runplan"
     },
     "android": {
-      "package": "com.nieu.runplan"
+      "package": "com.vovannieu.runplan"
     },
     "plugins": [
       "expo-router",
