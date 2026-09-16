@@ -36,6 +36,7 @@ export async function migrateDb(db: SQLiteDatabase) {
       target_pace_min_sec INTEGER,
       target_pace_max_sec INTEGER,
       description TEXT,
+      is_extra INTEGER NOT NULL DEFAULT 0,
       status TEXT NOT NULL DEFAULT 'PLANNED',
       completed_at TEXT,
       FOREIGN KEY(plan_id) REFERENCES training_plans(id) ON DELETE CASCADE
@@ -72,6 +73,7 @@ export async function migrateDb(db: SQLiteDatabase) {
   await addColumnIfMissing(db, 'training_plans', 'long_run_day', 'INTEGER NOT NULL DEFAULT 6');
   await addColumnIfMissing(db, 'training_plans', 'reminder_hour', 'INTEGER NOT NULL DEFAULT 18');
   await addColumnIfMissing(db, 'training_plans', 'reminder_minute', 'INTEGER NOT NULL DEFAULT 0');
+  await addColumnIfMissing(db, 'workouts', 'is_extra', 'INTEGER NOT NULL DEFAULT 0');
   await addColumnIfMissing(db, 'activities', 'name', 'TEXT');
   await addColumnIfMissing(db, 'activities', 'sport_type', 'TEXT');
   await addColumnIfMissing(db, 'activities', 'max_heart_rate', 'INTEGER');

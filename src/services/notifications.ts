@@ -33,7 +33,7 @@ export async function schedulePlanReminders(plan: TrainingPlan, workouts: Workou
   await Notifications.cancelAllScheduledNotificationsAsync();
   let count = 0;
   for (const workout of workouts) {
-    if (workout.status !== 'PLANNED') continue;
+    if (workout.isExtra || workout.status !== 'PLANNED') continue;
     const [y,m,d] = workout.date.split('-').map(Number);
     const reminder = new Date(y, m - 1, d, plan.reminderHour, plan.reminderMinute, 0, 0);
     if (reminder.getTime() <= Date.now()) continue;

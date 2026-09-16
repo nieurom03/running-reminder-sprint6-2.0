@@ -15,6 +15,7 @@ const mapWorkout = (r: any): Workout => ({
   id: r.id, planId: r.plan_id, date: r.date, type: r.type,
   distanceKm: safePositive(r.distance_km), targetPaceMinSec: r.target_pace_min_sec == null ? null : safePositive(r.target_pace_min_sec),
   targetPaceMaxSec: r.target_pace_max_sec == null ? null : safePositive(r.target_pace_max_sec), description: r.description,
+  isExtra: Boolean(r.is_extra),
   status: r.status, completedAt: r.completed_at
 });
 
@@ -69,6 +70,38 @@ export async function createGeneratedPlan(db: SQLiteDatabase, input: PlanInput) 
   return createdId;
 }
 
+export async function createExtraWorkout(
+  db: SQLiteDatabase,
+  input: { planId: number; date: string } & import('@/types/models').WorkoutEditInput,
+) {
+  let createdId: number | null = null;
+  await db.withTransactionAsync(async () => {
+    const existing = await db.getFirstAsync<{ id: number }>(
+      `SELECT id FROM workouts
+       WHERE plan_id = ? AND date = ? AND type <> 'REST'
+       LIMIT 1`,
+      input.planId,
+      input.date,
+    );
+    if (existing) return;
+
+    const created = await db.runAsync(
+      `INSERT INTO workouts(
+        plan_id,date,type,distance_km,target_pace_min_sec,target_pace_max_sec,description,is_extra
+       ) VALUES (?,?,?,?,?,?,?,1)`,
+      input.planId,
+      input.date,
+      input.type,
+      input.distanceKm,
+      input.targetPaceMinSec,
+      input.targetPaceMaxSec,
+      input.description,
+    );
+    createdId = Number(created.lastInsertRowId);
+  });
+  return createdId;
+}
+
 export async function deleteActivePlan(db: SQLiteDatabase) {
   const plan = await getActivePlan(db);
   if (plan) await db.runAsync('DELETE FROM training_plans WHERE id = ?', plan.id);
@@ -80,8 +113,8 @@ export async function getTrainingStats(db: SQLiteDatabase): Promise<TrainingStat
   const r:any = await db.getFirstAsync(`SELECT COUNT(*) total,
     SUM(CASE WHEN status='COMPLETED' THEN 1 ELSE 0 END) completed,
     COALESCE(SUM(distance_km),0) planned_km,
-    COALESCE((SELECT SUM(a.distance_km) FROM activities a JOIN workouts w2 ON w2.id=a.workout_id WHERE w2.plan_id=?),0) completed_km
-    FROM workouts WHERE plan_id=?`, plan.id, plan.id);
+    COALESCE((SELECT SUM(a.distance_km) FROM activities a JOIN workouts w2 ON w2.id=a.workout_id WHERE w2.plan_id=? AND w2.is_extra=0),0) completed_km
+    FROM workouts WHERE plan_id=? AND is_extra=0`, plan.id, plan.id);
   const total = Number(r?.total ?? 0); const completed = Number(r?.completed ?? 0);
   return { totalWorkouts:total, completedWorkouts:completed, completionPct:total ? Math.round(completed/total*100) : 0,
     plannedKm:Number(r?.planned_km ?? 0), completedKm:Number(r?.completed_km ?? 0) };
@@ -104,7 +137,7 @@ export async function deleteSetting(db: SQLiteDatabase, key: string) {
   await db.runAsync('DELETE FROM app_settings WHERE key = ?', key);
 }
 
-export async function getWeeklyRunningSummary(db: SQLiteDatabase, anchor = new Date()): Promise<import('@/types/models').WeeklyRunningSummary> {
+export async function getWeeklyRunningSummary(db: SQLiteDatabase, planId: number, anchor = new Date()): Promise<import('@/types/models').WeeklyRunningSummary> {
   const local = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate());
   const day = local.getDay();
   const mondayOffset = day === 0 ? -6 : 1 - day;
@@ -117,12 +150,14 @@ export async function getWeeklyRunningSummary(db: SQLiteDatabase, anchor = new D
   const startDate = iso(start);
   const endDate = iso(end);
   const rows = await db.getAllAsync<{ date: string; km: number }>(
-    `SELECT substr(start_time,1,10) date, COALESCE(SUM(distance_km),0) km
-     FROM activities
-     WHERE substr(start_time,1,10) BETWEEN ? AND ?
-       AND (sport_type IS NULL OR sport_type IN ('Run','TrailRun','VirtualRun'))
-     GROUP BY substr(start_time,1,10)`,
-    startDate, endDate
+    `SELECT substr(a.start_time,1,10) date, COALESCE(SUM(a.distance_km),0) km
+     FROM activities a
+     INNER JOIN workouts w ON w.id = a.workout_id
+     WHERE w.plan_id = ?
+       AND substr(a.start_time,1,10) BETWEEN ? AND ?
+       AND (a.sport_type IS NULL OR a.sport_type IN ('Run','TrailRun','VirtualRun'))
+     GROUP BY substr(a.start_time,1,10)`,
+    planId, startDate, endDate
   );
   const byDate = new Map(rows.map(r => [r.date, safePositive(r.km)]));
   const labels = ['T2','T3','T4','T5','T6','T7','CN'];
@@ -217,7 +252,7 @@ export async function markPastPlannedWorkoutsMissed(db: SQLiteDatabase) {
   await db.runAsync(
     `UPDATE workouts
      SET status='MISSED', completed_at=NULL
-     WHERE status='PLANNED' AND type <> 'REST' AND date < ?`,
+     WHERE status='PLANNED' AND is_extra=0 AND type <> 'REST' AND date < ?`,
     today
   );
 }

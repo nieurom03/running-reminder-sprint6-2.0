@@ -194,6 +194,20 @@ const vi = {
   completeAndSave: "HOÀN THÀNH & LƯU",
   deleteManualResult: "Xóa kết quả thủ công",
   notesPlaceholder: "Cảm giác chân, thời tiết, dinh dưỡng...",
+  noWorkoutToday: "Hôm nay chưa có lịch chạy",
+  extraWorkoutHelp: "Thêm một buổi phát sinh mà không thay đổi giáo án.",
+  addTodayWorkout: "THÊM BUỔI CHẠY",
+  extraWorkoutToday: "BUỔI CHẠY THÊM HÔM NAY",
+  extraWorkout: "Phát sinh",
+  createExtraWorkoutTitle: "Thêm buổi chạy hôm nay",
+  createExtraWorkoutSub:
+    "Buổi chạy này không thay đổi giáo án, nhưng kết quả sẽ được cộng vào tổng tuần hiện tại.",
+  saveAndEnterResult: "TẠO & NHẬP KẾT QUẢ",
+  workoutAlreadyScheduled: "Hôm nay đã có lịch chạy",
+  workoutAlreadyScheduledHelp:
+    "Bạn chỉ có thể thêm buổi chạy phát sinh khi hôm nay chưa có lịch.",
+  extraWorkoutChartNote:
+    "* Có buổi chạy phát sinh; không cộng vào tổng km kế hoạch.",
 };
 
 const en: typeof vi = {
@@ -388,6 +402,20 @@ const en: typeof vi = {
   completeAndSave: "COMPLETE & SAVE",
   deleteManualResult: "Delete manual result",
   notesPlaceholder: "Legs, weather, nutrition...",
+  noWorkoutToday: "No workout scheduled today",
+  extraWorkoutHelp: "Add an extra run without changing your training plan.",
+  addTodayWorkout: "ADD WORKOUT",
+  extraWorkoutToday: "TODAY'S EXTRA WORKOUT",
+  extraWorkout: "Extra",
+  createExtraWorkoutTitle: "Add today's workout",
+  createExtraWorkoutSub:
+    "This workout will not change your plan, but its result will count toward this week's total.",
+  saveAndEnterResult: "CREATE & ENTER RESULT",
+  workoutAlreadyScheduled: "A workout is already scheduled today",
+  workoutAlreadyScheduledHelp:
+    "You can only add an extra workout when today has no scheduled run.",
+  extraWorkoutChartNote:
+    "* Includes an extra workout; not added to total planned distance.",
 };
 
 export type TranslationKey = keyof typeof vi;

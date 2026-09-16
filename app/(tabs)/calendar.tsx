@@ -127,12 +127,16 @@ export default function CalendarScreen() {
           <View style={s.grid}>
             {cells.map((d, i) => {
               const ws = d ? (byDay.get(d) ?? []) : [];
+              const primaryWorkout =
+                ws.find((workout) => workout.type !== "REST") ?? ws[0];
               return (
                 <Pressable
                   key={i}
                   style={[s.cell, ws.length > 0 && [s.activeCell, { backgroundColor: colors.rowIconBg, borderColor: colors.bgCardBorder }]]}
                   disabled={!ws.length}
-                  onPress={() => ws[0] && router.push(`/workout/${ws[0].id}`)}
+                  onPress={() =>
+                    primaryWorkout && router.push(`/workout/${primaryWorkout.id}`)
+                  }
                 >
                   {d && (
                     <>
@@ -149,9 +153,9 @@ export default function CalendarScreen() {
                           );
                         })}
                       </View>
-                      {ws[0] && (
+                      {primaryWorkout && (
                         <Text numberOfLines={1} style={[s.km, { color: colors.textSecondary }]}>
-                          {ws[0].distanceKm} km
+                          {primaryWorkout.distanceKm} km
                         </Text>
                       )}
                     </>

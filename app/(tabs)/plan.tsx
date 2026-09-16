@@ -38,9 +38,10 @@ export default function PlanScreen() {
       setRows(await getWorkouts(db, p?.id));
     })();
   }, [db, key]);
+  const planRows = useMemo(() => rows.filter((w) => !w.isExtra), [rows]);
   const grouped = useMemo(
     () =>
-      rows.reduce<Record<string, Workout[]>>((acc, w) => {
+      planRows.reduce<Record<string, Workout[]>>((acc, w) => {
         const dt = new Date(`${w.date}T12:00:00`);
         const monday = new Date(dt);
         monday.setDate(dt.getDate() - ((dt.getDay() + 6) % 7));
@@ -48,16 +49,16 @@ export default function PlanScreen() {
         (acc[k] ??= []).push(w);
         return acc;
       }, {}),
-    [rows],
+    [planRows],
   );
-  const upcoming = rows
+  const upcoming = planRows
     .filter((w) => w.date >= new Date().toISOString().slice(0, 10))
     .slice(0, 4);
-  const done = rows.filter((w) => w.status === "COMPLETED").length;
-  const progress = rows.length ? Math.round((done / rows.length) * 100) : 0;
+  const done = planRows.filter((w) => w.status === "COMPLETED").length;
+  const progress = planRows.length ? Math.round((done / planRows.length) * 100) : 0;
   const reschedule = async () => {
     if (!plan) return;
-    const n = await schedulePlanReminders(plan, rows);
+    const n = await schedulePlanReminders(plan, planRows);
     Alert.alert(t("remindersRescheduled"), `${n}`);
   };
   const remove = () =>

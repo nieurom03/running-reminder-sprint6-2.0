@@ -56,10 +56,14 @@ Tính năng hiện có:
 SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activities`, `app_settings`.
 
 - Active plan là plan có `id` lớn nhất; dự án chưa có cờ active riêng.
+- `workouts.is_extra=1` đánh dấu buổi chạy phát sinh do người dùng thêm cho ngày hiện tại. Workout này không tham gia cấu trúc, progress, trạng thái tổng hoặc reminder của giáo án.
 - Xóa plan cascade xóa workouts; xóa workout làm activity liên kết bị xóa theo schema hiện tại.
 - Một kết quả manual được upsert theo `workout_id` + source `MANUAL`, đồng thời đặt workout thành `COMPLETED`.
 - Xóa kết quả manual đưa workout về `PLANNED`.
 - Weekly summary chạy từ thứ Hai đến Chủ nhật và cộng activity loại Run/TrailRun/VirtualRun hoặc chưa có `sport_type`.
+- Weekly summary trên Dashboard được lọc theo active plan; activity của plan đã xóa được giữ làm lịch sử nhưng không được cộng vào vòng tiến độ của plan mới.
+- Activity của workout phát sinh vẫn được cộng vào weekly summary của active plan; km kế hoạch và biểu đồ kế hoạch chỉ lấy workout có `is_extra=0`.
+- Trong Weekly Activity, cự ly workout phát sinh được cộng vào mốc hiển thị của đúng ngày và có dấu `*`; dấu này không làm thay đổi tổng km kế hoạch hoặc progress giáo án.
 - `training_plans.long_run_day` lưu ngày Long Run do người dùng chọn. Generator dùng ngày này; nếu dữ liệu cũ không hợp lệ thì mới fallback sang thứ Bảy hoặc ngày chạy cuối tuần.
 - Generator có quality workout xen kẽ tempo/interval, recovery, cutback mỗi tuần thứ tư, taper hai tuần cuối, rồi thêm Race Day.
 - `goalTimeMinutes` được khai báo là số phút nhưng UI có thể truyền số lẻ từ giây (`goalSec / 60`). Cần giữ độ chính xác khi chỉnh luồng này.

@@ -27,6 +27,7 @@ export interface Workout {
   targetPaceMinSec: number | null;
   targetPaceMaxSec: number | null;
   description: string | null;
+  isExtra: boolean;
   status: WorkoutStatus;
   completedAt: string | null;
 }

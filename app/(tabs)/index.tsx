@@ -57,7 +57,7 @@ export default function Dashboard() {
         if (!active) return;
         const ws = await getWorkouts(db, p?.id);
         if (!active) return;
-        const wk = await getWeeklyRunningSummary(db);
+        const wk = p ? await getWeeklyRunningSummary(db, p.id) : null;
         if (!active) return;
         setPlan(p);
         setWorkouts(ws);
@@ -72,19 +72,27 @@ export default function Dashboard() {
       active = false;
     };
   }, [db, refreshKey]);
-  const completed = workouts.filter((w) => w.status === "COMPLETED").length,
-    skipped = workouts.filter((w) => w.status === "SKIPPED").length,
-    missed = workouts.filter((w) => w.status === "MISSED").length;
-  const todayIso = new Date().toISOString().slice(0, 10);
+  const planWorkouts = useMemo(
+    () => workouts.filter((w) => !w.isExtra),
+    [workouts],
+  );
+  const completed = planWorkouts.filter((w) => w.status === "COMPLETED").length,
+    skipped = planWorkouts.filter((w) => w.status === "SKIPPED").length,
+    missed = planWorkouts.filter((w) => w.status === "MISSED").length;
+  const now = new Date();
+  const todayIso = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const todayRun = workouts.find(
+    (w) => w.date === todayIso && w.type !== "REST",
+  );
   const next =
-    workouts.find((w) => w.date >= todayIso && w.status === "PLANNED") ??
-    workouts.find((w) => w.status === "PLANNED");
+    planWorkouts.find((w) => w.date >= todayIso && w.status === "PLANNED") ??
+    planWorkouts.find((w) => w.status === "PLANNED");
   const totalKm = safePositive(week?.totalKm);
   const plannedWeekKm = useMemo(
     () =>
       week
         ? safePositive(
-            workouts
+            planWorkouts
               .filter(
                 (w) =>
                   w.date >= week.startDate &&
@@ -94,7 +102,7 @@ export default function Dashboard() {
               .reduce((sum, w) => sum + safePositive(w.distanceKm), 0),
           )
         : 0,
-    [week, workouts],
+    [week, planWorkouts],
   );
   const weekPct = Math.min(
     100,
@@ -103,7 +111,7 @@ export default function Dashboard() {
   const dailyPlan = useMemo(() => {
     const out: Record<string, number> = {};
     if (!week) return out;
-    for (const w of workouts) {
+    for (const w of planWorkouts) {
       if (w.date < week.startDate || w.date > week.endDate || w.type === "REST")
         continue;
       out[w.date] = safePositive(
@@ -111,7 +119,25 @@ export default function Dashboard() {
       );
     }
     return out;
+  }, [week, planWorkouts]);
+  const dailyExtra = useMemo(() => {
+    const out: Record<string, number> = {};
+    if (!week) return out;
+    for (const w of workouts) {
+      if (
+        !w.isExtra ||
+        w.date < week.startDate ||
+        w.date > week.endDate ||
+        w.type === "REST"
+      )
+        continue;
+      out[w.date] = safePositive(
+        (out[w.date] ?? 0) + safePositive(w.distanceKm),
+      );
+    }
+    return out;
   }, [week, workouts]);
+  const hasWeeklyExtra = Object.values(dailyExtra).some((km) => km > 0);
   const dailyStatus = useMemo(() => {
     const out: Record<string, Workout["status"]> = {};
     if (!week) return out;
@@ -208,6 +234,36 @@ export default function Dashboard() {
               </View>
             </GlassCard>
 
+            {!todayRun ? (
+              <GlassCard style={s.todayCard}>
+                <View style={[s.todayIcon, { backgroundColor: colors.rowIconBg }]}>
+                  <Ionicons name="add" size={23} color={colors.accent} />
+                </View>
+                <View style={s.todayCopy}>
+                  <Text style={[s.todayTitle, { color: colors.textPrimary }]}>
+                    {t("noWorkoutToday")}
+                  </Text>
+                  <Text style={[s.todayHelp, { color: colors.textSecondary }]}>
+                    {t("extraWorkoutHelp")}
+                  </Text>
+                </View>
+                <Pressable
+                  style={[s.todayButton, { backgroundColor: colors.accent }]}
+                  onPress={() => router.push("/workout/create")}
+                >
+                  <Ionicons name="add" size={18} color="#fff" />
+                  <Text style={s.todayButtonText}>{t("addTodayWorkout")}</Text>
+                </Pressable>
+              </GlassCard>
+            ) : todayRun.isExtra ? (
+              <View style={s.todayExtra}>
+                <Text style={[s.sectionOutside, { color: colors.textPrimary }]}>
+                  {t("extraWorkoutToday")}
+                </Text>
+                <WorkoutCard workout={todayRun} />
+              </View>
+            ) : null}
+
             <View style={s.statsRow}>
               <StatusTile
                 value={completed}
@@ -247,10 +303,12 @@ export default function Dashboard() {
                 {(week?.days ?? []).map((d, index) => {
                   const actual = safePositive(d.distanceKm),
                     planned = safePositive(dailyPlan[d.date]),
+                    extra = safePositive(dailyExtra[d.date]),
+                    chartTarget = safePositive(planned + extra),
                     status = dailyStatus[d.date] ?? "PLANNED";
                   const pct =
-                    planned > 0
-                      ? Math.min(100, safePercent(actual, planned))
+                    chartTarget > 0
+                      ? Math.min(100, safePercent(actual, chartTarget))
                       : 0;
                   const fill =
                     status === "SKIPPED"
@@ -259,15 +317,30 @@ export default function Dashboard() {
                         ? "#F04438"
                         : "#12B76A";
                   const fillPct =
-                    (status === "SKIPPED" || status === "MISSED") && planned > 0
+                    (status === "SKIPPED" || status === "MISSED") && chartTarget > 0
                       ? 100
                       : pct;
                   return (
                     <View key={d.date} style={s.barCol}>
-                      <Text style={[s.barTop, { color: colors.textSecondary }]}>
-                        {planned > 0 ? planned.toFixed(1) : ""}
+                      <Text
+                        style={[
+                          s.barTop,
+                          { color: extra > 0 ? colors.accent : colors.textSecondary },
+                        ]}
+                      >
+                        {chartTarget > 0
+                          ? `${chartTarget.toFixed(1)}${extra > 0 ? "*" : ""}`
+                          : ""}
                       </Text>
-                      <View style={[s.barTrack, { backgroundColor: colors.divider }]}>
+                      <View
+                        style={[
+                          s.barTrack,
+                          {
+                            backgroundColor:
+                              extra > 0 ? colors.accent : colors.divider,
+                          },
+                        ]}
+                      >
                         {fillPct > 0 && (
                           <View
                             style={[
@@ -301,6 +374,11 @@ export default function Dashboard() {
                 <Legend c="#F79009" text={t("skipped")} />
                 <Legend c="#F04438" text={t("missed")} />
               </View>
+              {hasWeeklyExtra && (
+                <Text style={[s.extraNote, { color: colors.textSecondary }]}>
+                  {t("extraWorkoutChartNote")}
+                </Text>
+              )}
             </GlassCard>
 
             <GlassCard style={s.nextCard}>
@@ -332,7 +410,7 @@ export default function Dashboard() {
             </GlassCard>
 
             <Text style={[s.sectionOutside, { color: colors.textPrimary }]}>{t("recentPlan")}</Text>
-            {workouts
+            {planWorkouts
               .filter((w) => w.date >= todayIso)
               .slice(0, 4)
               .map((w) => (
@@ -492,6 +570,35 @@ const s = StyleSheet.create({
   },
   primaryText: { color: "#fff", fontWeight: "900" },
   hero: { padding: 18, marginTop: 6 },
+  todayCard: {
+    padding: 15,
+    marginTop: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 11,
+    flexWrap: "wrap",
+  },
+  todayIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  todayCopy: { flex: 1, minWidth: 150 },
+  todayTitle: { fontSize: 15, fontWeight: "900" },
+  todayHelp: { fontSize: 11, lineHeight: 16, marginTop: 3 },
+  todayButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  todayButtonText: { color: "#fff", fontWeight: "900", fontSize: 10 },
+  todayExtra: { marginTop: 2 },
   heroHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -621,6 +728,7 @@ const s = StyleSheet.create({
   legendItem: { flexDirection: "row", alignItems: "center", gap: 5 },
   legendDot: { width: 8, height: 8, borderRadius: 4 },
   legendText: { fontSize: 10, color: "#667D72" },
+  extraNote: { fontSize: 10, lineHeight: 15, textAlign: "center", marginTop: 8 },
   nextCard: {
     padding: 15,
     marginTop: 12,
