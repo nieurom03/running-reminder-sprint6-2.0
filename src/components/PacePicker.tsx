@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useI18n } from '@/i18n';
 import { useTheme } from '@/context/ThemeContext';
+import { LiquidGlassModal } from '@/components/LiquidGlassModal';
 
 export const paceSecToText=(v:number|null|undefined)=>v==null?'--:--':`${Math.floor(v/60)}:${String(Math.floor(v%60)).padStart(2,'0')}`;
 
@@ -18,9 +19,11 @@ export function PacePicker({value,onChange,minMinute=3,maxMinute=15,compact=fals
       <Text style={[s.value,{color:colors.textPrimary},compact&&s.valueCompact]}>{paceSecToText(value)} <Text style={[s.per,{color:colors.textSecondary},compact&&s.perCompact]}>/ km</Text></Text>
       {!compact&&<Text style={[s.help,{color:colors.textSecondary}]}>{t('currentPaceHelp')}</Text>}
     </View>
-    <View style={[s.iconCircle,compact&&s.iconCompact]}><Ionicons name="speedometer-outline" size={compact?17:20} color="#155EEF" /></View>
+    <View style={[s.iconCircle,{backgroundColor:colors.rowIconBg},compact&&s.iconCompact]}><Ionicons name="speedometer-outline" size={compact?17:20} color="#155EEF" /></View>
   </Pressable>
-  <Modal visible={open} transparent animationType="fade" onRequestClose={()=>setOpen(false)}><View style={s.overlay}><View style={[s.modal,{backgroundColor:colors.bgRoot,borderWidth:1,borderColor:colors.bgCardBorder}]}><View style={s.modalHeader}><Text style={[s.title,{color:colors.textPrimary}]}>{t('choosePace')}</Text><View style={[s.modalIcon,{backgroundColor:colors.rowIconBg}]}><Ionicons name="speedometer-outline" size={18} color="#155EEF"/></View></View><View style={s.pickers}><Wheel values={minutes} value={m} onChange={setM} suffix="m"/><Text style={[s.colon,{color:colors.textPrimary}]}>:</Text><Wheel values={seconds} value={sec} onChange={setSec} suffix="s"/></View><Text style={[s.preview,{color:colors.textPrimary}]}>{m}:{String(sec).padStart(2,'0')} /km</Text><View style={s.actions}><Pressable style={[s.cancel,{borderColor:colors.bgCardBorder}]} onPress={()=>setOpen(false)}><Text style={[s.cancelText,{color:colors.textPrimary}]}>{t('cancel')}</Text></Pressable><Pressable style={[s.done,{backgroundColor:colors.accent}]} onPress={choose}><Text style={s.doneText}>{t('done')}</Text></Pressable></View></View></View></Modal>
+  <LiquidGlassModal visible={open} onRequestClose={()=>setOpen(false)}>
+    <View style={s.modalHeader}><Text style={[s.title,{color:colors.textPrimary}]}>{t('choosePace')}</Text><View style={[s.modalIcon,{backgroundColor:colors.rowIconBg}]}><Ionicons name="speedometer-outline" size={18} color="#155EEF"/></View></View><View style={s.pickers}><Wheel values={minutes} value={m} onChange={setM} suffix="m"/><Text style={[s.colon,{color:colors.textPrimary}]}>:</Text><Wheel values={seconds} value={sec} onChange={setSec} suffix="s"/></View><Text style={[s.preview,{color:colors.textPrimary}]}>{m}:{String(sec).padStart(2,'0')} /km</Text><View style={s.actions}><Pressable style={[s.cancel,{borderColor:colors.modalBorder,backgroundColor:colors.rowIconBg}]} onPress={()=>setOpen(false)}><Text style={[s.cancelText,{color:colors.textPrimary}]}>{t('cancel')}</Text></Pressable><Pressable style={[s.done,{backgroundColor:colors.accent}]} onPress={choose}><Text style={s.doneText}>{t('done')}</Text></Pressable></View>
+  </LiquidGlassModal>
  </>;
 }
 function Wheel({values,value,onChange,suffix}:{values:number[];value:number;onChange:(n:number)=>void;suffix:string}){const {colors}=useTheme();return <ScrollView style={s.wheel} contentContainerStyle={s.wheelContent} showsVerticalScrollIndicator={false}>{values.map(v=><Pressable key={v} onPress={()=>onChange(v)} style={[s.option,v===value&&[s.optionOn,{backgroundColor:colors.rowIconBg}]]}><Text style={[s.optionText,{color:colors.textSecondary},v===value&&[s.optionTextOn,{color:colors.accent}]]}>{String(v).padStart(2,'0')}{suffix}</Text></Pressable>)}</ScrollView>}

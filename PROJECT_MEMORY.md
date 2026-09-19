@@ -1,6 +1,6 @@
 # Running Reminder — Project Memory
 
-> Cập nhật lần cuối: 2026-09-13. Đây là ghi nhớ làm việc lâu dài cho các phiên Codex sau. Hãy đọc file này trước khi sửa dự án, rồi kiểm tra lại mã nguồn liên quan vì code có thể đã thay đổi.
+> Cập nhật lần cuối: 2026-09-19. Đây là ghi nhớ làm việc lâu dài cho các phiên Codex sau. Hãy đọc file này trước khi sửa dự án, rồi kiểm tra lại mã nguồn liên quan vì code có thể đã thay đổi.
 
 ## 1. Mục tiêu sản phẩm
 
@@ -49,7 +49,10 @@ Tính năng hiện có:
 - `src/types/models.ts`: domain types.
 - `src/i18n/index.ts`: dictionary VI/EN và `useI18n`.
 - `src/context/ThemeContext.tsx`, `src/constants/theme.ts`: theme runtime.
-- `src/components/Glass.tsx`, `WorkoutCard.tsx`, các picker: visual system và reusable UI.
+- `src/components/Glass.tsx`, `WorkoutCard.tsx`: visual system và reusable card UI.
+- `src/components/LiquidGlassModal.tsx`: khung popup kính mờ dùng chung và popup chọn một giá trị.
+- `src/components/GlassAlert.tsx`: provider cảnh báo/xác nhận toàn app; thay cho `Alert.alert` để luôn bám theme trong app.
+- `DateField.tsx`, `PacePicker.tsx`, `GoalTimePicker.tsx`, `DurationPicker.tsx`: các picker dùng chung `LiquidGlassModal`.
 
 ## 4. Dữ liệu và quy tắc nghiệp vụ
 
@@ -76,18 +79,22 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - Giữ migration cộng dồn bằng `addColumnIfMissing`; không xóa dữ liệu người dùng khi nâng schema.
 - UI đổi dữ liệu phải gọi `useAppStore(...refresh)` để các màn hình dựa vào `refreshKey` tải lại.
 - Text mới phải có cả VI và EN. Hiện vẫn còn một số text inline theo `language`; ưu tiên đưa về dictionary khi chỉnh khu vực đó.
+- Popup chọn dữ liệu, cảnh báo và xác nhận trong app phải dùng `LiquidGlassModal`, `GlassOptionModal` hoặc `useGlassAlert`; không quay lại `Alert.alert`/`ActionSheetIOS`, vì chúng có thể không khớp Light/Dark do người dùng chọn trong app.
+- `GlassAlertProvider` phải nằm bên trong `ThemeProvider` ở `app/_layout.tsx`. Các luồng thật sự thuộc hệ thống như share sheet iOS vẫn để native.
 - Date-only dùng dạng ISO `YYYY-MM-DD`; code thường tạo local date lúc 12:00 để tránh lệch ngày do timezone.
 - `SafeAreaView` thuộc app phải import từ `react-native-safe-area-context`.
 - Giữ phong cách giao diện hiện tại: nền mint, glass card, tab bar capsule tối, màu trạng thái xanh/cam/đỏ.
 - Không thay bundle identifier nếu chưa được yêu cầu vì liên quan signing/provisioning.
 - Thay native dependency, icon hoặc splash có thể cần `expo prebuild --clean -p ios` và rebuild iOS.
 
-## 6. Tình trạng kiểm tra ngày 2026-09-13
+## 6. Tình trạng kiểm tra ngày 2026-09-19
 
 - Không tìm thấy `AGENTS.md` trong workspace.
-- Workspace hiện không được Git nhận diện là repository, nên không có `git status`/history để dựa vào.
-- `npm run typecheck` chạy thành công. `tsconfig.json` tạm dùng `ignoreDeprecations: "6.0"` cho alias dựa trên `baseUrl`; cần migrate cấu hình trước TypeScript 7.
-- Có lệch version: `package.json`, `app.json` và README Sprint 6 ghi `0.6.0`, trong khi Settings hiển thị hard-code `0.6.2`. Khi release nên gom version về một nguồn duy nhất.
+- Workspace hiện là Git repository; luôn giữ nguyên các thay đổi chưa commit không thuộc tác vụ hiện tại.
+- Settings đọc version từ `app.json`, không hard-code. Hiện `package.json` là `0.6.0` còn `app.json` là `0.6.2`; khi release nên gom version về một nguồn duy nhất.
+- Popup Language/Appearance, date/pace/goal-time/duration và toàn bộ cảnh báo/xác nhận trong app đã dùng chung Liquid Glass, theo đúng Light/Dark do người dùng chọn.
+- `npm run typecheck`, export bundle iOS và Android chạy thành công sau thay đổi popup. Đã kiểm tra trực quan Light/Dark trên Simulator iPhone 17 Pro Max, iOS 26.3.
+- `tsconfig.json` tạm dùng `ignoreDeprecations: "6.0"` cho alias dựa trên `baseUrl`; cần migrate cấu hình trước TypeScript 7.
 - README chính có tiêu đề Sprint 5.1 nhưng chứa changelog đến 5.9; `README_SPRINT_6.md` mô tả UI 6.0.
 
 ## 7. Checklist trước khi bàn giao thay đổi

@@ -5,6 +5,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { migrateDb } from "@/db/database";
 import { markPastPlannedWorkoutsMissed } from "@/db/repository";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
+import { GlassAlertProvider } from "@/components/GlassAlert";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions({ duration: 350, fade: true });
@@ -42,7 +43,9 @@ export default function RootLayout() {
   return (
     <SQLiteProvider databaseName="runplan.db" onInit={initializeDatabase}>
       <ThemeProvider>
-        <AppStack />
+        <GlassAlertProvider>
+          <AppStack />
+        </GlassAlertProvider>
       </ThemeProvider>
     </SQLiteProvider>
   );

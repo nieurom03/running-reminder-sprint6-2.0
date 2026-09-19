@@ -9,10 +9,10 @@ import { useTheme } from '@/context/ThemeContext';
 const labels: Record<string,string> = { EASY:'Easy', TEMPO:'Tempo', INTERVAL:'Interval', LONG_RUN:'Long Run', RECOVERY:'Recovery', REST:'Rest' };
 export const pace = (sec: number | null) => sec == null ? '-' : `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
 export const statusTheme: Record<WorkoutStatus, { bg:string; border:string; text:string; badge:string; label:string; icon:string }> = {
-  PLANNED:{bg:'rgba(255,255,255,.62)',border:'rgba(255,255,255,.95)',text:'#263A31',badge:'#EFF5F1',label:'Planned',icon:'○'},
-  COMPLETED:{bg:'rgba(232,251,240,.78)',border:'rgba(90,204,139,.45)',text:'#067647',badge:'#CFF6DF',label:'Completed',icon:'✓'},
-  SKIPPED:{bg:'rgba(255,247,226,.84)',border:'rgba(247,144,9,.34)',text:'#B54708',badge:'#FFF0C2',label:'Skipped',icon:'↷'},
-  MISSED:{bg:'rgba(255,238,236,.84)',border:'rgba(240,68,56,.30)',text:'#B42318',badge:'#FFDAD6',label:'Missed',icon:'!'},
+  PLANNED:{bg:'rgba(255,255,255,.38)',border:'rgba(255,255,255,.62)',text:'#263A31',badge:'rgba(239,245,241,.48)',label:'Planned',icon:'○'},
+  COMPLETED:{bg:'rgba(232,251,240,.40)',border:'rgba(90,204,139,.34)',text:'#067647',badge:'rgba(207,246,223,.48)',label:'Completed',icon:'✓'},
+  SKIPPED:{bg:'rgba(255,247,226,.42)',border:'rgba(247,144,9,.28)',text:'#B54708',badge:'rgba(255,240,194,.50)',label:'Skipped',icon:'↷'},
+  MISSED:{bg:'rgba(255,238,236,.42)',border:'rgba(240,68,56,.26)',text:'#B42318',badge:'rgba(255,218,214,.50)',label:'Missed',icon:'!'},
 };
 function isRunType(type:string){ return type==='LONG_RUN'||type==='EASY'||type==='RECOVERY'; }
 function iconFor(type:string){return type==='INTERVAL'?'pulse-outline':type==='REST'?'bed-outline':type==='TEMPO'?'speedometer-outline':null}
@@ -20,7 +20,7 @@ export function WorkoutCard({workout}:{workout:Workout}){
   const {t}=useI18n(); const {colors,isDark}=useTheme(); const theme=statusTheme[workout.status]??statusTheme.PLANNED;
   const ionIcon = iconFor(workout.type);
   const cardBackground = workout.isExtra
-    ? isDark ? 'rgba(18,88,52,.72)' : 'rgba(222,248,234,.92)'
+    ? isDark ? 'rgba(18,88,52,.44)' : 'rgba(222,248,234,.42)'
     : isDark ? colors.bgCard : theme.bg;
   const cardBorder = workout.isExtra
     ? isDark ? 'rgba(45,181,38,.58)' : 'rgba(45,181,38,.38)'

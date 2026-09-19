@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useI18n } from '@/i18n';
 import { useTheme } from '@/context/ThemeContext';
+import { LiquidGlassModal } from '@/components/LiquidGlassModal';
 
 const fromIso=(iso:string)=>{
   const d=new Date(`${iso}T12:00:00`);
@@ -29,26 +30,41 @@ export function DateField({value,onChange,minimumDate}:{value:string;onChange:(v
       <Text style={[s.value,{color:colors.textPrimary}]}>{value}</Text>
       <Ionicons name="calendar-outline" size={21} color={colors.textSecondary}/>
     </Pressable>
-    {show && <View style={Platform.OS==='ios'?[s.iosPicker,{backgroundColor:colors.bgRoot,borderColor:colors.bgCardBorder}]:undefined}>
+    {show && Platform.OS === 'ios' && (
+      <LiquidGlassModal visible={show} onRequestClose={()=>setShow(false)}>
+        <Text style={[s.title,{color:colors.textPrimary}]}>{t('chooseDate')}</Text>
+        <View style={[s.iosPicker,{backgroundColor:colors.rowIconBg,borderColor:colors.modalBorder}]}>
+          <DateTimePicker
+            value={date}
+            mode="date"
+            display="inline"
+            themeVariant={isDark?'dark':'light'}
+            accentColor={colors.accent}
+            minimumDate={minimumDate}
+            onValueChange={handleValueChange}
+          />
+        </View>
+        <Pressable style={[s.done,{backgroundColor:colors.accent}]} onPress={()=>setShow(false)}><Text style={s.doneText}>{t('done')}</Text></Pressable>
+      </LiquidGlassModal>
+    )}
+    {show && Platform.OS !== 'ios' && (
       <DateTimePicker
         value={date}
         mode="date"
-        display={Platform.OS==='ios'?'inline':'default'}
-        themeVariant={Platform.OS==='ios'?(isDark?'dark':'light'):undefined}
-        accentColor={colors.accent}
+        display="default"
         minimumDate={minimumDate}
         onValueChange={handleValueChange}
         onDismiss={()=>setShow(false)}
       />
-      {Platform.OS==='ios' && <Pressable style={s.done} onPress={()=>setShow(false)}><Text style={[s.doneText,{color:colors.accent}]}>{t('done')}</Text></Pressable>}
-    </View>}
+    )}
   </View>;
 }
 
 const s=StyleSheet.create({
   field:{backgroundColor:'#fff',borderWidth:1,borderColor:'#D0D5DD',borderRadius:14,paddingHorizontal:14,paddingVertical:14,flexDirection:'row',justifyContent:'space-between',alignItems:'center'},
   value:{fontSize:17,color:'#101828',fontWeight:'600'},
-  iosPicker:{backgroundColor:'#fff',borderRadius:16,marginTop:8,overflow:'hidden',borderWidth:1,borderColor:'#EAECF0'},
-  done:{alignSelf:'flex-end',paddingHorizontal:16,paddingVertical:12},
-  doneText:{fontWeight:'900',color:'#027A48'}
+  title:{fontSize:24,fontWeight:'900'},
+  iosPicker:{borderRadius:20,marginTop:16,overflow:'hidden',borderWidth:1},
+  done:{marginTop:16,paddingHorizontal:16,paddingVertical:14,borderRadius:15,alignItems:'center'},
+  doneText:{fontWeight:'900',color:'#fff'}
 });

@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useI18n } from '@/i18n';
 import { useTheme } from '@/context/ThemeContext';
+import { LiquidGlassModal } from '@/components/LiquidGlassModal';
 
 export const durationSecToText=(value:number|null|undefined)=>{
   const total=Math.max(0,Math.floor(value??0));
@@ -29,8 +30,7 @@ export function DurationPicker({value,onChange}:{value:number;onChange:(sec:numb
       </View>
       <View style={[styles.iconCircle,{backgroundColor:colors.rowIconBg}]}><Ionicons name="time-outline" size={20} color={colors.accent} /></View>
     </Pressable>
-    <Modal visible={open} transparent animationType="fade" onRequestClose={()=>setOpen(false)}>
-      <View style={styles.overlay}><View style={[styles.modal,{backgroundColor:colors.bgRoot,borderWidth:1,borderColor:colors.bgCardBorder}]}>
+    <LiquidGlassModal visible={open} onRequestClose={()=>setOpen(false)}>
         <View style={styles.modalHeader}><Text style={[styles.title,{color:colors.textPrimary}]}>{t('duration')}</Text><View style={[styles.modalIcon,{backgroundColor:colors.rowIconBg}]}><Ionicons name="time-outline" size={18} color={colors.accent}/></View></View>
         <View style={styles.pickers}>
           <Wheel values={hours} value={h} onChange={setH} suffix="h" />
@@ -40,9 +40,8 @@ export function DurationPicker({value,onChange}:{value:number;onChange:(sec:numb
           <Wheel values={sixty} value={s} onChange={setS} suffix="s" />
         </View>
         <Text style={[styles.preview,{color:colors.textPrimary}]}>{durationSecToText(h*3600+m*60+s)}</Text>
-        <View style={styles.actions}><Pressable style={[styles.cancel,{borderColor:colors.bgCardBorder}]} onPress={()=>setOpen(false)}><Text style={[styles.cancelText,{color:colors.textPrimary}]}>{t('cancel')}</Text></Pressable><Pressable style={[styles.done,{backgroundColor:colors.accent}]} onPress={choose}><Text style={styles.doneText}>{t('done')}</Text></Pressable></View>
-      </View></View>
-    </Modal>
+        <View style={styles.actions}><Pressable style={[styles.cancel,{borderColor:colors.modalBorder,backgroundColor:colors.rowIconBg}]} onPress={()=>setOpen(false)}><Text style={[styles.cancelText,{color:colors.textPrimary}]}>{t('cancel')}</Text></Pressable><Pressable style={[styles.done,{backgroundColor:colors.accent}]} onPress={choose}><Text style={styles.doneText}>{t('done')}</Text></Pressable></View>
+    </LiquidGlassModal>
   </>;
 }
 

@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -14,6 +13,8 @@ import { deleteWorkout, getWorkout, updateWorkout } from "@/db/repository";
 import { useAppStore } from "@/store/useAppStore";
 import { DateField } from "@/components/DateField";
 import { PacePicker } from "@/components/PacePicker";
+import { GlassBackground } from "@/components/Glass";
+import { useGlassAlert } from "@/components/GlassAlert";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
 import type { Workout, WorkoutType } from "@/types/models";
@@ -31,6 +32,7 @@ export default function EditWorkoutScreen() {
   const refresh = useAppStore((s) => s.refresh);
   const { t, language } = useI18n();
   const { colors } = useTheme();
+  const showAlert = useGlassAlert();
   const [workout, setWorkout] = useState<Workout | null>(null);
   const [date, setDate] = useState("");
   const [type, setType] = useState<WorkoutType>("EASY");
@@ -62,7 +64,7 @@ export default function EditWorkoutScreen() {
   const save = async () => {
     const km = Number(distance.replace(",", "."));
     if (type !== "REST" && (!Number.isFinite(km) || km <= 0)) {
-      Alert.alert(t("invalidDistance"), t("invalidDistanceHelp"));
+      showAlert(t("invalidDistance"), t("invalidDistanceHelp"));
       return;
     }
     await updateWorkout(db, workout.id, {
@@ -77,7 +79,7 @@ export default function EditWorkoutScreen() {
     router.back();
   };
   const remove = () =>
-    Alert.alert(t("deleteWorkoutTitle"), t("deleteWorkoutMessage"), [
+    showAlert(t("deleteWorkoutTitle"), t("deleteWorkoutMessage"), [
       { text: t("cancel"), style: "cancel" },
       {
         text: t("delete"),
@@ -90,11 +92,12 @@ export default function EditWorkoutScreen() {
       },
     ]);
   return (
-    <ScrollView
-      style={[s.root,{backgroundColor:colors.bgRoot}]}
-      contentContainerStyle={s.content}
-      keyboardShouldPersistTaps="handled"
-    >
+    <GlassBackground>
+      <ScrollView
+        style={s.root}
+        contentContainerStyle={s.content}
+        keyboardShouldPersistTaps="handled"
+      >
       <Pressable onPress={() => router.back()}>
         <Text style={[s.back,{color:colors.textPrimary}]}>{t("back")}</Text>
       </Pressable>
@@ -160,11 +163,12 @@ export default function EditWorkoutScreen() {
       <Pressable style={s.delete} onPress={remove}>
         <Text style={s.deleteText}>{t("deleteWorkout")}</Text>
       </Pressable>
-    </ScrollView>
+      </ScrollView>
+    </GlassBackground>
   );
 }
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#F5F7FA" },
+  root: { flex: 1 },
   content: { padding: 22, paddingTop: 58, paddingBottom: 48 },
   loading: { flex: 1, alignItems: "center", justifyContent: "center" },
   back: { fontSize: 17, fontWeight: "800" },
