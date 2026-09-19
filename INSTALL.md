@@ -24,6 +24,11 @@ If you prefer Xcode:
 open ios/RunningReminder.xcworkspace
 ```
 
+Always open `RunningReminder.xcworkspace`, not `RunningReminder.xcodeproj`. The
+workspace includes the CocoaPods targets; opening only the project can cause
+errors such as `ExpoAsset/ExpoAsset.modulemap not found` when building for an
+iPhone.
+
 If the generated workspace name differs, list it with:
 
 ```bash
