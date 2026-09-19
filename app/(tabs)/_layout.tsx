@@ -83,7 +83,7 @@ export default function TabLayout() {
   );
 }
 
-const TAB_BAR_HEIGHT = 68;
+const TAB_BAR_HEIGHT = 52;
 const PILL_RADIUS = TAB_BAR_HEIGHT / 2;
 
 const styles = StyleSheet.create({
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    marginHorizontal: 16,
+    marginHorizontal: 56,
     bottom: 18,
     height: TAB_BAR_HEIGHT,
     paddingTop: 6,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
   tabBarOverlay: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: "rgba(18,18,20,0.30)",
+    backgroundColor: "rgba(202, 202, 227, 0.1)",
   },
   tabItem: {
     marginHorizontal: 2,
