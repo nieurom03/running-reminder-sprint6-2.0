@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,6 +12,8 @@ import { router } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { createExtraWorkout, getActivePlan } from "@/db/repository";
 import { PacePicker } from "@/components/PacePicker";
+import { GlassBackground } from "@/components/Glass";
+import { useGlassAlert } from "@/components/GlassAlert";
 import { useAppStore } from "@/store/useAppStore";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
@@ -36,6 +37,7 @@ export default function CreateExtraWorkoutScreen() {
   const refresh = useAppStore((s) => s.refresh);
   const { t } = useI18n();
   const { colors } = useTheme();
+  const showAlert = useGlassAlert();
   const [plan, setPlan] = useState<TrainingPlan | null>(null);
   const [type, setType] = useState<WorkoutType>("EASY");
   const [distance, setDistance] = useState("");
@@ -59,7 +61,7 @@ export default function CreateExtraWorkoutScreen() {
     if (!plan || saving) return;
     const km = Number(distance.replace(",", "."));
     if (!Number.isFinite(km) || km <= 0) {
-      Alert.alert(t("invalidDistance"), t("invalidDistanceHelp"));
+      showAlert(t("invalidDistance"), t("invalidDistanceHelp"));
       return;
     }
 
@@ -75,7 +77,7 @@ export default function CreateExtraWorkoutScreen() {
         description: notes.trim() || null,
       });
       if (!id) {
-        Alert.alert(
+        showAlert(
           t("workoutAlreadyScheduled"),
           t("workoutAlreadyScheduledHelp"),
         );
@@ -101,11 +103,12 @@ export default function CreateExtraWorkoutScreen() {
             : t("recovery");
 
   return (
-    <ScrollView
-      style={[s.root, { backgroundColor: colors.bgRoot }]}
-      contentContainerStyle={s.content}
-      keyboardShouldPersistTaps="handled"
-    >
+    <GlassBackground>
+      <ScrollView
+        style={s.root}
+        contentContainerStyle={s.content}
+        keyboardShouldPersistTaps="handled"
+      >
       <Pressable onPress={() => router.back()} style={s.backRow}>
         <Ionicons name="chevron-back" size={20} color={colors.textPrimary} />
         <Text style={[s.back, { color: colors.textPrimary }]}>{t("back")}</Text>
@@ -215,7 +218,8 @@ export default function CreateExtraWorkoutScreen() {
         <Text style={s.saveText}>{t("saveAndEnterResult")}</Text>
         <Ionicons name="arrow-forward" size={18} color="#fff" />
       </Pressable>
-    </ScrollView>
+      </ScrollView>
+    </GlassBackground>
   );
 }
 

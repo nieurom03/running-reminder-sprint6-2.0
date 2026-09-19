@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { setSetting } from "@/db/repository";
+import { GlassBackground } from "@/components/Glass";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
 const icons = [
@@ -32,11 +33,12 @@ export default function Onboarding() {
     router.replace("/(tabs)");
   };
   return (
-    <SafeAreaView
-      edges={["top", "bottom", "left", "right"]}
-      style={[s.root, { backgroundColor: colors.bgRoot }]}
-    >
-      <View style={s.content}>
+    <GlassBackground>
+      <SafeAreaView
+        edges={["top", "bottom", "left", "right"]}
+        style={s.root}
+      >
+        <View style={s.content}>
         {/* <Image
           source={require("../assets/images/icon.png")}
           style={s.logo}
@@ -86,26 +88,27 @@ export default function Onboarding() {
             />
           ))}
         </View>
-      </View>
-      <View style={s.footer}>
-        <Pressable onPress={finish}>
-          <Text style={[s.skip, { color: colors.textSecondary }]}>{t("skip")}</Text>
-        </Pressable>
-        <Pressable
-          style={[
-            s.next,
-            { backgroundColor: isDark ? colors.accent : "#111827" },
-          ]}
-          onPress={() => (step === 2 ? finish() : setStep(step + 1))}
-        >
-          <Text style={s.nextText}>{step === 2 ? t("start") : t("next")}</Text>
-        </Pressable>
-      </View>
-    </SafeAreaView>
+        </View>
+        <View style={s.footer}>
+          <Pressable onPress={finish}>
+            <Text style={[s.skip, { color: colors.textSecondary }]}>{t("skip")}</Text>
+          </Pressable>
+          <Pressable
+            style={[
+              s.next,
+              { backgroundColor: isDark ? colors.accent : "#111827" },
+            ]}
+            onPress={() => (step === 2 ? finish() : setStep(step + 1))}
+          >
+            <Text style={s.nextText}>{step === 2 ? t("start") : t("next")}</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    </GlassBackground>
   );
 }
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#F5F7FA" },
+  root: { flex: 1 },
   content: { flex: 1, padding: 28, paddingTop: 30, alignItems: "center" },
   logo: { width: 96, height: 96, borderRadius: 24 },
   brand: {

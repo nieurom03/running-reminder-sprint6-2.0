@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useI18n } from '@/i18n';
 import { useTheme } from '@/context/ThemeContext';
+import { LiquidGlassModal } from '@/components/LiquidGlassModal';
 
 export const goalSecToText = (value:number|null|undefined) => {
   const total = Math.max(0, Math.floor(value ?? 0));
@@ -26,8 +27,7 @@ export function GoalTimePicker({value,onChange}:{value:number;onChange:(sec:numb
   const openPicker=()=>{const v=Math.max(0,Math.floor(value||9900));setH(Math.floor(v/3600));setM(Math.floor((v%3600)/60));setSec(v%60);setOpen(true)};
   return <>
     <Pressable style={[s.field,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder}]} onPress={openPicker}><View><Text style={[s.value,{color:colors.textPrimary}]}>{goalSecToText(value)}</Text><Text style={[s.help,{color:colors.textSecondary}]}>{t('goalTimeHelp')}</Text></View><View style={[s.iconCircle,{backgroundColor:colors.rowIconBg}]}><Ionicons name="time-outline" size={20} color={colors.accent} /></View></Pressable>
-    <Modal visible={open} transparent animationType="fade" onRequestClose={()=>setOpen(false)}>
-      <View style={s.overlay}><View style={[s.modal,{backgroundColor:colors.bgRoot,borderWidth:1,borderColor:colors.bgCardBorder}]}>
+    <LiquidGlassModal visible={open} onRequestClose={()=>setOpen(false)}>
         <View style={s.modalHeader}><Text style={[s.title,{color:colors.textPrimary}]}>{t('chooseGoalTime')}</Text><View style={[s.modalIcon,{backgroundColor:colors.rowIconBg}]}><Ionicons name="time-outline" size={18} color={colors.accent}/></View></View>
         <View style={s.pickers}>
           <Wheel values={hours} value={h} onChange={setH} suffix="h" />
@@ -37,9 +37,8 @@ export function GoalTimePicker({value,onChange}:{value:number;onChange:(sec:numb
           <Wheel values={sixty} value={sec} onChange={setSec} suffix="s" />
         </View>
         <Text style={[s.preview,{color:colors.textPrimary}]}>{goalSecToText(h*3600+m*60+sec)}</Text>
-        <View style={s.actions}><Pressable style={[s.cancel,{borderColor:colors.bgCardBorder}]} onPress={()=>setOpen(false)}><Text style={[s.cancelText,{color:colors.textPrimary}]}>{t('cancel')}</Text></Pressable><Pressable style={[s.done,{backgroundColor:colors.accent}]} onPress={choose}><Text style={s.doneText}>{t('done')}</Text></Pressable></View>
-      </View></View>
-    </Modal>
+        <View style={s.actions}><Pressable style={[s.cancel,{borderColor:colors.modalBorder,backgroundColor:colors.rowIconBg}]} onPress={()=>setOpen(false)}><Text style={[s.cancelText,{color:colors.textPrimary}]}>{t('cancel')}</Text></Pressable><Pressable style={[s.done,{backgroundColor:colors.accent}]} onPress={choose}><Text style={s.doneText}>{t('done')}</Text></Pressable></View>
+    </LiquidGlassModal>
   </>;
 }
 function Wheel({values,value,onChange,suffix}:{values:number[];value:number;onChange:(n:number)=>void;suffix:string}){const {colors}=useTheme();return <ScrollView style={s.wheel} contentContainerStyle={s.wheelContent} showsVerticalScrollIndicator={false}>{values.map(v=><Pressable key={v} onPress={()=>onChange(v)} style={[s.option,v===value&&[s.optionOn,{backgroundColor:colors.rowIconBg}]]}><Text style={[s.optionText,{color:colors.textSecondary},v===value&&[s.optionTextOn,{color:colors.accent}]]}>{String(v).padStart(2,'0')}{suffix}</Text></Pressable>)}</ScrollView>}

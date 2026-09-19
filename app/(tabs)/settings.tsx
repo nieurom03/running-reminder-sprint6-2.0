@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  ActionSheetIOS,
-  Alert,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -23,6 +20,8 @@ import {
 } from "@/store/useAppStore";
 import { AppHeader } from "@/components/AppHeader";
 import { GlassBackground, GlassCard } from "@/components/Glass";
+import { GlassOptionModal } from "@/components/LiquidGlassModal";
+import { useGlassAlert } from "@/components/GlassAlert";
 import { useI18n, type TranslationKey } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
 import type { TrainingStats } from "@/types/models";
@@ -37,9 +36,12 @@ export default function Settings() {
   const setColorSchemeState = useAppStore((s) => s.setColorScheme);
   const { t, language } = useI18n();
   const { colors } = useTheme();
+  const showAlert = useGlassAlert();
   const [stats, setStats] = useState<TrainingStats | null>(null);
   const [busy, setBusy] = useState(false);
   const [notifications, setNotifications] = useState(true);
+  const [languagePickerOpen, setLanguagePickerOpen] = useState(false);
+  const [appearancePickerOpen, setAppearancePickerOpen] = useState(false);
 
   useEffect(() => {
     getTrainingStats(db).then(setStats);
@@ -71,41 +73,8 @@ export default function Settings() {
     await setSetting(db, "color_scheme", scheme);
   };
 
-  const openAppearancePicker = () => {
-    const labels = schemeOptions.map((o) => t(o.label));
-    if (Platform.OS === "ios") {
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options: [...labels, t("cancel")],
-          cancelButtonIndex: labels.length,
-          title: t("chooseAppearance"),
-        },
-        (idx) => {
-          if (idx < schemeOptions.length)
-            changeAppearance(schemeOptions[idx].value);
-        },
-      );
-    } else {
-      // Android fallback — Alert với buttons
-      Alert.alert(
-        t("chooseAppearance"),
-        undefined,
-        [
-          ...schemeOptions.map((o) => ({
-            text: t(o.label),
-            onPress: () => changeAppearance(o.value),
-          })),
-          {
-            text: t("cancel"),
-            style: "cancel" as const,
-          },
-        ],
-      );
-    }
-  };
-
   const backup = () =>
-    Alert.alert(t("icloudBackupTitle"), t("icloudBackupInstructions"), [
+    showAlert(t("icloudBackupTitle"), t("icloudBackupInstructions"), [
       { text: t("cancel"), style: "cancel" },
       {
         text: t("continue"),
@@ -116,7 +85,7 @@ export default function Settings() {
             await backupToICloudDrive(db);
             await setSetting(db, "last_backup_at", new Date().toISOString());
           } catch (e: any) {
-            Alert.alert(t("backupFailed"), e?.message ?? String(e));
+            showAlert(t("backupFailed"), e?.message ?? String(e));
           } finally {
             setBusy(false);
           }
@@ -125,7 +94,7 @@ export default function Settings() {
     ]);
 
   const restore = () =>
-    Alert.alert(t("restoreBackupTitle"), t("restoreBackupWarning"), [
+    showAlert(t("restoreBackupTitle"), t("restoreBackupWarning"), [
       { text: t("cancel"), style: "cancel" },
       {
         text: t("restore"),
@@ -140,9 +109,9 @@ export default function Settings() {
             if (lang === "vi" || lang === "en")
               setLanguageState(lang as AppLanguage);
             refresh();
-            Alert.alert(t("restoreComplete"), t("restoreCompleteMessage"));
+            showAlert(t("restoreComplete"), t("restoreCompleteMessage"));
           } catch (e: any) {
-            Alert.alert(t("restoreFailed"), e?.message ?? String(e));
+            showAlert(t("restoreFailed"), e?.message ?? String(e));
           } finally {
             setBusy(false);
           }
@@ -163,25 +132,29 @@ export default function Settings() {
             style={s.logo}
           />
           <View style={{ flex: 1 }}>
-            <Text style={[s.appName, { color: colors.textPrimary }]}>{t("runningReminder")}</Text>
+            <Text style={[s.appName, { color: colors.textPrimary }]}>
+              {t("runningReminder")}
+            </Text>
             <Text style={[s.appVer, { color: colors.textMuted }]}>
               {t("version")} {appConfig.expo.version}
             </Text>
           </View>
-          <Ionicons
+          {/* <Ionicons
             name="chevron-forward"
             size={18}
             color={colors.textSecondary}
-          />
+          /> */}
         </GlassCard>
 
-        <Text style={[s.groupTitle, { color: colors.groupTitle }]}>{t("settingsGeneral")}</Text>
+        <Text style={[s.groupTitle, { color: colors.groupTitle }]}>
+          {t("settingsGeneral")}
+        </Text>
         <GlassCard style={s.group}>
           <Row
             icon="globe-outline"
             title={t("language")}
             value={t(language === "vi" ? "vietnamese" : "english")}
-            onPress={() => changeLanguage(language === "vi" ? "en" : "vi")}
+            onPress={() => setLanguagePickerOpen(true)}
             colors={colors}
           />
           <Divider colors={colors} />
@@ -189,7 +162,7 @@ export default function Settings() {
             icon="color-palette-outline"
             title={t("appearance")}
             value={schemeLabel(colorScheme)}
-            onPress={openAppearancePicker}
+            onPress={() => setAppearancePickerOpen(true)}
             colors={colors}
           />
           <Divider colors={colors} />
@@ -209,10 +182,12 @@ export default function Settings() {
           </View>
         </GlassCard>
 
-        <Text style={[s.groupTitle, { color: colors.groupTitle }]}>{t("backupSync")}</Text>
+        <Text style={[s.groupTitle, { color: colors.groupTitle }]}>
+          {t("backupSync")}
+        </Text>
         <GlassCard style={s.group}>
           <Row
-            icon="cloud-upload-outline"
+            icon="cloud-download-outline"
             title={t("backupICloud")}
             subtitle={t("backupHelp")}
             onPress={backup}
@@ -220,7 +195,7 @@ export default function Settings() {
           />
           <Divider colors={colors} />
           <Row
-            icon="cloud-download-outline"
+            icon="cloud-upload-outline"
             title={t("restoreICloud")}
             subtitle={t("icloudNote")}
             onPress={restore}
@@ -228,7 +203,9 @@ export default function Settings() {
           />
         </GlassCard>
 
-        <Text style={[s.groupTitle, { color: colors.groupTitle }]}>{t("settingsData")}</Text>
+        <Text style={[s.groupTitle, { color: colors.groupTitle }]}>
+          {t("settingsData")}
+        </Text>
         <GlassCard style={s.stats}>
           <Stat
             v={`${stats?.completionPct ?? 0}%`}
@@ -247,7 +224,9 @@ export default function Settings() {
           />
         </GlassCard>
 
-        <Text style={[s.groupTitle, { color: colors.groupTitle }]}>{t("settingsOther")}</Text>
+        <Text style={[s.groupTitle, { color: colors.groupTitle }]}>
+          {t("settingsOther")}
+        </Text>
         <GlassCard style={s.group}>
           <Row
             icon="refresh-outline"
@@ -271,6 +250,45 @@ export default function Settings() {
           />
         </GlassCard>
       </ScrollView>
+
+      <GlassOptionModal<AppLanguage>
+        visible={languagePickerOpen}
+        title={t("chooseLanguage")}
+        value={language}
+        options={[
+          {
+            value: "vi",
+            label: t("vietnamese"),
+            icon: "language-outline",
+          },
+          { value: "en", label: t("english"), icon: "globe-outline" },
+        ]}
+        onRequestClose={() => setLanguagePickerOpen(false)}
+        onSelect={(value) => {
+          setLanguagePickerOpen(false);
+          void changeLanguage(value);
+        }}
+      />
+
+      <GlassOptionModal<AppColorScheme>
+        visible={appearancePickerOpen}
+        title={t("chooseAppearance")}
+        value={colorScheme}
+        options={[
+          { value: "light", label: t("themeLight"), icon: "sunny-outline" },
+          { value: "dark", label: t("themeDark"), icon: "moon-outline" },
+          {
+            value: "system",
+            label: t("themeSystem"),
+            icon: "contrast-outline",
+          },
+        ]}
+        onRequestClose={() => setAppearancePickerOpen(false)}
+        onSelect={(value) => {
+          setAppearancePickerOpen(false);
+          void changeAppearance(value);
+        }}
+      />
     </GlassBackground>
   );
 }
@@ -326,7 +344,7 @@ function Row({
 
 function Stat({ v, l, colors }: { v: string; l: string; colors: any }) {
   return (
-    <View style={[s.stat, { backgroundColor: colors.bgCard }]}>
+    <View style={[s.stat, { backgroundColor: colors.rowIconBg }]}>
       <Text style={[s.statV, { color: colors.accent }]}>{v}</Text>
       <Text style={[s.statL, { color: colors.textMuted }]}>{l}</Text>
     </View>

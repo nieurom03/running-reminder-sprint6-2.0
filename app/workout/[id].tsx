@@ -1,6 +1,5 @@
 import { useCallback, useState } from "react";
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -17,6 +16,8 @@ import {
   setWorkoutStatus,
 } from "@/db/repository";
 import { pace, statusTheme } from "@/components/WorkoutCard";
+import { GlassBackground } from "@/components/Glass";
+import { useGlassAlert } from "@/components/GlassAlert";
 import { useAppStore } from "@/store/useAppStore";
 import { scheduleWorkoutReminder } from "@/services/notifications";
 import type {
@@ -49,6 +50,7 @@ export default function WorkoutDetail() {
   const refresh = useAppStore((s) => s.refresh);
   const { t } = useI18n();
   const { colors, isDark } = useTheme();
+  const showAlert = useGlassAlert();
   const [w, setW] = useState<Workout | null>(null);
   const [activity, setActivity] = useState<Activity | null>(null);
   const [plan, setPlan] = useState<TrainingPlan | null>(null);
@@ -115,7 +117,7 @@ export default function WorkoutDetail() {
     const beforeMinutes =
       custom != null ? Math.round(custom * 1440) : offsetMin;
     if (custom != null && (!Number.isFinite(custom) || custom <= 0)) {
-      Alert.alert(t("reminderCustom"), t("customDaysInvalid"));
+      showAlert(t("reminderCustom"), t("customDaysInvalid"));
       return;
     }
     const [y, m, d] = w.date.split("-").map(Number);
@@ -130,7 +132,7 @@ export default function WorkoutDetail() {
     );
     const reminderAt = new Date(anchor.getTime() - beforeMinutes * 60_000);
     if (reminderAt.getTime() <= Date.now()) {
-      Alert.alert(t("reminderOptions"), t("reminderPast"));
+      showAlert(t("reminderOptions"), t("reminderPast"));
       return;
     }
     const result = await scheduleWorkoutReminder(
@@ -138,13 +140,14 @@ export default function WorkoutDetail() {
       `🏃 Running Reminder`,
       `${typeLabel} · ${w.distanceKm} km · ${w.date}`,
     );
-    Alert.alert(
+    showAlert(
       result ? t("reminderScheduled") : t("reminderPermission"),
       result ? `${reminderAt.toLocaleString()}` : "",
     );
   };
   return (
-    <ScrollView style={[s.root,{backgroundColor:colors.bgRoot}]} contentContainerStyle={s.content}>
+    <GlassBackground>
+      <ScrollView style={s.root} contentContainerStyle={s.content}>
       <View style={s.top}>
         <Pressable onPress={() => router.back()}>
           <Text style={[s.back,{color:colors.textPrimary}]}>{t("back")}</Text>
@@ -181,7 +184,14 @@ export default function WorkoutDetail() {
       </View>
       {activity && (
         <Pressable
-          style={[s.actual,isDark&&{backgroundColor:colors.bgCard}]}
+          style={[
+            s.actual,
+            {
+              backgroundColor: isDark
+                ? colors.bgCard
+                : "rgba(236,253,243,0.40)",
+            },
+          ]}
           onPress={() => router.push(`/workout/result/${w.id}`)}
         >
           <View style={{ flex: 1 }}>
@@ -280,11 +290,12 @@ export default function WorkoutDetail() {
           <Text style={s.reminderButtonText}>{t("scheduleReminder")}</Text>
         </Pressable>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </GlassBackground>
   );
 }
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#F5F7FA" },
+  root: { flex: 1 },
   content: { padding: 22, paddingTop: 58, paddingBottom: 54 },
   loading: {
     flex: 1,

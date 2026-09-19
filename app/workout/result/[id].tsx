@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -21,6 +20,8 @@ import { useAppStore } from "@/store/useAppStore";
 import type { Activity, RunFeeling, Workout } from "@/types/models";
 import { useI18n } from "@/i18n";
 import { DurationPicker } from "@/components/DurationPicker";
+import { GlassBackground } from "@/components/Glass";
+import { useGlassAlert } from "@/components/GlassAlert";
 import { useTheme } from "@/context/ThemeContext";
 
 const FEELINGS: {
@@ -87,6 +88,7 @@ export default function ResultScreen() {
   const refresh = useAppStore((s) => s.refresh);
   const { t, language } = useI18n();
   const { colors } = useTheme();
+  const showAlert = useGlassAlert();
   const [w, setW] = useState<Workout | null>(null);
   const [existing, setExisting] = useState<Activity | null>(null);
   const [distance, setDistance] = useState("");
@@ -135,11 +137,11 @@ export default function ResultScreen() {
     );
   const save = async () => {
     if (!Number.isFinite(km) || km <= 0) {
-      Alert.alert(t("invalidDistance"));
+      showAlert(t("invalidDistance"));
       return;
     }
     if (!Number.isFinite(seconds) || seconds <= 0) {
-      Alert.alert(t("invalidDuration"), t("invalidDurationHelp"));
+      showAlert(t("invalidDuration"), t("invalidDurationHelp"));
       return;
     }
     const num = (v: string) => (v.trim() ? Number(v) : null);
@@ -147,7 +149,7 @@ export default function ResultScreen() {
       m = num(maxHr),
       e = num(elevation);
     if ([a, m, e].some((v) => v != null && !Number.isFinite(v))) {
-      Alert.alert(t("invalidData"));
+      showAlert(t("invalidData"));
       return;
     }
     await saveManualActivity(db, {
@@ -165,7 +167,7 @@ export default function ResultScreen() {
     router.back();
   };
   const remove = () =>
-    Alert.alert(t("deleteRunResult"), t("deleteRunResultMessage"), [
+    showAlert(t("deleteRunResult"), t("deleteRunResultMessage"), [
       { text: t("cancel"), style: "cancel" },
       {
         text: t("delete"),
@@ -178,11 +180,12 @@ export default function ResultScreen() {
       },
     ]);
   return (
-    <ScrollView
-      style={[s.root,{backgroundColor:colors.bgRoot}]}
-      contentContainerStyle={s.content}
-      keyboardShouldPersistTaps="handled"
-    >
+    <GlassBackground>
+      <ScrollView
+        style={s.root}
+        contentContainerStyle={s.content}
+        keyboardShouldPersistTaps="handled"
+      >
       <Pressable onPress={() => router.back()}>
         <Text style={[s.back,{color:colors.textPrimary}]}>{t("back")}</Text>
       </Pressable>
@@ -314,11 +317,12 @@ export default function ResultScreen() {
           <Text style={s.deleteText}>{t("deleteManualResult")}</Text>
         </Pressable>
       )}
-    </ScrollView>
+      </ScrollView>
+    </GlassBackground>
   );
 }
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#F5F7FA" },
+  root: { flex: 1 },
   content: { padding: 22, paddingTop: 58, paddingBottom: 48 },
   loading: { flex: 1, alignItems: "center", justifyContent: "center" },
   back: { fontSize: 17, fontWeight: "800" },

@@ -1,5 +1,13 @@
+import { BlurView } from 'expo-blur';
 import type { ReactNode } from 'react';
-import { StyleSheet, View, type ViewStyle } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  View,
+  type ColorValue,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 
 export function GlassBackground({ children }: { children: ReactNode }) {
@@ -14,14 +22,55 @@ export function GlassBackground({ children }: { children: ReactNode }) {
   );
 }
 
-export function GlassCard({ children, style }: { children: ReactNode; style?: ViewStyle | ViewStyle[] }) {
-  const { colors } = useTheme();
+export function GlassCard({
+  children,
+  style,
+}: {
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const { colors, isDark } = useTheme();
+  const flattenedStyle = StyleSheet.flatten(style);
+  const radius =
+    typeof flattenedStyle?.borderRadius === 'number'
+      ? flattenedStyle.borderRadius
+      : 28;
+  const surfaceColor = (flattenedStyle?.backgroundColor ??
+    (Platform.OS === 'android'
+      ? colors.bgCard
+      : isDark
+        ? 'rgba(7,18,11,0.12)'
+        : 'rgba(255,255,255,0.10)')) as ColorValue;
+  const borderColor = (flattenedStyle?.borderColor ??
+    colors.bgCardBorder) as ColorValue;
+
   return (
-    <View style={[
-      s.card,
-      { backgroundColor: colors.bgCard, borderColor: colors.bgCardBorder },
-      style,
-    ]}>
+    <View
+      style={[
+        s.card,
+        style,
+        { backgroundColor: 'transparent', borderColor },
+      ]}
+    >
+      <View
+        pointerEvents="none"
+        style={[StyleSheet.absoluteFill, s.materialClip, { borderRadius: radius }]}
+      >
+        {Platform.OS === 'android' ? (
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: surfaceColor }]} />
+        ) : (
+          <BlurView
+            intensity={isDark ? 30 : 24}
+            tint={
+              isDark
+                ? 'systemUltraThinMaterialDark'
+                : 'systemUltraThinMaterialLight'
+            }
+            style={StyleSheet.absoluteFill}
+          />
+        )}
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: surfaceColor }]} />
+      </View>
       {children}
     </View>
   );
@@ -30,7 +79,7 @@ export function GlassCard({ children, style }: { children: ReactNode; style?: Vi
 const s = StyleSheet.create({
   root: { flex: 1, overflow: 'hidden' },
   content: { flex: 1 },
-  orb: { position: 'absolute', borderRadius: 999, opacity: 0.56 },
+  orb: { position: 'absolute', borderRadius: 999, opacity: 0.88 },
   orb1: { width: 330, height: 330, right: -130, top: -90 },
   orb2: { width: 260, height: 260, left: -120, top: 260 },
   orb3: { width: 360, height: 360, right: -180, bottom: 70 },
@@ -43,4 +92,5 @@ const s = StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     elevation: 5,
   },
+  materialClip: { overflow: 'hidden' },
 });

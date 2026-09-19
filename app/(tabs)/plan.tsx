@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,6 +18,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { AppHeader } from "@/components/AppHeader";
 import { WorkoutCard } from "@/components/WorkoutCard";
 import { GlassBackground, GlassCard } from "@/components/Glass";
+import { useGlassAlert } from "@/components/GlassAlert";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
 import type { TrainingPlan, Workout } from "@/types/models";
@@ -29,6 +29,7 @@ export default function PlanScreen() {
   const refresh = useAppStore((s) => s.refresh);
   const { t, language } = useI18n();
   const { colors } = useTheme();
+  const showAlert = useGlassAlert();
   const [rows, setRows] = useState<Workout[]>([]);
   const [plan, setPlan] = useState<TrainingPlan | null>(null);
   useEffect(() => {
@@ -59,10 +60,10 @@ export default function PlanScreen() {
   const reschedule = async () => {
     if (!plan) return;
     const n = await schedulePlanReminders(plan, planRows);
-    Alert.alert(t("remindersRescheduled"), `${n}`);
+    showAlert(t("remindersRescheduled"), `${n}`);
   };
   const remove = () =>
-    Alert.alert(t("deleteCurrentPlanTitle"), t("deleteCurrentPlanMessage"), [
+    showAlert(t("deleteCurrentPlanTitle"), t("deleteCurrentPlanMessage"), [
       { text: t("cancel"), style: "cancel" },
       {
         text: t("delete"),
@@ -182,7 +183,7 @@ export default function PlanScreen() {
 }
 const s = StyleSheet.create({
   content: { paddingHorizontal: 18, paddingTop: 5, paddingBottom: 112 },
-  featured: { padding: 18, overflow: "hidden" },
+  featured: { padding: 18 },
   featureTop: {
     flexDirection: "row",
     justifyContent: "space-between",

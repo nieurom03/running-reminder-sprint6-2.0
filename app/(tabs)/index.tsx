@@ -270,21 +270,21 @@ export default function Dashboard() {
                 label={t("completed")}
                 icon="checkmark"
                 color="#0F9F63"
-                bg="rgba(224,249,235,.78)"
+                bg="rgba(224,249,235,.30)"
               />
               <StatusTile
                 value={skipped}
                 label={t("skipped")}
                 icon="play-forward"
                 color="#C87500"
-                bg="rgba(255,244,204,.82)"
+                bg="rgba(255,244,204,.32)"
               />
               <StatusTile
                 value={missed}
                 label={t("missed")}
                 icon="close"
                 color="#D63B31"
-                bg="rgba(255,229,226,.82)"
+                bg="rgba(255,229,226,.32)"
               />
             </View>
 

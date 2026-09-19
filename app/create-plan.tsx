@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -21,6 +20,8 @@ import { useAppStore } from "@/store/useAppStore";
 import { DateField } from "@/components/DateField";
 import { PacePicker } from "@/components/PacePicker";
 import { GoalTimePicker, goalSecToText } from "@/components/GoalTimePicker";
+import { GlassBackground } from "@/components/Glass";
+import { useGlassAlert } from "@/components/GlassAlert";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
 const distances = [5, 10, 21.1, 42.2];
@@ -31,6 +32,7 @@ export default function CreatePlanScreen() {
   const refresh = useAppStore((s) => s.refresh);
   const { t, language } = useI18n();
   const { colors } = useTheme();
+  const showAlert = useGlassAlert();
   const future = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() + 84);
@@ -66,7 +68,7 @@ export default function CreatePlanScreen() {
     }
   };
   const create = async () => {
-    if (!valid) return Alert.alert(t("checkData"), t("chooseRaceAndDays"));
+    if (!valid) return showAlert(t("checkData"), t("chooseRaceAndDays"));
     setSaving(true);
     try {
       await createGeneratedPlan(db, {
@@ -85,23 +87,24 @@ export default function CreatePlanScreen() {
       let reminders = 0;
       if (plan) reminders = await schedulePlanReminders(plan, workouts);
       refresh();
-      Alert.alert(
+      showAlert(
         t("planCreated"),
         `${workouts.length} ${t("workouts")} · ${reminders} reminder`,
       );
       router.replace("/(tabs)/plan");
     } catch (e: any) {
-      Alert.alert(t("couldNotCreatePlan"), e?.message ?? String(e));
+      showAlert(t("couldNotCreatePlan"), e?.message ?? String(e));
     } finally {
       setSaving(false);
     }
   };
   return (
-    <ScrollView
-      style={[s.root, { backgroundColor: colors.bgRoot }]}
-      contentContainerStyle={s.content}
-      keyboardShouldPersistTaps="handled"
-    >
+    <GlassBackground>
+      <ScrollView
+        style={s.root}
+        contentContainerStyle={s.content}
+        keyboardShouldPersistTaps="handled"
+      >
       <View style={s.top}>
         <Pressable onPress={() => router.back()} style={s.backBtn}>
           <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
@@ -222,11 +225,12 @@ export default function CreatePlanScreen() {
       >
         <Text style={s.buttonText}>{saving ? t("creating") : t("next")}</Text>
       </Pressable>
-    </ScrollView>
+      </ScrollView>
+    </GlassBackground>
   );
 }
 const s = StyleSheet.create({
-  root: { flex: 1, backgroundColor: "#F5F7FA" },
+  root: { flex: 1 },
   content: { padding: 20, paddingTop: 20, paddingBottom: 60 },
   top: {
     flexDirection: "row",
