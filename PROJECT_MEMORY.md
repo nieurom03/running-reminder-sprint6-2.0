@@ -1,6 +1,6 @@
 # Running Reminder — Project Memory
 
-> Cập nhật lần cuối: 2026-09-19. Đây là ghi nhớ làm việc lâu dài cho các phiên Codex sau. Hãy đọc file này trước khi sửa dự án, rồi kiểm tra lại mã nguồn liên quan vì code có thể đã thay đổi.
+> Cập nhật lần cuối: 2026-09-20. Đây là ghi nhớ làm việc lâu dài cho các phiên Codex sau. Hãy đọc file này trước khi sửa dự án, rồi kiểm tra lại mã nguồn liên quan vì code có thể đã thay đổi.
 
 ## 1. Mục tiêu sản phẩm
 
@@ -14,7 +14,8 @@ Tính năng hiện có:
 - Trạng thái `PLANNED`, `COMPLETED`, `SKIPPED`, `MISSED`; workout quá hạn tự chuyển `MISSED` (trừ `REST`).
 - Notification cục bộ theo toàn giáo án hoặc theo từng workout.
 - Tiếng Việt/English và giao diện `light`/`dark`/`system`, lưu trong SQLite.
-- Backup/restore thủ công dạng JSON qua iOS share sheet và iCloud Drive. Đây không phải CloudKit sync tự động.
+- Backup/restore thủ công qua iOS share sheet và Files/iCloud Drive. Backup mới dùng file `.rrbackup` mã hóa bằng mật khẩu; restore vẫn đọc được backup JSON cũ. Đây không phải CloudKit sync tự động.
+- Settings có form Feedback dùng share sheet hệ thống, tự kèm phiên bản app và phiên bản hệ điều hành.
 - Onboarding, icon/splash và phong cách UI liquid-glass/mint.
 
 ## 2. Stack và cấu hình
@@ -25,7 +26,7 @@ Tính năng hiện có:
 - Zustand chỉ giữ state UI toàn cục nhỏ: language, color scheme và `refreshKey`.
 - Alias TypeScript: `@/*` trỏ tới `src/*`.
 - App name: `Running Reminder`; scheme: `runningreminder`.
-- Bundle ID/package hiện giữ nguyên: `com.nieu.runplan`.
+- Bundle ID/package hiện giữ nguyên: `com.vovannieu.runplan`.
 - Scripts chính: `npm start`, `npm run ios`, `npm run android`, `npm run doctor`, `npm run typecheck`.
 - Tài liệu cài đặt yêu cầu Node 22.13+ và khuyến nghị prebuild sạch khi native dependency/asset thay đổi.
 
@@ -45,7 +46,7 @@ Tính năng hiện có:
 - `src/db/repository.ts`: toàn bộ truy vấn và transaction nghiệp vụ.
 - `src/services/trainingGenerator.ts`: thuật toán sinh giáo án.
 - `src/services/notifications.ts`: quyền và lịch local notification.
-- `src/services/backup.ts`: export/import JSON transactional.
+- `src/services/backup.ts`: export AES-256-GCM/PBKDF2 có mật khẩu, chọn file và import transactional; tương thích backup JSON cũ.
 - `src/types/models.ts`: domain types.
 - `src/i18n/index.ts`: dictionary VI/EN và `useI18n`.
 - `src/context/ThemeContext.tsx`, `src/constants/theme.ts`: theme runtime.
@@ -69,6 +70,7 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - Trong Weekly Activity, cự ly workout phát sinh được cộng vào mốc hiển thị của đúng ngày và có dấu `*`; dấu này không làm thay đổi tổng km kế hoạch hoặc progress giáo án.
 - `training_plans.long_run_day` lưu ngày Long Run do người dùng chọn. Generator dùng ngày này; nếu dữ liệu cũ không hợp lệ thì mới fallback sang thứ Bảy hoặc ngày chạy cuối tuần.
 - Generator có quality workout xen kẽ tempo/interval, recovery, cutback mỗi tuần thứ tư, taper hai tuần cuối, rồi thêm Race Day.
+- Tạo plan chỉ điều hướng sau khi người dùng đóng popup hoàn tất. Việc schedule notification chạy nền sau điều hướng và chỉ giữ 60 workout sắp tới để UI không bị chặn.
 - `goalTimeMinutes` được khai báo là số phút nhưng UI có thể truyền số lẻ từ giây (`goalSec / 60`). Cần giữ độ chính xác khi chỉnh luồng này.
 - Các giá trị số đọc từ DB được bảo vệ bằng helpers trong `src/utils/numbers.ts` để tránh NaN/CoreGraphics crash.
 
@@ -86,8 +88,9 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - Giữ phong cách giao diện hiện tại: nền mint, glass card, tab bar capsule tối, màu trạng thái xanh/cam/đỏ.
 - Không thay bundle identifier nếu chưa được yêu cầu vì liên quan signing/provisioning.
 - Thay native dependency, icon hoặc splash có thể cần `expo prebuild --clean -p ios` và rebuild iOS.
+- Mã hóa backup dùng `randomblob` của SQLite đã được liên kết sẵn để tạo salt/nonce, PBKDF2-HMAC-SHA256 (310.000 vòng) để dẫn xuất khóa và AES-256-GCM để bảo mật/xác thực nội dung. Không lưu mật khẩu; mất mật khẩu thì không khôi phục được file. Không thêm native module chỉ để mã hóa vì development build cũ sẽ lỗi ngay khi tải Settings.
 
-## 6. Tình trạng kiểm tra ngày 2026-09-19
+## 6. Tình trạng kiểm tra ngày 2026-09-20
 
 - Không tìm thấy `AGENTS.md` trong workspace.
 - Workspace hiện là Git repository; luôn giữ nguyên các thay đổi chưa commit không thuộc tác vụ hiện tại.

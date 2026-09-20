@@ -84,14 +84,26 @@ export default function CreatePlanScreen() {
       });
       const plan = await getActivePlan(db);
       const workouts = await getWorkouts(db, plan?.id);
-      let reminders = 0;
-      if (plan) reminders = await schedulePlanReminders(plan, workouts);
       refresh();
       showAlert(
         t("planCreated"),
-        `${workouts.length} ${t("workouts")} · ${reminders} reminder`,
+        `${workouts.length} ${t("workouts")}`,
+        [
+          {
+            text: t("viewPlan"),
+            onPress: () => {
+              router.replace("/(tabs)/plan");
+              if (plan) {
+                setTimeout(() => {
+                  void schedulePlanReminders(plan, workouts).catch((error) => {
+                    console.warn("Could not schedule plan reminders", error);
+                  });
+                }, 350);
+              }
+            },
+          },
+        ],
       );
-      router.replace("/(tabs)/plan");
     } catch (e: any) {
       showAlert(t("couldNotCreatePlan"), e?.message ?? String(e));
     } finally {

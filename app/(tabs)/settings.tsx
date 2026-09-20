@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import {
+  Image,
+  Platform,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Switch,
   Text,
+  TextInput,
   View,
-  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -20,12 +23,21 @@ import {
 } from "@/store/useAppStore";
 import { AppHeader } from "@/components/AppHeader";
 import { GlassBackground, GlassCard } from "@/components/Glass";
-import { GlassOptionModal } from "@/components/LiquidGlassModal";
+import {
+  GlassOptionModal,
+  LiquidGlassModal,
+} from "@/components/LiquidGlassModal";
 import { useGlassAlert } from "@/components/GlassAlert";
 import { useI18n, type TranslationKey } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
 import type { TrainingStats } from "@/types/models";
-import { backupToICloudDrive, restoreFromICloudDrive } from "@/services/backup";
+import {
+  BackupFileError,
+  backupToICloudDrive,
+  pickBackupFile,
+  restoreBackupFile,
+  type PickedBackupFile,
+} from "@/services/backup";
 
 export default function Settings() {
   const db = useSQLiteContext();
@@ -42,6 +54,11 @@ export default function Settings() {
   const [notifications, setNotifications] = useState(true);
   const [languagePickerOpen, setLanguagePickerOpen] = useState(false);
   const [appearancePickerOpen, setAppearancePickerOpen] = useState(false);
+  const [backupPasswordOpen, setBackupPasswordOpen] = useState(false);
+  const [restorePasswordOpen, setRestorePasswordOpen] = useState(false);
+  const [pendingRestore, setPendingRestore] =
+    useState<PickedBackupFile | null>(null);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   useEffect(() => {
     getTrainingStats(db).then(setStats);
@@ -73,51 +90,121 @@ export default function Settings() {
     await setSetting(db, "color_scheme", scheme);
   };
 
-  const backup = () =>
-    showAlert(t("icloudBackupTitle"), t("icloudBackupInstructions"), [
-      { text: t("cancel"), style: "cancel" },
-      {
-        text: t("continue"),
-        onPress: async () => {
-          if (busy) return;
-          setBusy(true);
-          try {
-            await backupToICloudDrive(db);
-            await setSetting(db, "last_backup_at", new Date().toISOString());
-          } catch (e: any) {
-            showAlert(t("backupFailed"), e?.message ?? String(e));
-          } finally {
-            setBusy(false);
-          }
-        },
-      },
-    ]);
+  const backup = () => {
+    if (!busy) setBackupPasswordOpen(true);
+  };
 
-  const restore = () =>
-    showAlert(t("restoreBackupTitle"), t("restoreBackupWarning"), [
-      { text: t("cancel"), style: "cancel" },
-      {
-        text: t("restore"),
-        style: "destructive",
-        onPress: async () => {
-          if (busy) return;
-          setBusy(true);
-          try {
-            const r = await restoreFromICloudDrive(db);
-            if (r.canceled) return;
-            const lang = await getSetting(db, "language");
-            if (lang === "vi" || lang === "en")
-              setLanguageState(lang as AppLanguage);
-            refresh();
-            showAlert(t("restoreComplete"), t("restoreCompleteMessage"));
-          } catch (e: any) {
-            showAlert(t("restoreFailed"), e?.message ?? String(e));
-          } finally {
-            setBusy(false);
-          }
+  const createProtectedBackup = async (password: string) => {
+    if (busy) return;
+    setBackupPasswordOpen(false);
+    setBusy(true);
+    try {
+      await backupToICloudDrive(db, password);
+      await setSetting(db, "last_backup_at", new Date().toISOString());
+    } catch (error: any) {
+      showAlert(t("backupFailed"), error?.message ?? String(error));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const finishRestore = async (
+    file: PickedBackupFile,
+    password?: string,
+  ) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await restoreBackupFile(db, file, password);
+      setRestorePasswordOpen(false);
+      setPendingRestore(null);
+      const lang = await getSetting(db, "language");
+      if (lang === "vi" || lang === "en") {
+        setLanguageState(lang as AppLanguage);
+      }
+      const restoredScheme = await getSetting(db, "color_scheme");
+      if (
+        restoredScheme === "light" ||
+        restoredScheme === "dark" ||
+        restoredScheme === "system"
+      ) {
+        setColorSchemeState(restoredScheme as AppColorScheme);
+      }
+      refresh();
+      setTimeout(
+        () => showAlert(t("restoreComplete"), t("restoreCompleteMessage")),
+        file.encrypted ? 220 : 0,
+      );
+    } catch (error: any) {
+      if (error instanceof BackupFileError) {
+        if (error.code === "INVALID_PASSWORD") {
+          throw new Error(t("incorrectBackupPassword"));
+        }
+        if (error.code === "PASSWORD_REQUIRED") {
+          throw new Error(t("backupPasswordRequired"));
+        }
+        throw new Error(t("invalidBackupFile"));
+      }
+      throw error;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const confirmRestore = (file: PickedBackupFile) => {
+    showAlert(
+      t("restoreBackupTitle"),
+      `${file.name}\n\n${t("restoreBackupWarning")}`,
+      [
+        {
+          text: t("cancel"),
+          style: "cancel",
+          onPress: () => setPendingRestore(null),
         },
-      },
-    ]);
+        {
+          text: t("restore"),
+          style: "destructive",
+          onPress: () => {
+            if (file.encrypted) {
+              setTimeout(() => setRestorePasswordOpen(true), 220);
+              return;
+            }
+            void finishRestore(file).catch((error: any) => {
+              showAlert(t("restoreFailed"), error?.message ?? String(error));
+            });
+          },
+        },
+      ],
+    );
+  };
+
+  const restore = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const picked = await pickBackupFile();
+      if (picked.canceled) return;
+      setPendingRestore(picked.file);
+      confirmRestore(picked.file);
+    } catch (error: any) {
+      const message =
+        error instanceof BackupFileError
+          ? t("invalidBackupFile")
+          : error?.message ?? String(error);
+      showAlert(t("restoreFailed"), message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const shareFeedback = async (message: string) => {
+    const diagnostic = `${t("version")} ${appConfig.expo.version} · ${Platform.OS} ${Platform.Version}`;
+    await Share.share({
+      title: t("feedback"),
+      message: `${message.trim()}\n\n${diagnostic}`,
+    });
+    setFeedbackOpen(false);
+  };
 
   return (
     <GlassBackground>
@@ -189,7 +276,8 @@ export default function Settings() {
           <Row
             icon="cloud-download-outline"
             title={t("backupICloud")}
-            subtitle={t("backupHelp")}
+            subtitle={t("encryptedBackupHelp")}
+            value={busy ? t("pleaseWait") : undefined}
             onPress={backup}
             colors={colors}
           />
@@ -197,8 +285,9 @@ export default function Settings() {
           <Row
             icon="cloud-upload-outline"
             title={t("restoreICloud")}
-            subtitle={t("icloudNote")}
-            onPress={restore}
+            subtitle={t("restoreFileHelp")}
+            value={busy ? t("pleaseWait") : undefined}
+            onPress={() => void restore()}
             colors={colors}
           />
         </GlassCard>
@@ -248,6 +337,14 @@ export default function Settings() {
             value={t("appStore")}
             colors={colors}
           />
+          <Divider colors={colors} />
+          <Row
+            icon="chatbubble-ellipses-outline"
+            title={t("feedback")}
+            subtitle={t("feedbackHelp")}
+            onPress={() => setFeedbackOpen(true)}
+            colors={colors}
+          />
         </GlassCard>
       </ScrollView>
 
@@ -289,7 +386,314 @@ export default function Settings() {
           void changeAppearance(value);
         }}
       />
+
+      <PasswordModal
+        visible={backupPasswordOpen}
+        title={t("backupPasswordTitle")}
+        message={t("backupPasswordHelp")}
+        confirmPassword
+        busy={busy}
+        submitLabel={t("createBackup")}
+        onRequestClose={() => setBackupPasswordOpen(false)}
+        onSubmit={createProtectedBackup}
+      />
+
+      <PasswordModal
+        visible={restorePasswordOpen}
+        title={t("restorePasswordTitle")}
+        message={t("restorePasswordHelp")}
+        busy={busy}
+        submitLabel={t("restore")}
+        onRequestClose={() => {
+          setRestorePasswordOpen(false);
+          setPendingRestore(null);
+        }}
+        onSubmit={async (password) => {
+          if (!pendingRestore) throw new Error(t("invalidBackupFile"));
+          await finishRestore(pendingRestore, password);
+        }}
+      />
+
+      <FeedbackModal
+        visible={feedbackOpen}
+        onRequestClose={() => setFeedbackOpen(false)}
+        onSubmit={shareFeedback}
+      />
     </GlassBackground>
+  );
+}
+
+function PasswordModal({
+  visible,
+  title,
+  message,
+  submitLabel,
+  confirmPassword = false,
+  busy,
+  onRequestClose,
+  onSubmit,
+}: {
+  visible: boolean;
+  title: string;
+  message: string;
+  submitLabel: string;
+  confirmPassword?: boolean;
+  busy: boolean;
+  onRequestClose: () => void;
+  onSubmit: (password: string) => Promise<void>;
+}) {
+  const { colors } = useTheme();
+  const { t } = useI18n();
+  const [password, setPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!visible) {
+      setPassword("");
+      setConfirmation("");
+      setPasswordVisible(false);
+      setError("");
+    }
+  }, [visible]);
+
+  const submit = async () => {
+    setError("");
+    if (password.length < 8) {
+      setError(t("backupPasswordMinLength"));
+      return;
+    }
+    if (confirmPassword && password !== confirmation) {
+      setError(t("backupPasswordMismatch"));
+      return;
+    }
+    try {
+      await onSubmit(password);
+    } catch (submitError: any) {
+      setError(submitError?.message ?? String(submitError));
+    }
+  };
+
+  return (
+    <LiquidGlassModal
+      visible={visible}
+      onRequestClose={onRequestClose}
+      dismissOnBackdropPress={!busy}
+    >
+      <View style={s.modalHeader}>
+        <View style={[s.modalIcon, { backgroundColor: colors.rowIconBg }]}>
+          <Ionicons name="lock-closed-outline" size={22} color={colors.accent} />
+        </View>
+        <View style={s.modalHeading}>
+          <Text style={[s.modalTitle, { color: colors.textPrimary }]}>
+            {title}
+          </Text>
+          <Text style={[s.modalMessage, { color: colors.textSecondary }]}>
+            {message}
+          </Text>
+        </View>
+      </View>
+
+      <Text style={[s.inputLabel, { color: colors.textLabel }]}>
+        {t("backupPassword")}
+      </Text>
+      <View
+        style={[
+          s.passwordField,
+          { backgroundColor: colors.bgCard, borderColor: colors.modalBorder },
+        ]}
+      >
+        <TextInput
+          value={password}
+          onChangeText={(value) => {
+            setPassword(value);
+            setError("");
+          }}
+          editable={!busy}
+          secureTextEntry={!passwordVisible}
+          autoCapitalize="none"
+          autoCorrect={false}
+          placeholder={t("backupPasswordPlaceholder")}
+          placeholderTextColor={colors.textMuted}
+          style={[s.passwordInput, { color: colors.textPrimary }]}
+        />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("togglePasswordVisibility")}
+          onPress={() => setPasswordVisible((value) => !value)}
+          hitSlop={10}
+        >
+          <Ionicons
+            name={passwordVisible ? "eye-off-outline" : "eye-outline"}
+            size={20}
+            color={colors.textSecondary}
+          />
+        </Pressable>
+      </View>
+
+      {confirmPassword && (
+        <>
+          <Text style={[s.inputLabel, { color: colors.textLabel }]}>
+            {t("confirmBackupPassword")}
+          </Text>
+          <TextInput
+            value={confirmation}
+            onChangeText={(value) => {
+              setConfirmation(value);
+              setError("");
+            }}
+            editable={!busy}
+            secureTextEntry={!passwordVisible}
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholder={t("confirmBackupPassword")}
+            placeholderTextColor={colors.textMuted}
+            style={[
+              s.modalInput,
+              {
+                backgroundColor: colors.bgCard,
+                borderColor: colors.modalBorder,
+                color: colors.textPrimary,
+              },
+            ]}
+          />
+        </>
+      )}
+
+      {!!error && <Text style={s.formError}>{error}</Text>}
+
+      <View style={s.modalActions}>
+        <Pressable
+          disabled={busy}
+          onPress={onRequestClose}
+          style={[s.secondaryButton, { borderColor: colors.modalBorder }]}
+        >
+          <Text style={[s.secondaryButtonText, { color: colors.textPrimary }]}>
+            {t("cancel")}
+          </Text>
+        </Pressable>
+        <Pressable
+          disabled={busy}
+          onPress={() => void submit()}
+          style={[s.primaryButton, { backgroundColor: colors.accent }, busy && s.disabled]}
+        >
+          <Text style={s.primaryButtonText}>
+            {busy ? t("pleaseWait") : submitLabel}
+          </Text>
+        </Pressable>
+      </View>
+    </LiquidGlassModal>
+  );
+}
+
+function FeedbackModal({
+  visible,
+  onRequestClose,
+  onSubmit,
+}: {
+  visible: boolean;
+  onRequestClose: () => void;
+  onSubmit: (message: string) => Promise<void>;
+}) {
+  const { colors } = useTheme();
+  const { t } = useI18n();
+  const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!visible) {
+      setMessage("");
+      setSending(false);
+      setError("");
+    }
+  }, [visible]);
+
+  const submit = async () => {
+    if (!message.trim()) {
+      setError(t("feedbackRequired"));
+      return;
+    }
+    setSending(true);
+    setError("");
+    try {
+      await onSubmit(message);
+    } catch (submitError: any) {
+      setError(submitError?.message ?? t("feedbackFailed"));
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <LiquidGlassModal
+      visible={visible}
+      onRequestClose={onRequestClose}
+      dismissOnBackdropPress={!sending}
+    >
+      <View style={s.modalHeader}>
+        <View style={[s.modalIcon, { backgroundColor: colors.rowIconBg }]}>
+          <Ionicons
+            name="chatbubble-ellipses-outline"
+            size={22}
+            color={colors.accent}
+          />
+        </View>
+        <View style={s.modalHeading}>
+          <Text style={[s.modalTitle, { color: colors.textPrimary }]}>
+            {t("feedbackTitle")}
+          </Text>
+          <Text style={[s.modalMessage, { color: colors.textSecondary }]}>
+            {t("feedbackModalHelp")}
+          </Text>
+        </View>
+      </View>
+
+      <TextInput
+        value={message}
+        onChangeText={(value) => {
+          setMessage(value);
+          setError("");
+        }}
+        editable={!sending}
+        multiline
+        textAlignVertical="top"
+        maxLength={2000}
+        placeholder={t("feedbackPlaceholder")}
+        placeholderTextColor={colors.textMuted}
+        style={[
+          s.feedbackInput,
+          {
+            backgroundColor: colors.bgCard,
+            borderColor: colors.modalBorder,
+            color: colors.textPrimary,
+          },
+        ]}
+      />
+      {!!error && <Text style={s.formError}>{error}</Text>}
+
+      <View style={s.modalActions}>
+        <Pressable
+          disabled={sending}
+          onPress={onRequestClose}
+          style={[s.secondaryButton, { borderColor: colors.modalBorder }]}
+        >
+          <Text style={[s.secondaryButtonText, { color: colors.textPrimary }]}>
+            {t("cancel")}
+          </Text>
+        </Pressable>
+        <Pressable
+          disabled={sending}
+          onPress={() => void submit()}
+          style={[s.primaryButton, { backgroundColor: colors.accent }, sending && s.disabled]}
+        >
+          <Text style={s.primaryButtonText}>
+            {sending ? t("pleaseWait") : t("sendFeedback")}
+          </Text>
+        </Pressable>
+      </View>
+    </LiquidGlassModal>
   );
 }
 
@@ -391,4 +795,90 @@ const s = StyleSheet.create({
   stat: { flex: 1, borderRadius: 18, padding: 13, alignItems: "center" },
   statV: { fontSize: 21, fontWeight: "900" },
   statL: { fontSize: 10, fontWeight: "800", marginTop: 3 },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+    marginBottom: 18,
+  },
+  modalIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalHeading: { flex: 1 },
+  modalTitle: { fontSize: 21, lineHeight: 27, fontWeight: "900" },
+  modalMessage: { marginTop: 5, fontSize: 13, lineHeight: 19, fontWeight: "600" },
+  inputLabel: {
+    marginTop: 11,
+    marginBottom: 7,
+    fontSize: 12,
+    fontWeight: "900",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+  },
+  passwordField: {
+    minHeight: 52,
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  passwordInput: { flex: 1, minHeight: 50, fontSize: 16, fontWeight: "700" },
+  modalInput: {
+    minHeight: 52,
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  feedbackInput: {
+    minHeight: 150,
+    maxHeight: 230,
+    borderRadius: 18,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    fontSize: 15,
+    lineHeight: 21,
+    fontWeight: "600",
+  },
+  formError: {
+    marginTop: 9,
+    color: "#F04438",
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: "700",
+  },
+  modalActions: { flexDirection: "row", gap: 10, marginTop: 20 },
+  secondaryButton: {
+    flex: 1,
+    minHeight: 50,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 12,
+  },
+  secondaryButtonText: { fontSize: 14, fontWeight: "900" },
+  primaryButton: {
+    flex: 1.4,
+    minHeight: 50,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 12,
+  },
+  primaryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "900",
+    textAlign: "center",
+  },
+  disabled: { opacity: 0.6 },
 });

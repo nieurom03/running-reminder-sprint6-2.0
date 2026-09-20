@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import type { ReactNode } from 'react';
 import {
+  KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
@@ -42,7 +43,10 @@ export function LiquidGlassModal({
       hardwareAccelerated
       onRequestClose={onRequestClose}
     >
-      <View style={s.root}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={s.root}
+      >
         {Platform.OS !== 'android' && (
           <BlurView
             pointerEvents="none"
@@ -98,7 +102,7 @@ export function LiquidGlassModal({
             <View style={[s.content, contentStyle]}>{children}</View>
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

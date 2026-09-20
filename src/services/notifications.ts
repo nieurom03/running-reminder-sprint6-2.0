@@ -1,6 +1,10 @@
 import * as Notifications from 'expo-notifications';
 import type { TrainingPlan, Workout } from '@/types/models';
 
+// Keep a small buffer below iOS's pending local-notification limit. Rescheduling
+// later will always pick the nearest upcoming workouts again.
+const MAX_PLAN_REMINDERS = 60;
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowBanner: true,
@@ -32,11 +36,27 @@ export async function schedulePlanReminders(plan: TrainingPlan, workouts: Workou
   if (!granted) return 0;
   await Notifications.cancelAllScheduledNotificationsAsync();
   let count = 0;
-  for (const workout of workouts) {
-    if (workout.isExtra || workout.status !== 'PLANNED') continue;
-    const [y,m,d] = workout.date.split('-').map(Number);
-    const reminder = new Date(y, m - 1, d, plan.reminderHour, plan.reminderMinute, 0, 0);
-    if (reminder.getTime() <= Date.now()) continue;
+  const upcoming = workouts
+    .filter((workout) => !workout.isExtra && workout.status === 'PLANNED')
+    .map((workout) => {
+      const [year, month, day] = workout.date.split('-').map(Number);
+      return {
+        workout,
+        reminder: new Date(
+          year,
+          month - 1,
+          day,
+          plan.reminderHour,
+          plan.reminderMinute,
+          0,
+          0,
+        ),
+      };
+    })
+    .filter(({ reminder }) => reminder.getTime() > Date.now())
+    .sort((a, b) => a.reminder.getTime() - b.reminder.getTime())
+    .slice(0, MAX_PLAN_REMINDERS);
+  for (const { workout, reminder } of upcoming) {
     const pace = workout.targetPaceMinSec ? ` · pace ${formatPace(workout.targetPaceMinSec)}–${formatPace(workout.targetPaceMaxSec ?? workout.targetPaceMinSec)}` : '';
     await Notifications.scheduleNotificationAsync({
       content: {

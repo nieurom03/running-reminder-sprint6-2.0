@@ -69,3 +69,10 @@ This is intentional to avoid disrupting your current signing/provisioning setup.
 - Restore is transactional and replaces current local data only after the selected backup is validated.
 
 This is manual file backup through iCloud Drive, not continuous CloudKit synchronization. Continuous automatic multi-device sync would require an iCloud/CloudKit capability and a separate sync layer.
+
+## Sprint 7
+
+- Creating a plan no longer blocks the UI while all local notifications are scheduled. The app opens the Plan tab first and schedules up to the nearest 60 reminders in the background.
+- New backups are password-protected `.rrbackup` files encrypted with AES-256-GCM and PBKDF2-HMAC-SHA256.
+- Restore opens the system file picker, supports encrypted `.rrbackup` files, and remains compatible with legacy JSON backups.
+- Settings now includes a functional Feedback form that opens the system share sheet with app/device version information.
