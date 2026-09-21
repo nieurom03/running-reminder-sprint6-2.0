@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "RunningReminder.app"
-               BlueprintName = "RunningReminder"
-               ReferencedContainer = "container:RunningReminder.xcodeproj">
+               BuildableName = "WorkoutTraining.app"
+               BlueprintName = "WorkoutTraining"
+               ReferencedContainer = "container:WorkoutTraining.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "RunningReminderTests.xctest"
-               BlueprintName = "RunningReminderTests"
-               ReferencedContainer = "container:RunningReminder.xcodeproj">
+               BuildableName = "WorkoutTrainingTests.xctest"
+               BlueprintName = "WorkoutTrainingTests"
+               ReferencedContainer = "container:WorkoutTraining.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "RunningReminder.app"
-            BlueprintName = "RunningReminder"
-            ReferencedContainer = "container:RunningReminder.xcodeproj">
+            BuildableName = "WorkoutTraining.app"
+            BlueprintName = "WorkoutTraining"
+            ReferencedContainer = "container:WorkoutTraining.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "RunningReminder.app"
-            BlueprintName = "RunningReminder"
-            ReferencedContainer = "container:RunningReminder.xcodeproj">
+            BuildableName = "WorkoutTraining.app"
+            BlueprintName = "WorkoutTraining"
+            ReferencedContainer = "container:WorkoutTraining.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -3,9 +3,9 @@ PODS:
   - DoubleConversion (1.1.6)
   - EXApplication (57.0.3):
     - ExpoModulesCore
-  - EXConstants (57.0.18):
+  - EXConstants (57.0.19):
     - ExpoModulesCore
-  - Expo (57.0.22):
+  - Expo (57.0.24):
     - boost
     - DoubleConversion
     - ExpoModulesCore
@@ -37,7 +37,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - ExpoAsset (57.0.17):
+  - ExpoAsset (57.0.18):
     - ExpoModulesCore
   - ExpoBlur (57.0.3):
     - ExpoModulesCore
@@ -100,12 +100,12 @@ PODS:
     - ExpoModulesJSI
     - ExpoModulesWorklets
     - RNWorklets
-  - ExpoNotifications (57.0.18):
+  - ExpoNotifications (57.0.20):
     - ExpoModulesCore
-  - ExpoRouter (57.0.21):
+  - ExpoRouter (57.0.22):
     - ExpoModulesCore
     - RNScreens
-  - ExpoSharing (57.0.19):
+  - ExpoSharing (57.0.21):
     - ExpoModulesCore
   - ExpoSplashScreen (57.0.9):
     - ExpoModulesCore
@@ -113,7 +113,7 @@ PODS:
     - ExpoModulesCore
   - ExpoSymbols (57.0.3):
     - ExpoModulesCore
-  - ExpoUI (57.0.18):
+  - ExpoUI (57.0.19):
     - ExpoModulesCore
     - ExpoModulesWorklets
     - React-RCTFabric
@@ -3479,9 +3479,9 @@ SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   EXApplication: a727f05eb8592f0bc764f6ab8d51eacc158652ec
-  EXConstants: 8948a340eb14bf2bdaaa0e21a63cb9343860b87a
-  Expo: eef69f77caa686c43b3968ac91e7d580a22f7ccf
-  ExpoAsset: b3999ffb3d4049b6c870708c60ea2209ace9f170
+  EXConstants: 2dc4473aff5574eccaccb9f3eefe6d95247e5d38
+  Expo: 45fff86bfaadbb47881ccb796454eb8f5f17ccf9
+  ExpoAsset: a917b756b2e4fe12cef1ac3bca5fd849ddb2b919
   ExpoBlur: 975b78b65b3c8f475c44bd8f8b53948146b1ff9b
   ExpoDevice: 5c638e530304a51992263ab5c1cab726f992b9dc
   ExpoDocumentPicker: fe03a24855e39af0f9b5aee17e7eb4813f6e44a6
@@ -3496,13 +3496,13 @@ SPEC CHECKSUMS:
   ExpoModulesJSI: 9df8e7c9719f59e8c001ec33611774137fc1484a
   ExpoModulesWorklets: 986cf72c18400743869b4642d243115f831e404d
   ExpoModulesWorkletsAdapter: 45b4ea99adb80abaa012b45e9a9543b4763275c9
-  ExpoNotifications: b353d8b1c939dc935d9634925491e1480be7b999
-  ExpoRouter: 8f978c2ecb68bfb1f2eeff765ba2ddd8d66c54e0
-  ExpoSharing: c5da4721c1c539fde2db3fe83e46338550e3691d
+  ExpoNotifications: b3724bcea3afbb5bdef6dac64f0a3d314470059b
+  ExpoRouter: 3a8e63a51be53961b03f331c33108629090cf667
+  ExpoSharing: f958c26d3ef378dbe5601327cffdce6b7cc37473
   ExpoSplashScreen: e771da4f26d550ea4fd067d8fb942657e47bb846
   ExpoSQLite: 72e6ada0504a27cd043eb1bf172db70485a761b6
   ExpoSymbols: 37a3a6e5847edb08b83a5ee04d3b46525e205f00
-  ExpoUI: 97c741e691148862d8032f467c708671d28809b1
+  ExpoUI: 98d4650d9d32daaf772597adc76525c645b1ff76
   ExpoWebBrowser: a4d7c382116fbe33c1ec7f60293f02b7e97042e4
   fast_float: b32c788ed9c6a8c584d114d0047beda9664e7cc6
   FBLazyVector: 94a9e5b949d0f65bbc1a741f8a7c72499da32567
@@ -3591,6 +3591,6 @@ SPEC CHECKSUMS:
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: d7173acd024fffc6a23d0f5f41df2d91bf9d5f58
 
-PODFILE CHECKSUM: 6f7b43f207efec28cf55fa8b9cab35c4ffc02452
+PODFILE CHECKSUM: bb11467154db72858a0d1b9a55218665f3786be1
 
 COCOAPODS: 1.16.2

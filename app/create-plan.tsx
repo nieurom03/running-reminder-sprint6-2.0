@@ -21,7 +21,6 @@ import { DateField } from "@/components/DateField";
 import { PacePicker } from "@/components/PacePicker";
 import { GoalTimePicker, goalSecToText } from "@/components/GoalTimePicker";
 import { GlassBackground } from "@/components/Glass";
-import { useGlassAlert } from "@/components/GlassAlert";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
 const distances = [5, 10, 21.1, 42.2];
@@ -32,7 +31,6 @@ export default function CreatePlanScreen() {
   const refresh = useAppStore((s) => s.refresh);
   const { t, language } = useI18n();
   const { colors } = useTheme();
-  const showAlert = useGlassAlert();
   const future = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() + 84);
@@ -47,15 +45,26 @@ export default function CreatePlanScreen() {
   const [hour, setHour] = useState("18");
   const [minute, setMinute] = useState("00");
   const [saving, setSaving] = useState(false);
+  const [createError, setCreateError] = useState("");
   const dayNames =
     language === "vi"
       ? ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
       : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const valid = useMemo(
-    () =>
-      /^\d{4}-\d{2}-\d{2}$/.test(raceDate) &&
-      days.length >= 3 &&
-      days.includes(longRunDay),
+    () => {
+      const [year, month, day] = raceDate.split("-").map(Number);
+      const race = new Date(year, month - 1, day, 12, 0, 0, 0);
+      const today = new Date();
+      today.setHours(12, 0, 0, 0);
+      const validDate =
+        /^\d{4}-\d{2}-\d{2}$/.test(raceDate) &&
+        Number.isFinite(race.getTime()) &&
+        race.getFullYear() === year &&
+        race.getMonth() === month - 1 &&
+        race.getDate() === day &&
+        race > today;
+      return validDate && days.length >= 3 && days.includes(longRunDay);
+    },
     [raceDate, days, longRunDay],
   );
   const toggle = (d: number) => {
@@ -68,10 +77,14 @@ export default function CreatePlanScreen() {
     }
   };
   const create = async () => {
-    if (!valid) return showAlert(t("checkData"), t("chooseRaceAndDays"));
+    setCreateError("");
+    if (!valid) {
+      setCreateError(t("chooseRaceAndDays"));
+      return;
+    }
     setSaving(true);
     try {
-      await createGeneratedPlan(db, {
+      const createdPlanId = await createGeneratedPlan(db, {
         raceDistanceKm: distance,
         raceDate,
         goalTimeMinutes: goalSec / 60,
@@ -83,29 +96,25 @@ export default function CreatePlanScreen() {
         reminderMinute: Math.min(59, Math.max(0, Number(minute) || 0)),
       });
       const plan = await getActivePlan(db);
-      const workouts = await getWorkouts(db, plan?.id);
+      const workouts = await getWorkouts(db, createdPlanId);
       refresh();
-      showAlert(
-        t("planCreated"),
-        `${workouts.length} ${t("workouts")}`,
-        [
-          {
-            text: t("viewPlan"),
-            onPress: () => {
-              router.replace("/(tabs)/plan");
-              if (plan) {
-                setTimeout(() => {
-                  void schedulePlanReminders(plan, workouts).catch((error) => {
-                    console.warn("Could not schedule plan reminders", error);
-                  });
-                }, 350);
-              }
-            },
-          },
-        ],
-      );
+      // create-plan is itself presented as an iOS modal. Waiting for another
+      // modal alert here can leave the screen visually stuck if iOS refuses
+      // the nested presentation. Move to the result screen immediately.
+      router.replace("/(tabs)/plan");
+
+      // Let the navigation animation finish before requesting permission and
+      // scheduling notifications so this work never blocks the Next action.
+      if (plan?.id === createdPlanId) {
+        setTimeout(() => {
+          void schedulePlanReminders(plan, workouts).catch((error) => {
+            console.warn("Could not schedule plan reminders", error);
+          });
+        }, 500);
+      }
     } catch (e: any) {
-      showAlert(t("couldNotCreatePlan"), e?.message ?? String(e));
+      const details = e?.message ?? String(e);
+      setCreateError(`${t("couldNotCreatePlan")}: ${details}`);
     } finally {
       setSaving(false);
     }
@@ -230,9 +239,17 @@ export default function CreatePlanScreen() {
           />
         </View>
       </View>
+      {!!createError && (
+        <View style={s.errorBox} accessibilityRole="alert">
+          <Ionicons name="alert-circle-outline" size={20} color="#F04438" />
+          <Text style={s.errorText}>{createError}</Text>
+        </View>
+      )}
       <Pressable
         onPress={create}
         disabled={saving}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: saving, busy: saving }}
         style={[s.button, saving && { opacity: 0.6 }]}
       >
         <Text style={s.buttonText}>{saving ? t("creating") : t("next")}</Text>
@@ -353,6 +370,24 @@ const s = StyleSheet.create({
     textAlign: "center",
   },
   colon: { fontSize: 24, fontWeight: "700", paddingHorizontal: 10 },
+  errorBox: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(240,68,56,0.35)",
+    backgroundColor: "rgba(240,68,56,0.1)",
+    paddingHorizontal: 13,
+    paddingVertical: 12,
+  },
+  errorText: {
+    flex: 1,
+    color: "#F04438",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "700",
+  },
   button: {
     backgroundColor: "#12B76A",
     padding: 17,

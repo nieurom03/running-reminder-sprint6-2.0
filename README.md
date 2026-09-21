@@ -1,10 +1,10 @@
-# Running Reminder — Sprint 5.1
+# Workout Training
 
 React Native / Expo SDK 57 running-plan app, offline-first with SQLite.
 
 ## Sprint 5.1 changes
 
-- App renamed to **Running Reminder**.
+- App was previously named **Running Reminder** and is now **Workout Training**.
 - Vietnamese / English runtime language switch, persisted in SQLite (`app_settings.language`).
 - Native date picker for race date and workout date.
 - Pace picker uses a dedicated MM:SS timer-style picker to support seconds (for example 7:30/km).
@@ -22,7 +22,7 @@ Core versions are intentionally preserved from Sprint 5 / Expo SDK 57.
 
 ## iOS note about device name
 
-On recent iOS versions, Apple may return a generic device name such as `iPhone` unless the app has the required entitlement. Running Reminder falls back to the human-friendly model name when possible.
+On recent iOS versions, Apple may return a generic device name such as `iPhone` unless the app has the required entitlement. Workout Training falls back to the human-friendly model name when possible.
 
 ## Bundle identifier
 
@@ -39,7 +39,7 @@ This is intentional to avoid disrupting your current signing/provisioning setup.
 - App icon mới gồm 3 đường màu: Completed (xanh), Skipped (cam), Missed (đỏ).
 
 ## Sprint 5.6
-- Uses the new Running Reminder app icon for app icon, splash screen, and onboarding.
+- Uses the Workout Training app icon for app icon, splash screen, and onboarding.
 - Fixes DateTimePicker 9.1 API migration: `onValueChange(event, selectedDate)` + `onDismiss`.
 - Prevents the previous `selectedDate.getTime()` runtime error by validating the second callback argument before converting it.
 - Version bumped to 0.5.6.
@@ -64,7 +64,7 @@ This is intentional to avoid disrupting your current signing/provisioning setup.
 - Added manual iCloud Drive backup/restore for local SQLite data.
   - Settings -> Backup & Restore -> Back up to iCloud Drive.
   - In the iOS share sheet choose Save to Files -> iCloud Drive.
-  - On a new iPhone install Running Reminder, open Settings -> Restore from iCloud Drive, and select the JSON backup file.
+  - On a new iPhone install Workout Training, open Settings -> Restore from iCloud Drive, and select the backup file.
 - Backup includes training plans, workouts, activities/results, and app settings.
 - Restore is transactional and replaces current local data only after the selected backup is validated.
 
@@ -72,7 +72,7 @@ This is manual file backup through iCloud Drive, not continuous CloudKit synchro
 
 ## Sprint 7
 
-- Creating a plan no longer blocks the UI while all local notifications are scheduled. The app opens the Plan tab first and schedules up to the nearest 60 reminders in the background.
+- Creating a plan navigates directly to the Plan tab without waiting for a nested success popup or local notifications. Up to the nearest 60 reminders are scheduled in the background after navigation.
 - New backups are password-protected `.rrbackup` files encrypted with AES-256-GCM and PBKDF2-HMAC-SHA256.
 - Restore opens the system file picker, supports encrypted `.rrbackup` files, and remains compatible with legacy JSON backups.
 - Settings now includes a functional Feedback form that opens the system share sheet with app/device version information.

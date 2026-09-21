@@ -135,7 +135,7 @@ function backupFileName() {
     String(now.getHours()).padStart(2, '0'),
     String(now.getMinutes()).padStart(2, '0'),
   ].join('');
-  return `running-reminder-backup-${stamp}.rrbackup`;
+  return `workout-training-backup-${stamp}.rrbackup`;
 }
 
 function encryptedMetadata(
@@ -375,7 +375,7 @@ export async function backupToICloudDrive(
   await Sharing.shareAsync(uri, {
     UTI: 'public.data',
     mimeType: 'application/octet-stream',
-    dialogTitle: 'Running Reminder Backup',
+    dialogTitle: 'Workout Training Backup',
   });
   return { uri, exportedAt: payload.exportedAt };
 }
@@ -397,7 +397,7 @@ export async function pickBackupFile(): Promise<
       canceled: false,
       file: {
         uri: asset.uri,
-        name: asset.name || 'Running Reminder backup',
+        name: asset.name || 'Workout Training backup',
         encrypted: true,
         exportedAt: parsed.exportedAt,
       },
@@ -408,7 +408,7 @@ export async function pickBackupFile(): Promise<
     canceled: false,
     file: {
       uri: asset.uri,
-      name: asset.name || 'Running Reminder backup',
+      name: asset.name || 'Workout Training backup',
       encrypted: false,
       exportedAt: parsed.exportedAt,
     },

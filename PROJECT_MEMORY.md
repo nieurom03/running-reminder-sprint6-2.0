@@ -1,10 +1,10 @@
-# Running Reminder — Project Memory
+# Workout Training — Project Memory
 
-> Cập nhật lần cuối: 2026-09-20. Đây là ghi nhớ làm việc lâu dài cho các phiên Codex sau. Hãy đọc file này trước khi sửa dự án, rồi kiểm tra lại mã nguồn liên quan vì code có thể đã thay đổi.
+> Cập nhật lần cuối: 2026-09-21. Đây là ghi nhớ làm việc lâu dài cho các phiên Codex sau. Hãy đọc file này trước khi sửa dự án, rồi kiểm tra lại mã nguồn liên quan vì code có thể đã thay đổi.
 
 ## 1. Mục tiêu sản phẩm
 
-Running Reminder là ứng dụng lập và theo dõi giáo án chạy bộ, ưu tiên iOS, hoạt động offline-first. Người dùng tạo giáo án theo cự ly race, ngày race, goal time, pace hiện tại và các ngày chạy; ứng dụng sinh workout, nhắc lịch, cho sửa từng buổi và nhập kết quả chạy thủ công.
+Workout Training là ứng dụng lập và theo dõi giáo án chạy bộ, ưu tiên iOS, hoạt động offline-first. Người dùng tạo giáo án theo cự ly race, ngày race, goal time, pace hiện tại và các ngày chạy; ứng dụng sinh workout, nhắc lịch, cho sửa từng buổi và nhập kết quả chạy thủ công.
 
 Tính năng hiện có:
 
@@ -25,7 +25,7 @@ Tính năng hiện có:
 - Expo SQLite (`runplan.db`) là nguồn dữ liệu bền vững.
 - Zustand chỉ giữ state UI toàn cục nhỏ: language, color scheme và `refreshKey`.
 - Alias TypeScript: `@/*` trỏ tới `src/*`.
-- App name: `Running Reminder`; scheme: `runningreminder`.
+- App name: `Workout Training`; scheme nội bộ vẫn là `runningreminder` để giữ tương thích.
 - Bundle ID/package hiện giữ nguyên: `com.vovannieu.runplan`.
 - Scripts chính: `npm start`, `npm run ios`, `npm run android`, `npm run doctor`, `npm run typecheck`.
 - Tài liệu cài đặt yêu cầu Node 22.13+ và khuyến nghị prebuild sạch khi native dependency/asset thay đổi.
@@ -70,7 +70,7 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - Trong Weekly Activity, cự ly workout phát sinh được cộng vào mốc hiển thị của đúng ngày và có dấu `*`; dấu này không làm thay đổi tổng km kế hoạch hoặc progress giáo án.
 - `training_plans.long_run_day` lưu ngày Long Run do người dùng chọn. Generator dùng ngày này; nếu dữ liệu cũ không hợp lệ thì mới fallback sang thứ Bảy hoặc ngày chạy cuối tuần.
 - Generator có quality workout xen kẽ tempo/interval, recovery, cutback mỗi tuần thứ tư, taper hai tuần cuối, rồi thêm Race Day.
-- Tạo plan chỉ điều hướng sau khi người dùng đóng popup hoàn tất. Việc schedule notification chạy nền sau điều hướng và chỉ giữ 60 workout sắp tới để UI không bị chặn.
+- Tạo plan chuyển thẳng sang tab Plan ngay khi transaction hoàn tất; không mở popup thành công lồng trong modal `create-plan`. Việc schedule notification chạy nền sau điều hướng và chỉ giữ 60 workout sắp tới để UI không bị chặn.
 - `goalTimeMinutes` được khai báo là số phút nhưng UI có thể truyền số lẻ từ giây (`goalSec / 60`). Cần giữ độ chính xác khi chỉnh luồng này.
 - Các giá trị số đọc từ DB được bảo vệ bằng helpers trong `src/utils/numbers.ts` để tránh NaN/CoreGraphics crash.
 
@@ -89,8 +89,10 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - Không thay bundle identifier nếu chưa được yêu cầu vì liên quan signing/provisioning.
 - Thay native dependency, icon hoặc splash có thể cần `expo prebuild --clean -p ios` và rebuild iOS.
 - Mã hóa backup dùng `randomblob` của SQLite đã được liên kết sẵn để tạo salt/nonce, PBKDF2-HMAC-SHA256 (310.000 vòng) để dẫn xuất khóa và AES-256-GCM để bảo mật/xác thực nội dung. Không lưu mật khẩu; mất mật khẩu thì không khôi phục được file. Không thêm native module chỉ để mã hóa vì development build cũ sẽ lỗi ngay khi tải Settings.
+- Tên hiển thị của app là `Workout Training`. Target/project iOS và định danh nội bộ của định dạng backup vẫn giữ `RunningReminder`/`Running Reminder` để không làm hỏng signing, Pods hoặc file backup cũ.
+- Feedback dùng `Share.share` cho nội dung text nhưng loại activity `SaveToFiles`/iCloud Drive trên iOS; lưu file chỉ thuộc luồng Backup. Popup Feedback chỉ đóng sau khi người dùng chọn một kênh chia sẻ.
 
-## 6. Tình trạng kiểm tra ngày 2026-09-20
+## 6. Tình trạng kiểm tra ngày 2026-09-21
 
 - Không tìm thấy `AGENTS.md` trong workspace.
 - Workspace hiện là Git repository; luôn giữ nguyên các thay đổi chưa commit không thuộc tác vụ hiện tại.

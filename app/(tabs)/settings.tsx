@@ -199,11 +199,28 @@ export default function Settings() {
 
   const shareFeedback = async (message: string) => {
     const diagnostic = `${t("version")} ${appConfig.expo.version} · ${Platform.OS} ${Platform.Version}`;
-    await Share.share({
-      title: t("feedback"),
-      message: `${message.trim()}\n\n${diagnostic}`,
-    });
-    setFeedbackOpen(false);
+    const result = await Share.share(
+      {
+        title: t("feedbackTitle"),
+        message: `${message.trim()}\n\n${diagnostic}`,
+      },
+      {
+        dialogTitle: t("feedbackTitle"),
+        subject: `[Workout Training] ${t("feedbackTitle")}`,
+        // Feedback is text to send through a communication app. Do not offer
+        // the Files destination used by the separate Backup feature.
+        excludedActivityTypes:
+          Platform.OS === "ios"
+            ? [
+                "com.apple.DocumentManagerUICore.SaveToFiles",
+                "com.apple.CloudDocsUI.AddToiCloudDrive",
+              ]
+            : undefined,
+      },
+    );
+    if (result.action === Share.sharedAction) {
+      setFeedbackOpen(false);
+    }
   };
 
   return (

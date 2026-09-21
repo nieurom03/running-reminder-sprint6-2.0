@@ -137,7 +137,7 @@ export default function WorkoutDetail() {
     }
     const result = await scheduleWorkoutReminder(
       reminderAt,
-      `🏃 Running Reminder`,
+      `🏃 Workout Training`,
       `${typeLabel} · ${w.distanceKm} km · ${w.date}`,
     );
     showAlert(
