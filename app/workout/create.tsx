@@ -25,6 +25,7 @@ const TYPES: WorkoutType[] = [
   "INTERVAL",
   "LONG_RUN",
   "RECOVERY",
+  "WALK",
 ];
 
 const todayIso = () => {
@@ -100,7 +101,9 @@ export default function CreateExtraWorkoutScreen() {
           ? t("interval")
           : value === "LONG_RUN"
             ? t("longRun")
-            : t("recovery");
+            : value === "RECOVERY"
+              ? t("recovery")
+              : t("walk");
 
   return (
     <GlassBackground>

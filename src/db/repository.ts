@@ -155,7 +155,7 @@ export async function getWeeklyRunningSummary(db: SQLiteDatabase, planId: number
      INNER JOIN workouts w ON w.id = a.workout_id
      WHERE w.plan_id = ?
        AND substr(a.start_time,1,10) BETWEEN ? AND ?
-       AND (a.sport_type IS NULL OR a.sport_type IN ('Run','TrailRun','VirtualRun'))
+       AND (a.sport_type IS NULL OR a.sport_type IN ('Run','TrailRun','VirtualRun','Walk'))
      GROUP BY substr(a.start_time,1,10)`,
     planId, startDate, endDate
   );
@@ -213,22 +213,29 @@ export async function getActivityForWorkout(db: SQLiteDatabase, workoutId: numbe
 
 export async function saveManualActivity(db: SQLiteDatabase, input: import('@/types/models').ManualActivityInput) {
   await db.withTransactionAsync(async () => {
+    const workout = await db.getFirstAsync<{ type: import('@/types/models').WorkoutType }>(
+      'SELECT type FROM workouts WHERE id = ?',
+      input.workoutId,
+    );
+    const activityName = workout?.type === 'WALK' ? 'Manual walk' : 'Manual run';
+    const sportType = workout?.type === 'WALK' ? 'Walk' : 'Run';
     const existing: any = await db.getFirstAsync(
       `SELECT id FROM activities WHERE workout_id = ? AND source = 'MANUAL' ORDER BY id DESC LIMIT 1`,
       input.workoutId
     );
     if (existing?.id) {
       await db.runAsync(
-        `UPDATE activities SET start_time=?, distance_km=?, duration_seconds=?, avg_heart_rate=?, max_heart_rate=?, elevation_gain=?, feeling=?, notes=?, name='Manual run', sport_type='Run'
+        `UPDATE activities SET start_time=?, distance_km=?, duration_seconds=?, avg_heart_rate=?, max_heart_rate=?, elevation_gain=?, feeling=?, notes=?, name=?, sport_type=?
          WHERE id=?`,
         input.startTime, input.distanceKm, input.durationSeconds, input.avgHeartRate ?? null,
-        input.maxHeartRate ?? null, input.elevationGain ?? null, input.feeling ?? null, input.notes ?? null, existing.id
+        input.maxHeartRate ?? null, input.elevationGain ?? null, input.feeling ?? null, input.notes ?? null,
+        activityName, sportType, existing.id
       );
     } else {
       await db.runAsync(
         `INSERT INTO activities(workout_id,source,external_id,name,sport_type,start_time,distance_km,duration_seconds,avg_heart_rate,max_heart_rate,elevation_gain,feeling,notes,raw_data)
-         VALUES (?,'MANUAL',NULL,'Manual run','Run',?,?,?,?,?,?,?,?,NULL)`,
-        input.workoutId, input.startTime, input.distanceKm, input.durationSeconds, input.avgHeartRate ?? null,
+         VALUES (?, 'MANUAL', NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)`,
+        input.workoutId, activityName, sportType, input.startTime, input.distanceKm, input.durationSeconds, input.avgHeartRate ?? null,
         input.maxHeartRate ?? null, input.elevationGain ?? null, input.feeling ?? null, input.notes ?? null
       );
     }

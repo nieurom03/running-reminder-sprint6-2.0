@@ -1,4 +1,11 @@
-export type WorkoutType = 'EASY' | 'TEMPO' | 'INTERVAL' | 'LONG_RUN' | 'RECOVERY' | 'REST';
+export type WorkoutType =
+  | 'EASY'
+  | 'TEMPO'
+  | 'INTERVAL'
+  | 'LONG_RUN'
+  | 'RECOVERY'
+  | 'WALK'
+  | 'REST';
 export type WorkoutStatus = 'PLANNED' | 'COMPLETED' | 'SKIPPED' | 'MISSED';
 export type ActivitySource = 'MANUAL' | 'STRAVA' | 'GARMIN' | 'HEALTHKIT';
 export type RunFeeling = 'GREAT' | 'GOOD' | 'NORMAL' | 'HARD' | 'VERY_HARD';

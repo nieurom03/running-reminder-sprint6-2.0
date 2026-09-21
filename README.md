@@ -76,3 +76,4 @@ This is manual file backup through iCloud Drive, not continuous CloudKit synchro
 - New backups are password-protected `.rrbackup` files encrypted with AES-256-GCM and PBKDF2-HMAC-SHA256.
 - Restore opens the system file picker, supports encrypted `.rrbackup` files, and remains compatible with legacy JSON backups.
 - Settings now includes a functional Feedback form that opens the system share sheet with app/device version information.
+- Workout type `WALK` is available when editing any workout or creating an extra workout. Walk results are tracked as walking activities and included in the current weekly activity total.

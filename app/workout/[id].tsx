@@ -97,7 +97,9 @@ export default function WorkoutDetail() {
             ? t("longRun")
             : w.type === "RECOVERY"
               ? t("recovery")
-              : t("rest");
+              : w.type === "WALK"
+                ? t("walk")
+                : t("rest");
   const reminderLabel = (m: number) =>
     m === 60
       ? t("reminder1h")
@@ -137,7 +139,7 @@ export default function WorkoutDetail() {
     }
     const result = await scheduleWorkoutReminder(
       reminderAt,
-      `🏃 Workout Training`,
+      `${w.type === "WALK" ? "🚶" : "🏃"} Workout Training`,
       `${typeLabel} · ${w.distanceKm} km · ${w.date}`,
     );
     showAlert(

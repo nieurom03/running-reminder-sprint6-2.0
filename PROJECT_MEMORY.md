@@ -61,6 +61,7 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 
 - Active plan là plan có `id` lớn nhất; dự án chưa có cờ active riêng.
 - `workouts.is_extra=1` đánh dấu buổi chạy phát sinh do người dùng thêm cho ngày hiện tại. Workout này không tham gia cấu trúc, progress, trạng thái tổng hoặc reminder của giáo án.
+- `WorkoutType` hỗ trợ `WALK`. Người dùng chọn một workout từ Plan/Calendar, mở Edit và đổi riêng ngày đó sang Walk mà không tái tạo hoặc thay đổi các ngày còn lại. Kết quả thủ công của Walk lưu `sport_type='Walk'` và vẫn cộng vào tổng hoạt động tuần.
 - Xóa plan cascade xóa workouts; xóa workout làm activity liên kết bị xóa theo schema hiện tại.
 - Một kết quả manual được upsert theo `workout_id` + source `MANUAL`, đồng thời đặt workout thành `COMPLETED`.
 - Xóa kết quả manual đưa workout về `PLANNED`.

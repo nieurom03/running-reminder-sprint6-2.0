@@ -34,6 +34,7 @@ import type {
   Workout,
 } from "@/types/models";
 import { RunnerIcon } from "@/components/RunnerIcon";
+import { WalkerIcon } from "@/components/WalkerIcon";
 import { useTheme } from "@/context/ThemeContext";
 
 export default function Dashboard() {
@@ -388,7 +389,11 @@ export default function Dashboard() {
                   { backgroundColor: colors.rowIconBg },
                 ]}
               >
-                <RunnerIcon size={26} color="#079455" />
+                {next?.type === "WALK" ? (
+                  <WalkerIcon size={27} color="#079455" />
+                ) : (
+                  <RunnerIcon size={26} color="#079455" />
+                )}
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={[s.nextLabel, { color: colors.textSecondary }]}>{t("nextRun")}</Text>

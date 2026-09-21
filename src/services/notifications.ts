@@ -60,7 +60,7 @@ export async function schedulePlanReminders(plan: TrainingPlan, workouts: Workou
     const pace = workout.targetPaceMinSec ? ` · pace ${formatPace(workout.targetPaceMinSec)}–${formatPace(workout.targetPaceMaxSec ?? workout.targetPaceMinSec)}` : '';
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: `🏃 ${workout.type.replace('_',' ')} · ${workout.distanceKm} km`,
+        title: `${workout.type === 'WALK' ? '🚶' : '🏃'} ${workout.type.replace('_',' ')} · ${workout.distanceKm} km`,
         body: `${workout.date}${pace}`,
         data: { workoutId: workout.id }
       },

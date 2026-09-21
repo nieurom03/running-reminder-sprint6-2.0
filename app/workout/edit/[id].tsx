@@ -24,6 +24,7 @@ const TYPES: WorkoutType[] = [
   "INTERVAL",
   "LONG_RUN",
   "RECOVERY",
+  "WALK",
   "REST",
 ];
 export default function EditWorkoutScreen() {
@@ -124,7 +125,9 @@ export default function EditWorkoutScreen() {
                       ? t("longRun")
                       : x === "RECOVERY"
                         ? t("recovery")
-                        : t("rest")}
+                        : x === "WALK"
+                          ? t("walk")
+                          : t("rest")}
             </Text>
           </Pressable>
         ))}
