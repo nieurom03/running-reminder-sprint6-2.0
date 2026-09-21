@@ -1,17 +1,17 @@
 {
   "expo": {
     "name": "Workout Training",
-    "slug": "running-reminder",
-    "scheme": "runningreminder",
+    "slug": "workout-training",
+    "scheme": "workout-training",
     "version": "0.6.2",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.vovannieu.runplan"
+      "bundleIdentifier": "com.vovannieu.workouttraining"
     },
     "android": {
-      "package": "com.vovannieu.runplan"
+      "package": "com.vovannieu.workouttraining"
     },
     "plugins": [
       "expo-router",
@@ -20,7 +20,8 @@
         "expo-build-properties",
         {
           "ios": {
-            "buildReactNativeFromSource": true
+            "buildReactNativeFromSource": true,
+            "enableSceneSupport": true
           }
         }
       ],

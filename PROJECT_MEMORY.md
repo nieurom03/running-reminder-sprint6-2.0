@@ -90,7 +90,8 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - Không thay bundle identifier nếu chưa được yêu cầu vì liên quan signing/provisioning.
 - Thay native dependency, icon hoặc splash có thể cần `expo prebuild --clean -p ios` và rebuild iOS.
 - Mã hóa backup dùng `randomblob` của SQLite đã được liên kết sẵn để tạo salt/nonce, PBKDF2-HMAC-SHA256 (310.000 vòng) để dẫn xuất khóa và AES-256-GCM để bảo mật/xác thực nội dung. Không lưu mật khẩu; mất mật khẩu thì không khôi phục được file. Không thêm native module chỉ để mã hóa vì development build cũ sẽ lỗi ngay khi tải Settings.
-- Tên hiển thị của app là `Workout Training`. Target/project iOS và định danh nội bộ của định dạng backup vẫn giữ `RunningReminder`/`Running Reminder` để không làm hỏng signing, Pods hoặc file backup cũ.
+- Tên hiển thị của app là `Workout Training`; target/project iOS là `WorkoutTraining`, bundle identifier iOS và application ID Android là `com.vovannieu.workouttraining`. Định danh nội bộ của định dạng backup vẫn giữ nguyên để đọc được file backup cũ.
+- Build bằng iOS 27 SDK bắt buộc dùng UIKit scene lifecycle. Giữ `expo-build-properties.ios.enableSceneSupport=true`, `AppDelegate` conform `ExpoReactNativeFactoryProvider`, không khởi tạo `UIWindow`/React Native trực tiếp trong `didFinishLaunching`, và giữ `UIApplicationSceneManifest` trỏ tới `EXExpoAppSceneDelegate`. Cần Expo SDK từ `57.0.23` trở lên cho cấu hình này.
 - Feedback dùng `Share.share` cho nội dung text nhưng loại activity `SaveToFiles`/iCloud Drive trên iOS; lưu file chỉ thuộc luồng Backup. Popup Feedback chỉ đóng sau khi người dùng chọn một kênh chia sẻ.
 
 ## 6. Tình trạng kiểm tra ngày 2026-09-21
@@ -100,6 +101,7 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - Settings đọc version từ `app.json`, không hard-code. Hiện `package.json` là `0.6.0` còn `app.json` là `0.6.2`; khi release nên gom version về một nguồn duy nhất.
 - Popup Language/Appearance, date/pace/goal-time/duration và toàn bộ cảnh báo/xác nhận trong app đã dùng chung Liquid Glass, theo đúng Light/Dark do người dùng chọn.
 - `npm run typecheck`, export bundle iOS và Android chạy thành công sau thay đổi popup. Đã kiểm tra trực quan Light/Dark trên Simulator iPhone 17 Pro Max, iOS 26.3.
+- Bản Release đã build bằng iOS 27 SDK và khởi chạy thành công trên Simulator iPhone 18 Pro Max, iOS 27.0 sau khi chuyển sang scene lifecycle; không còn lỗi `UIScene life cycle is required`.
 - `tsconfig.json` tạm dùng `ignoreDeprecations: "6.0"` cho alias dựa trên `baseUrl`; cần migrate cấu hình trước TypeScript 7.
 - README chính có tiêu đề Sprint 5.1 nhưng chứa changelog đến 5.9; `README_SPRINT_6.md` mô tả UI 6.0.
 

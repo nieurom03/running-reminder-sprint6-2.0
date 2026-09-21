@@ -12,10 +12,10 @@ npx expo-doctor
 Then regenerate the native iOS project so the new app name and native modules are applied:
 
 ```bash
-rm -rf ~/Library/Developer/Xcode/DerivedData/RunPlan-*
-rm -rf ~/Library/Developer/Xcode/DerivedData/RunningReminder-*
+rm -rf ~/Library/Developer/Xcode/DerivedData/WorkoutTraining-*
 npx expo prebuild --clean -p ios
 npx expo run:ios --device
+npx expo run:ios --configuration release
 ```
 
 If you prefer Xcode:
@@ -47,7 +47,9 @@ npx expo-doctor
 Open **More / Thêm → Language / Ngôn ngữ** and choose Vietnamese or English. The selection is stored locally in SQLite.
 
 ### Sprint 5.8 clean rebuild
+
 Because the icon asset changed, remove generated iOS assets before rebuilding:
+
 ```bash
 rm -rf .expo ios
 npx expo prebuild --clean -p ios
