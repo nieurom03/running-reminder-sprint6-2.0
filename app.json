@@ -17,6 +17,12 @@
       "expo-router",
       "expo-sqlite",
       [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Workout Training to use your location while recording a workout."
+        }
+      ],
+      [
         "expo-build-properties",
         {
           "ios": {

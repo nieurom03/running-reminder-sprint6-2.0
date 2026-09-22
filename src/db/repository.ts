@@ -36,6 +36,22 @@ export async function getWorkout(db: SQLiteDatabase, id: number): Promise<Workou
   return r ? mapWorkout(r) : null;
 }
 
+export async function getWorkoutForDate(
+  db: SQLiteDatabase,
+  planId: number,
+  date: string,
+): Promise<Workout | null> {
+  const row: any = await db.getFirstAsync(
+    `SELECT * FROM workouts
+     WHERE plan_id = ? AND date = ? AND type <> 'REST'
+     ORDER BY is_extra ASC, id ASC
+     LIMIT 1`,
+    planId,
+    date,
+  );
+  return row ? mapWorkout(row) : null;
+}
+
 export async function setWorkoutCompleted(db: SQLiteDatabase, id: number, completed: boolean) {
   await setWorkoutStatus(db, id, completed ? 'COMPLETED' : 'PLANNED');
 }
@@ -220,7 +236,7 @@ export async function saveManualActivity(db: SQLiteDatabase, input: import('@/ty
     const activityName = workout?.type === 'WALK' ? 'Manual walk' : 'Manual run';
     const sportType = workout?.type === 'WALK' ? 'Walk' : 'Run';
     const existing: any = await db.getFirstAsync(
-      `SELECT id FROM activities WHERE workout_id = ? AND source = 'MANUAL' ORDER BY id DESC LIMIT 1`,
+      `SELECT id FROM activities WHERE workout_id = ? ORDER BY id DESC LIMIT 1`,
       input.workoutId
     );
     if (existing?.id) {
@@ -246,9 +262,71 @@ export async function saveManualActivity(db: SQLiteDatabase, input: import('@/ty
   });
 }
 
+export async function saveRecordedActivity(
+  db: SQLiteDatabase,
+  input: import('@/types/models').RecordedActivityInput,
+) {
+  let workoutId = input.workoutId;
+  await db.withTransactionAsync(async () => {
+    if (workoutId != null) {
+      const workout = await db.getFirstAsync<{ id: number }>(
+        'SELECT id FROM workouts WHERE id = ? AND plan_id = ?',
+        workoutId,
+        input.planId,
+      );
+      if (!workout) workoutId = null;
+    }
+
+    if (workoutId == null) {
+      const created = await db.runAsync(
+        `INSERT INTO workouts(
+          plan_id,date,type,distance_km,target_pace_min_sec,target_pace_max_sec,description,is_extra
+         ) VALUES (?,?,?,?,NULL,NULL,?,1)`,
+        input.planId,
+        input.startTime.slice(0, 10),
+        input.workoutType,
+        Math.max(0, input.distanceKm),
+        'GPS recorded activity',
+      );
+      workoutId = Number(created.lastInsertRowId);
+    }
+
+    const sportType = input.workoutType === 'WALK' ? 'Walk' : 'Run';
+    const activityName = input.workoutType === 'WALK' ? 'Recorded walk' : 'Recorded run';
+    const externalId = `gps-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    const rawData = JSON.stringify({
+      version: 1,
+      provider: 'expo-location',
+      route: input.route,
+    });
+
+    await db.runAsync(
+      `INSERT INTO activities(
+        workout_id,source,external_id,name,sport_type,start_time,distance_km,
+        duration_seconds,avg_heart_rate,max_heart_rate,elevation_gain,feeling,notes,raw_data
+       ) VALUES (?, 'GPS', ?, ?, ?, ?, ?, ?, NULL, NULL, ?, NULL, NULL, ?)`,
+      workoutId,
+      externalId,
+      activityName,
+      sportType,
+      input.startTime,
+      Math.max(0, input.distanceKm),
+      Math.max(1, Math.round(input.durationSeconds)),
+      Math.max(0, input.elevationGain),
+      rawData,
+    );
+    await db.runAsync(
+      `UPDATE workouts SET status='COMPLETED', completed_at=? WHERE id=?`,
+      new Date().toISOString(),
+      workoutId,
+    );
+  });
+  return workoutId;
+}
+
 export async function deleteManualActivityForWorkout(db: SQLiteDatabase, workoutId: number) {
   await db.withTransactionAsync(async () => {
-    await db.runAsync(`DELETE FROM activities WHERE workout_id=? AND source='MANUAL'`, workoutId);
+    await db.runAsync(`DELETE FROM activities WHERE workout_id=?`, workoutId);
     await db.runAsync(`UPDATE workouts SET status='PLANNED', completed_at=NULL WHERE id=?`, workoutId);
   });
 }

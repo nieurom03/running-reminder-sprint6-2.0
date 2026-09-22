@@ -58,6 +58,13 @@ function IOSLiquidGlassTabs() {
         <NativeTabs.Trigger.Label>{t("plan")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="start">
+        <NativeTabs.Trigger.Icon
+          sf={{ default: "record.circle", selected: "record.circle.fill" }}
+        />
+        <NativeTabs.Trigger.Label>{t("recordTab")}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name="calendar">
         <NativeTabs.Trigger.Icon sf="calendar" />
         <NativeTabs.Trigger.Label>{t("calendar")}</NativeTabs.Trigger.Label>
@@ -160,6 +167,15 @@ function FallbackTabs() {
           title: t("plan"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="barbell-outline" color={color} size={size + 2} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="start"
+        options={{
+          title: t("recordTab"),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="radio-button-on-outline" color={color} size={size + 3} />
           ),
         }}
       />

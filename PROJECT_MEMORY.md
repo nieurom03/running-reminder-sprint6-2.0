@@ -38,6 +38,7 @@ Tính năng hiện có:
 - `app/(tabs)/plan.tsx`: tổng quan và quản lý giáo án, reschedule reminder, xóa plan.
 - `app/(tabs)/calendar.tsx`: lịch workout theo tháng.
 - `app/(tabs)/settings.tsx`: ngôn ngữ, theme, thống kê, backup/restore, onboarding.
+- `app/(tabs)/start.tsx`: màn ghi hoạt động GPS kiểu Strava; chọn Run/Walk, Start/Pause/Resume/Finish, hiển thị route, cự ly, thời gian, pace và độ cao.
 - `app/create-plan.tsx`: form tạo giáo án và schedule notifications.
 - `app/workout/[id].tsx`: chi tiết, trạng thái và reminder riêng.
 - `app/workout/edit/[id].tsx`: sửa/xóa một workout.
@@ -53,6 +54,7 @@ Tính năng hiện có:
 - `src/components/Glass.tsx`, `WorkoutCard.tsx`: visual system và reusable card UI.
 - `src/components/LiquidGlassModal.tsx`: khung popup kính mờ dùng chung và popup chọn một giá trị.
 - `src/components/GlassAlert.tsx`: provider cảnh báo/xác nhận toàn app; thay cho `Alert.alert` để luôn bám theme trong app.
+- `src/components/RunMap.ios.tsx`, `RunMap.tsx`: Apple Maps trên iOS và bản đồ route nhẹ cho nền tảng còn lại.
 - `DateField.tsx`, `PacePicker.tsx`, `GoalTimePicker.tsx`, `DurationPicker.tsx`: các picker dùng chung `LiquidGlassModal`.
 
 ## 4. Dữ liệu và quy tắc nghiệp vụ
@@ -68,6 +70,7 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - Weekly summary chạy từ thứ Hai đến Chủ nhật và cộng activity loại Run/TrailRun/VirtualRun hoặc chưa có `sport_type`.
 - Weekly summary trên Dashboard được lọc theo active plan; activity của plan đã xóa được giữ làm lịch sử nhưng không được cộng vào vòng tiến độ của plan mới.
 - Activity của workout phát sinh vẫn được cộng vào weekly summary của active plan; km kế hoạch và biểu đồ kế hoạch chỉ lấy workout có `is_extra=0`.
+- Activity được ghi từ tab Start có `source='GPS'` và lưu route gốc trong `raw_data`. Nếu ngày hiện tại không có workout, lúc lưu sẽ tự tạo workout `is_extra=1`; nếu có lịch thì activity được gắn với workout đó và đánh dấu hoàn thành.
 - Trong Weekly Activity, cự ly workout phát sinh được cộng vào mốc hiển thị của đúng ngày và có dấu `*`; dấu này không làm thay đổi tổng km kế hoạch hoặc progress giáo án.
 - `training_plans.long_run_day` lưu ngày Long Run do người dùng chọn. Generator dùng ngày này; nếu dữ liệu cũ không hợp lệ thì mới fallback sang thứ Bảy hoặc ngày chạy cuối tuần.
 - Generator có quality workout xen kẽ tempo/interval, recovery, cutback mỗi tuần thứ tư, taper hai tuần cuối, rồi thêm Race Day.
@@ -92,6 +95,10 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - Mã hóa backup dùng `randomblob` của SQLite đã được liên kết sẵn để tạo salt/nonce, PBKDF2-HMAC-SHA256 (310.000 vòng) để dẫn xuất khóa và AES-256-GCM để bảo mật/xác thực nội dung. Không lưu mật khẩu; mất mật khẩu thì không khôi phục được file. Không thêm native module chỉ để mã hóa vì development build cũ sẽ lỗi ngay khi tải Settings.
 - Tên hiển thị của app là `Workout Training`; target/project iOS là `WorkoutTraining`, bundle identifier iOS và application ID Android là `com.vovannieu.workouttraining`. Định danh nội bộ của định dạng backup vẫn giữ nguyên để đọc được file backup cũ.
 - Build bằng iOS 27 SDK bắt buộc dùng UIKit scene lifecycle. Giữ `expo-build-properties.ios.enableSceneSupport=true`, `AppDelegate` conform `ExpoReactNativeFactoryProvider`, không khởi tạo `UIWindow`/React Native trực tiếp trong `didFinishLaunching`, và giữ `UIApplicationSceneManifest` trỏ tới `EXExpoAppSceneDelegate`. Cần Expo SDK từ `57.0.23` trở lên cho cấu hình này.
+- Tab Start dùng `expo-location`, `expo-haptics` và `react-native-maps`; iOS phải giữ `NSLocationWhenInUseUsageDescription` và chạy `pod install` sau khi cài lại dependencies. Hiện chỉ ghi GPS khi app ở foreground; đưa app về nền sẽ tự Pause để không tính thời gian thiếu dữ liệu vị trí.
+- Màn hình Start giữ card thống kê/điều khiển cố định phía trên tab bar; vùng Map + workout dùng flex và chỉ vùng này cuộn khi màn hình thấp. Nhờ vậy bản đồ tự giãn trên Pro Max/iPad. Selector dùng `run-fast` cho Run và giữ `footsteps-outline` cho Walk; lựa chọn sport phải lưu qua `sportRef` để callback GPS không làm effect tải workout đặt lại tab.
+- Map được tách theo platform: iOS dùng Apple Maps, Android dùng Google Maps khi `GOOGLE_MAPS_ANDROID_API_KEY` có mặt lúc prebuild/build, web hoặc Android thiếu key dùng SVG fallback. Google Maps key thuộc dự án Cloud và phải giới hạn theo package `com.vovannieu.workouttraining`, SHA-1 cùng Maps SDK for Android; không yêu cầu người dùng đăng nhập Gmail. `app.config.js` chỉ bật plugin/key khi biến môi trường có giá trị.
+- Các mô tả hệ thống cũ do generator lưu bằng tiếng Việt phải được ánh xạ qua i18n khi hiển thị; ghi chú tùy chỉnh của người dùng giữ nguyên. Start screen hiện xử lý các mô tả Easy/Long/Tempo/Interval/Recovery/Race Day/GPS cũ theo quy tắc này.
 - Feedback dùng `Share.share` cho nội dung text nhưng loại activity `SaveToFiles`/iCloud Drive trên iOS; lưu file chỉ thuộc luồng Backup. Popup Feedback chỉ đóng sau khi người dùng chọn một kênh chia sẻ.
 
 ## 6. Tình trạng kiểm tra ngày 2026-09-21
@@ -102,6 +109,7 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - Popup Language/Appearance, date/pace/goal-time/duration và toàn bộ cảnh báo/xác nhận trong app đã dùng chung Liquid Glass, theo đúng Light/Dark do người dùng chọn.
 - `npm run typecheck`, export bundle iOS và Android chạy thành công sau thay đổi popup. Đã kiểm tra trực quan Light/Dark trên Simulator iPhone 17 Pro Max, iOS 26.3.
 - Bản Release đã build bằng iOS 27 SDK và khởi chạy thành công trên Simulator iPhone 18 Pro Max, iOS 27.0 sau khi chuyển sang scene lifecycle; không còn lỗi `UIScene life cycle is required`.
+- Tab Start đã được kiểm tra trực quan trên Simulator iPhone 18 Pro Max/iOS 27.0 với Apple Maps và native Liquid Glass tab bar 5 mục. TypeScript, iOS export và Release build đều thành công.
 - `tsconfig.json` tạm dùng `ignoreDeprecations: "6.0"` cho alias dựa trên `baseUrl`; cần migrate cấu hình trước TypeScript 7.
 - README chính có tiêu đề Sprint 5.1 nhưng chứa changelog đến 5.9; `README_SPRINT_6.md` mô tả UI 6.0.
 

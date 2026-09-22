@@ -8,24 +8,24 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		15DE3A4658F3B07C7248E405 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1765BA6A6B82357E6D5AE122 /* ExpoModulesProvider.swift */; };
+		3B5BDBB664C1CCF2149E336F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 520473B21DA3016061AE3C5C /* PrivacyInfo.xcprivacy */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		5F0BC394E94B39E8D026F673 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B5423390F3513AB6AC7488EA /* PrivacyInfo.xcprivacy */; };
-		7280F5537A2C34BF37A5831D /* libPods-WorkoutTraining.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E21AC4A611291E5270B2E52 /* libPods-WorkoutTraining.a */; };
+		6DC8DD19470EC9CD8381D0EC /* libPods-WorkoutTraining.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3493BE7396717BEEE0D82E92 /* libPods-WorkoutTraining.a */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
+		DE40744BF5F73D832B8499AA /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0652597A5BC0C1C5310A21 /* ExpoModulesProvider.swift */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		13A9D3B7CD0873C7734C786B /* Pods-WorkoutTraining.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WorkoutTraining.debug.xcconfig"; path = "Target Support Files/Pods-WorkoutTraining/Pods-WorkoutTraining.debug.xcconfig"; sourceTree = "<group>"; };
+		08FEE83299E515FFA5A6E919 /* Pods-WorkoutTraining.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WorkoutTraining.release.xcconfig"; path = "Target Support Files/Pods-WorkoutTraining/Pods-WorkoutTraining.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* WorkoutTraining.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WorkoutTraining.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = WorkoutTraining/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = WorkoutTraining/Info.plist; sourceTree = "<group>"; };
-		1765BA6A6B82357E6D5AE122 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-WorkoutTraining/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		3E21AC4A611291E5270B2E52 /* libPods-WorkoutTraining.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WorkoutTraining.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		7A654EE12B6111A4E11D14BB /* Pods-WorkoutTraining.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WorkoutTraining.release.xcconfig"; path = "Target Support Files/Pods-WorkoutTraining/Pods-WorkoutTraining.release.xcconfig"; sourceTree = "<group>"; };
+		3493BE7396717BEEE0D82E92 /* libPods-WorkoutTraining.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WorkoutTraining.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		520473B21DA3016061AE3C5C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = WorkoutTraining/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = WorkoutTraining/SplashScreen.storyboard; sourceTree = "<group>"; };
-		B5423390F3513AB6AC7488EA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = WorkoutTraining/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		AFD083A47E773D742DA5C051 /* Pods-WorkoutTraining.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WorkoutTraining.debug.xcconfig"; path = "Target Support Files/Pods-WorkoutTraining/Pods-WorkoutTraining.debug.xcconfig"; sourceTree = "<group>"; };
+		BB0652597A5BC0C1C5310A21 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-WorkoutTraining/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = WorkoutTraining/AppDelegate.swift; sourceTree = "<group>"; };
@@ -37,7 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7280F5537A2C34BF37A5831D /* libPods-WorkoutTraining.a in Frameworks */,
+				6DC8DD19470EC9CD8381D0EC /* libPods-WorkoutTraining.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,15 +53,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				B5423390F3513AB6AC7488EA /* PrivacyInfo.xcprivacy */,
-			);
-			name = WorkoutTraining;
-			sourceTree = "<group>";
-		};
-		1F790C20F54ABEFCDD929BF6 /* WorkoutTraining */ = {
-			isa = PBXGroup;
-			children = (
-				1765BA6A6B82357E6D5AE122 /* ExpoModulesProvider.swift */,
+				520473B21DA3016061AE3C5C /* PrivacyInfo.xcprivacy */,
 			);
 			name = WorkoutTraining;
 			sourceTree = "<group>";
@@ -70,18 +62,9 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				3E21AC4A611291E5270B2E52 /* libPods-WorkoutTraining.a */,
+				3493BE7396717BEEE0D82E92 /* libPods-WorkoutTraining.a */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		6E9888BE894CB77102435E79 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				13A9D3B7CD0873C7734C786B /* Pods-WorkoutTraining.debug.xcconfig */,
-				7A654EE12B6111A4E11D14BB /* Pods-WorkoutTraining.release.xcconfig */,
-			);
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -98,8 +81,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				6E9888BE894CB77102435E79 /* Pods */,
-				91E24F2A503300E92952C910 /* ExpoModulesProviders */,
+				8B136D3D3ABC771B575499B7 /* Pods */,
+				FCB37286757F563C5174B017 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -114,12 +97,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		91E24F2A503300E92952C910 /* ExpoModulesProviders */ = {
+		8B136D3D3ABC771B575499B7 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				1F790C20F54ABEFCDD929BF6 /* WorkoutTraining */,
+				AFD083A47E773D742DA5C051 /* Pods-WorkoutTraining.debug.xcconfig */,
+				08FEE83299E515FFA5A6E919 /* Pods-WorkoutTraining.release.xcconfig */,
 			);
-			name = ExpoModulesProviders;
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 		BB2F792B24A3F905000567C9 /* Supporting */ = {
@@ -131,6 +116,22 @@
 			path = WorkoutTraining/Supporting;
 			sourceTree = "<group>";
 		};
+		F171EE90353877ECC667916B /* WorkoutTraining */ = {
+			isa = PBXGroup;
+			children = (
+				BB0652597A5BC0C1C5310A21 /* ExpoModulesProvider.swift */,
+			);
+			name = WorkoutTraining;
+			sourceTree = "<group>";
+		};
+		FCB37286757F563C5174B017 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				F171EE90353877ECC667916B /* WorkoutTraining */,
+			);
+			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -139,13 +140,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "WorkoutTraining" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				BD80133A0E69C249D4A45DC7 /* [Expo] Configure project */,
+				ACA9E1B4DD3233FE8B7FE769 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				63FB0AB9873418DB31539641 /* [CP] Embed Pods Frameworks */,
+				B1D0A09AD65036F6E53F439D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -195,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				5F0BC394E94B39E8D026F673 /* PrivacyInfo.xcprivacy in Resources */,
+				3B5BDBB664C1CCF2149E336F /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,26 +242,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		63FB0AB9873418DB31539641 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-WorkoutTraining/Pods-WorkoutTraining-frameworks.sh",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ExpoModulesJSI/ExpoModulesJSI.framework/ExpoModulesJSI",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermesvm.framework/hermesvm",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ExpoModulesJSI.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermesvm.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-WorkoutTraining/Pods-WorkoutTraining-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -303,7 +284,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-WorkoutTraining/Pods-WorkoutTraining-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		BD80133A0E69C249D4A45DC7 /* [Expo] Configure project */ = {
+		ACA9E1B4DD3233FE8B7FE769 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -327,6 +308,26 @@
 			shellPath = /bin/sh;
 			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-WorkoutTraining/expo-configure-project.sh\"\n";
 		};
+		B1D0A09AD65036F6E53F439D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-WorkoutTraining/Pods-WorkoutTraining-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/ExpoModulesJSI/ExpoModulesJSI.framework/ExpoModulesJSI",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built/hermesvm.framework/hermesvm",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ExpoModulesJSI.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermesvm.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-WorkoutTraining/Pods-WorkoutTraining-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -335,7 +336,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				15DE3A4658F3B07C7248E405 /* ExpoModulesProvider.swift in Sources */,
+				DE40744BF5F73D832B8499AA /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -344,27 +345,25 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 13A9D3B7CD0873C7734C786B /* Pods-WorkoutTraining.debug.xcconfig */;
+			baseConfigurationReference = AFD083A47E773D742DA5C051 /* Pods-WorkoutTraining.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = WorkoutTraining/WorkoutTraining.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5J7ZGV2NQY;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"FB_SONARKIT_ENABLED=1",
 				);
 				INFOPLIST_FILE = WorkoutTraining/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Workout Training";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.4;
-				MARKETING_VERSION = 0.6.2;
+				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -373,10 +372,6 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.vovannieu.workouttraining;
 				PRODUCT_NAME = WorkoutTraining;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "WorkoutTraining/WorkoutTraining-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -387,22 +382,20 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7A654EE12B6111A4E11D14BB /* Pods-WorkoutTraining.release.xcconfig */;
+			baseConfigurationReference = 08FEE83299E515FFA5A6E919 /* Pods-WorkoutTraining.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = WorkoutTraining/WorkoutTraining.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 5J7ZGV2NQY;
 				INFOPLIST_FILE = WorkoutTraining/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Workout Training";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.4;
-				MARKETING_VERSION = 0.6.2;
+				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -411,10 +404,6 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = com.vovannieu.workouttraining;
 				PRODUCT_NAME = WorkoutTraining;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "WorkoutTraining/WorkoutTraining-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -476,7 +465,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DRCT_REMOVE_LEGACY_ARCH=1",
@@ -540,7 +529,6 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DRCT_REMOVE_LEGACY_ARCH=1",

@@ -7,7 +7,7 @@ export type WorkoutType =
   | 'WALK'
   | 'REST';
 export type WorkoutStatus = 'PLANNED' | 'COMPLETED' | 'SKIPPED' | 'MISSED';
-export type ActivitySource = 'MANUAL' | 'STRAVA' | 'GARMIN' | 'HEALTHKIT';
+export type ActivitySource = 'MANUAL' | 'GPS' | 'STRAVA' | 'GARMIN' | 'HEALTHKIT';
 export type RunFeeling = 'GREAT' | 'GOOD' | 'NORMAL' | 'HARD' | 'VERY_HARD';
 
 export interface TrainingPlan {
@@ -67,6 +67,25 @@ export interface ManualActivityInput {
   elevationGain?: number | null;
   feeling?: RunFeeling | null;
   notes?: string | null;
+}
+
+export interface RecordedRoutePoint {
+  latitude: number;
+  longitude: number;
+  altitude: number | null;
+  accuracy: number | null;
+  timestamp: number;
+}
+
+export interface RecordedActivityInput {
+  planId: number;
+  workoutId: number | null;
+  workoutType: 'EASY' | 'WALK';
+  startTime: string;
+  distanceKm: number;
+  durationSeconds: number;
+  elevationGain: number;
+  route: RecordedRoutePoint[];
 }
 
 export interface WorkoutEditInput {
