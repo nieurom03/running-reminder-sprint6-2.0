@@ -34,6 +34,7 @@ import type {
 
 type SessionPhase = "ready" | "recording" | "paused" | "saving";
 type RecordSport = "RUN" | "WALK";
+type MapMode = "follow" | "route" | "free";
 
 const EARTH_RADIUS_M = 6_371_000;
 
@@ -95,6 +96,10 @@ export default function StartScreen() {
   const [gpsAccuracy, setGpsAccuracy] = useState<number | null>(null);
   const [permission, setPermission] =
     useState<Location.PermissionStatus | null>(null);
+  const [mapMode, setMapMode] = useState<MapMode>("follow");
+  const [mapInteracting, setMapInteracting] = useState(false);
+  const [locatingMap, setLocatingMap] = useState(false);
+  const [northUpRequest, setNorthUpRequest] = useState(0);
 
   const phaseRef = useRef<SessionPhase>("ready");
   const sportRef = useRef<RecordSport>("RUN");
@@ -247,6 +252,47 @@ export default function StartScreen() {
   }, [phase]);
 
   useEffect(() => {
+    if (
+      phase !== "ready" ||
+      permission !== Location.PermissionStatus.GRANTED
+    ) {
+      return;
+    }
+    let active = true;
+    let previewSubscription: Location.LocationSubscription | null = null;
+    void Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.Balanced,
+        timeInterval: 2000,
+        distanceInterval: 3,
+      },
+      (location) => {
+        if (!active) return;
+        setCurrentLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          altitude: location.coords.altitude,
+          accuracy: location.coords.accuracy,
+          timestamp: location.timestamp,
+        });
+        setGpsAccuracy(location.coords.accuracy);
+      },
+    )
+      .then((subscription) => {
+        if (!active) {
+          subscription.remove();
+          return;
+        }
+        previewSubscription = subscription;
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+      previewSubscription?.remove();
+    };
+  }, [permission, phase]);
+
+  useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {
       if (state !== "active" && phaseRef.current === "recording") {
         pauseSession(false);
@@ -275,6 +321,31 @@ export default function StartScreen() {
     return true;
   };
 
+  const locateOnMap = async () => {
+    if (locatingMap) return;
+    setLocatingMap(true);
+    try {
+      if (!(await ensureLocationPermission())) return;
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      setCurrentLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        altitude: location.coords.altitude,
+        accuracy: location.coords.accuracy,
+        timestamp: location.timestamp,
+      });
+      setGpsAccuracy(location.coords.accuracy);
+      setMapMode("follow");
+      void Haptics.selectionAsync();
+    } catch {
+      showAlert(t("locationUnavailableTitle"), t("locationUnavailableHelp"));
+    } finally {
+      setLocatingMap(false);
+    }
+  };
+
   const startSession = async () => {
     if (!plan) {
       showAlert(t("noCurrentPlan"), t("createPlanToRecord"), [
@@ -300,6 +371,7 @@ export default function StartScreen() {
       setDistanceMeters(0);
       setElevationGain(0);
       setElapsedSeconds(0);
+      setMapMode("follow");
       setSessionPhase("recording");
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
       await beginLocationUpdates();
@@ -341,6 +413,7 @@ export default function StartScreen() {
     setDistanceMeters(0);
     setElevationGain(0);
     setElapsedSeconds(0);
+    setMapMode("follow");
     setSessionPhase("ready");
   }, [setSessionPhase, stopLocationUpdates]);
 
@@ -409,6 +482,16 @@ export default function StartScreen() {
     () => route.map(({ latitude, longitude }) => ({ latitude, longitude })),
     [route],
   );
+  const showRouteOverview = () => {
+    if (routeCoordinates.length < 2) return;
+    setMapMode("route");
+    void Haptics.selectionAsync();
+  };
+  const orientNorthUp = () => {
+    setMapMode("follow");
+    setNorthUpRequest((value) => value + 1);
+    void Haptics.selectionAsync();
+  };
   const mapLocation = currentLocation
     ? {
         latitude: currentLocation.latitude,
@@ -540,6 +623,8 @@ export default function StartScreen() {
             contentContainerStyle={s.mapContent}
             showsVerticalScrollIndicator={false}
             bounces={false}
+            nestedScrollEnabled
+            scrollEnabled={!mapInteracting}
           >
           <View
             style={[
@@ -552,6 +637,14 @@ export default function StartScreen() {
               route={routeCoordinates}
               isDark={isDark}
               accentColor={colors.accent}
+              fitRoute={mapMode === "route"}
+              followCurrent={mapMode === "follow"}
+              northUpRequest={northUpRequest}
+              interactive
+              onInteractionChange={(active) => {
+                setMapInteracting(active);
+                if (active) setMapMode("free");
+              }}
             />
             <View
               style={[
@@ -617,11 +710,105 @@ export default function StartScreen() {
                 ]}
               >
                 <Ionicons name="navigate" size={13} color={gpsColor} />
-                <Text style={[s.accuracyText, { color: colors.textPrimary }]}> 
+                <Text style={[s.accuracyText, { color: colors.textPrimary }]}>
                   ±{Math.round(gpsAccuracy)} {t("meterShort")}
                 </Text>
               </View>
             )}
+            <View style={s.mapControls}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t("locateCurrentPosition")}
+                disabled={locatingMap}
+                hitSlop={7}
+                onPress={locateOnMap}
+                style={({ pressed }) => [
+                  s.mapControl,
+                  {
+                    backgroundColor:
+                      mapMode === "follow"
+                        ? colors.accent
+                        : isDark
+                          ? "rgba(7,18,11,0.86)"
+                          : "rgba(255,255,255,0.92)",
+                    borderColor: colors.bgCardBorder,
+                    opacity: pressed || locatingMap ? 0.68 : 1,
+                  },
+                ]}
+              >
+                <Ionicons
+                  name={locatingMap ? "hourglass-outline" : "locate"}
+                  size={21}
+                  color={
+                    mapMode === "follow" ? "#FFFFFF" : colors.textPrimary
+                  }
+                />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t("showFullRoute")}
+                accessibilityState={{
+                  disabled: routeCoordinates.length < 2,
+                  selected: mapMode === "route",
+                }}
+                disabled={routeCoordinates.length < 2}
+                hitSlop={7}
+                onPress={showRouteOverview}
+                style={({ pressed }) => [
+                  s.mapControl,
+                  {
+                    backgroundColor:
+                      mapMode === "route"
+                        ? colors.accent
+                        : isDark
+                          ? "rgba(7,18,11,0.86)"
+                          : "rgba(255,255,255,0.92)",
+                    borderColor: colors.bgCardBorder,
+                    opacity:
+                      routeCoordinates.length < 2
+                        ? 0.42
+                        : pressed
+                          ? 0.68
+                          : 1,
+                  },
+                ]}
+              >
+                <Ionicons
+                  name="map-outline"
+                  size={20}
+                  color={
+                    mapMode === "route" ? "#FFFFFF" : colors.textPrimary
+                  }
+                />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t("northUp")}
+                hitSlop={7}
+                onPress={orientNorthUp}
+                style={({ pressed }) => [
+                  s.mapControl,
+                  {
+                    backgroundColor: isDark
+                      ? "rgba(7,18,11,0.86)"
+                      : "rgba(255,255,255,0.92)",
+                    borderColor: colors.bgCardBorder,
+                    opacity: pressed ? 0.68 : 1,
+                  },
+                ]}
+              >
+                <View style={s.compassGlyph}>
+                  <Text style={[s.compassNorth, { color: colors.textPrimary }]}>
+                    {t("northShort")}
+                  </Text>
+                  <Ionicons
+                    name="navigate-outline"
+                    size={17}
+                    color={colors.textPrimary}
+                  />
+                </View>
+              </Pressable>
+            </View>
           </View>
 
           <GlassCard style={s.workoutCard}>
@@ -699,7 +886,7 @@ export default function StartScreen() {
               />
             </View>
             {elevationGain > 0 && (
-              <Text style={[s.elevation, { color: colors.textSecondary }]}> 
+              <Text style={[s.elevation, { color: colors.textSecondary }]}>
                 {t("elevationGainShort")} +{Math.round(elevationGain)} {t("meterShort")}
               </Text>
             )}
@@ -950,6 +1137,38 @@ const s = StyleSheet.create({
     zIndex: 10,
   },
   accuracyText: { fontSize: 11, fontWeight: "900" },
+  mapControls: {
+    position: "absolute",
+    right: 14,
+    bottom: 16,
+    gap: 9,
+    zIndex: 22,
+    elevation: 22,
+  },
+  mapControl: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000000",
+    shadowOpacity: 0.17,
+    shadowRadius: 9,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 8,
+  },
+  compassGlyph: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 0,
+  },
+  compassNorth: {
+    marginBottom: -3,
+    fontSize: 8,
+    lineHeight: 9,
+    fontWeight: "900",
+  },
   workoutCard: {
     flexShrink: 0,
     minHeight: 86,

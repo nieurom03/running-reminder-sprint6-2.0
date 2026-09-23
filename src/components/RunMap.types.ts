@@ -8,4 +8,11 @@ export type RunMapProps = {
   route: RunMapCoordinate[];
   isDark: boolean;
   accentColor: string;
+  fitRoute?: boolean;
+  showsUserLocation?: boolean;
+  focusCoordinate?: RunMapCoordinate | null;
+  followCurrent?: boolean;
+  northUpRequest?: number;
+  interactive?: boolean;
+  onInteractionChange?: (active: boolean) => void;
 };

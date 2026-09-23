@@ -1,7 +1,8 @@
 import Constants from "expo-constants";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { StyleSheet } from "react-native";
 import MapView, {
+  Marker,
   Polyline,
   PROVIDER_GOOGLE,
   type MapStyleElement,
@@ -74,22 +75,96 @@ const DARK_MAP_STYLE: MapStyleElement[] = [
 ];
 
 export function RunMap(props: RunMapProps) {
-  const { current, route, isDark, accentColor } = props;
+  const {
+    current,
+    route,
+    isDark,
+    accentColor,
+    fitRoute = false,
+    showsUserLocation = true,
+    focusCoordinate = null,
+    followCurrent = true,
+    northUpRequest = 0,
+    interactive = true,
+    onInteractionChange,
+  } = props;
   const mapRef = useRef<MapView>(null);
+  const handledNorthUpRequestRef = useRef(0);
+  const currentLatitude = current?.latitude;
+  const currentLongitude = current?.longitude;
+  const focusLatitude = focusCoordinate?.latitude;
+  const focusLongitude = focusCoordinate?.longitude;
   const googleMapsConfigured =
     Constants.expoConfig?.extra?.googleMapsAndroidConfigured === true;
 
+  const focusMap = useCallback(
+    (animated: boolean) => {
+      if (!googleMapsConfigured) return;
+      if (focusLatitude != null && focusLongitude != null) {
+        mapRef.current?.animateToRegion(
+          {
+            latitude: focusLatitude,
+            longitude: focusLongitude,
+            latitudeDelta: 0.006,
+            longitudeDelta: 0.006,
+          },
+          animated ? 500 : 0,
+        );
+        return;
+      }
+      if (fitRoute && route.length > 1) {
+        mapRef.current?.fitToCoordinates(route, {
+          edgePadding: { top: 42, right: 42, bottom: 42, left: 42 },
+          animated,
+        });
+        return;
+      }
+      if (!followCurrent) return;
+      if (currentLatitude == null || currentLongitude == null) return;
+      mapRef.current?.animateToRegion(
+        {
+          latitude: currentLatitude,
+          longitude: currentLongitude,
+          latitudeDelta: 0.006,
+          longitudeDelta: 0.006,
+        },
+        animated ? 500 : 0,
+      );
+    },
+    [
+      currentLatitude,
+      currentLongitude,
+      fitRoute,
+      followCurrent,
+      focusLatitude,
+      focusLongitude,
+      googleMapsConfigured,
+      route,
+    ],
+  );
+
   useEffect(() => {
-    if (!current || !googleMapsConfigured) return;
-    mapRef.current?.animateToRegion(
-      {
-        ...current,
-        latitudeDelta: 0.006,
-        longitudeDelta: 0.006,
-      },
-      500,
-    );
-  }, [current?.latitude, current?.longitude, googleMapsConfigured]);
+    focusMap(true);
+  }, [focusMap]);
+
+  useEffect(() => {
+    if (
+      !googleMapsConfigured ||
+      northUpRequest <= 0 ||
+      handledNorthUpRequestRef.current === northUpRequest
+    ) {
+      return;
+    }
+    handledNorthUpRequestRef.current = northUpRequest;
+    void (async () => {
+      const camera = await mapRef.current?.getCamera();
+      if (!camera) return;
+      mapRef.current?.animateCamera(
+        { ...camera, heading: 0 },
+        { duration: 320 },
+      );
+    })();
+  }, [googleMapsConfigured, northUpRequest]);
 
   if (!googleMapsConfigured) {
     return <RunMapFallback {...props} />;
@@ -106,16 +181,29 @@ export function RunMap(props: RunMapProps) {
           : FALLBACK_REGION
       }
       customMapStyle={isDark ? DARK_MAP_STYLE : []}
-      showsUserLocation
+      onMapReady={() => focusMap(false)}
+      showsUserLocation={showsUserLocation}
       showsMyLocationButton={false}
       showsCompass={false}
-      pitchEnabled={false}
-      rotateEnabled={false}
+      scrollEnabled={interactive}
+      zoomEnabled={interactive}
+      pitchEnabled={interactive}
+      rotateEnabled={interactive}
+      zoomControlEnabled={false}
+      onTouchStart={() => onInteractionChange?.(true)}
+      onTouchEnd={() => onInteractionChange?.(false)}
+      onTouchCancel={() => onInteractionChange?.(false)}
       toolbarEnabled={false}
       loadingEnabled
       loadingBackgroundColor={isDark ? "#17251D" : "#DFEEE6"}
       loadingIndicatorColor={accentColor}
     >
+      {fitRoute && route.length > 0 && (
+        <Marker coordinate={route[0]} pinColor={accentColor} />
+      )}
+      {fitRoute && route.length > 1 && (
+        <Marker coordinate={route[route.length - 1]} pinColor="#F04438" />
+      )}
       {route.length > 1 && (
         <Polyline
           coordinates={route}

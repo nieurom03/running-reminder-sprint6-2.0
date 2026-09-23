@@ -228,6 +228,7 @@ export async function getActivityForWorkout(db: SQLiteDatabase, workoutId: numbe
 }
 
 export async function saveManualActivity(db: SQLiteDatabase, input: import('@/types/models').ManualActivityInput) {
+  const distanceKm = Math.round(Math.max(0, input.distanceKm) * 100) / 100;
   await db.withTransactionAsync(async () => {
     const workout = await db.getFirstAsync<{ type: import('@/types/models').WorkoutType }>(
       'SELECT type FROM workouts WHERE id = ?',
@@ -236,22 +237,25 @@ export async function saveManualActivity(db: SQLiteDatabase, input: import('@/ty
     const activityName = workout?.type === 'WALK' ? 'Manual walk' : 'Manual run';
     const sportType = workout?.type === 'WALK' ? 'Walk' : 'Run';
     const existing: any = await db.getFirstAsync(
-      `SELECT id FROM activities WHERE workout_id = ? ORDER BY id DESC LIMIT 1`,
+      `SELECT id, source, name, sport_type
+       FROM activities WHERE workout_id = ? ORDER BY id DESC LIMIT 1`,
       input.workoutId
     );
     if (existing?.id) {
+      const savedName = existing.source === 'GPS' ? existing.name ?? activityName : activityName;
+      const savedSportType = existing.source === 'GPS' ? existing.sport_type ?? sportType : sportType;
       await db.runAsync(
         `UPDATE activities SET start_time=?, distance_km=?, duration_seconds=?, avg_heart_rate=?, max_heart_rate=?, elevation_gain=?, feeling=?, notes=?, name=?, sport_type=?
          WHERE id=?`,
-        input.startTime, input.distanceKm, input.durationSeconds, input.avgHeartRate ?? null,
+        input.startTime, distanceKm, input.durationSeconds, input.avgHeartRate ?? null,
         input.maxHeartRate ?? null, input.elevationGain ?? null, input.feeling ?? null, input.notes ?? null,
-        activityName, sportType, existing.id
+        savedName, savedSportType, existing.id
       );
     } else {
       await db.runAsync(
         `INSERT INTO activities(workout_id,source,external_id,name,sport_type,start_time,distance_km,duration_seconds,avg_heart_rate,max_heart_rate,elevation_gain,feeling,notes,raw_data)
          VALUES (?, 'MANUAL', NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)`,
-        input.workoutId, activityName, sportType, input.startTime, input.distanceKm, input.durationSeconds, input.avgHeartRate ?? null,
+        input.workoutId, activityName, sportType, input.startTime, distanceKm, input.durationSeconds, input.avgHeartRate ?? null,
         input.maxHeartRate ?? null, input.elevationGain ?? null, input.feeling ?? null, input.notes ?? null
       );
     }
@@ -267,6 +271,7 @@ export async function saveRecordedActivity(
   input: import('@/types/models').RecordedActivityInput,
 ) {
   let workoutId = input.workoutId;
+  const distanceKm = Math.round(Math.max(0, input.distanceKm) * 100) / 100;
   await db.withTransactionAsync(async () => {
     if (workoutId != null) {
       const workout = await db.getFirstAsync<{ id: number }>(
@@ -285,7 +290,7 @@ export async function saveRecordedActivity(
         input.planId,
         input.startTime.slice(0, 10),
         input.workoutType,
-        Math.max(0, input.distanceKm),
+        distanceKm,
         'GPS recorded activity',
       );
       workoutId = Number(created.lastInsertRowId);
@@ -310,7 +315,7 @@ export async function saveRecordedActivity(
       activityName,
       sportType,
       input.startTime,
-      Math.max(0, input.distanceKm),
+      distanceKm,
       Math.max(1, Math.round(input.durationSeconds)),
       Math.max(0, input.elevationGain),
       rawData,

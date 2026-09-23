@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import * as Location from "expo-location";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import {
@@ -22,7 +23,10 @@ import { useI18n } from "@/i18n";
 import { DurationPicker } from "@/components/DurationPicker";
 import { GlassBackground } from "@/components/Glass";
 import { useGlassAlert } from "@/components/GlassAlert";
+import { RunMap } from "@/components/RunMap";
 import { useTheme } from "@/context/ThemeContext";
+import { parseRecordedRoute } from "@/utils/activityRoute";
+import type { RunMapCoordinate } from "@/components/RunMap.types";
 
 const FEELINGS: {
   value: RunFeeling;
@@ -87,7 +91,7 @@ export default function ResultScreen() {
   const db = useSQLiteContext();
   const refresh = useAppStore((s) => s.refresh);
   const { t, language } = useI18n();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const showAlert = useGlassAlert();
   const [w, setW] = useState<Workout | null>(null);
   const [existing, setExisting] = useState<Activity | null>(null);
@@ -98,6 +102,10 @@ export default function ResultScreen() {
   const [elevation, setElevation] = useState("");
   const [feeling, setFeeling] = useState<RunFeeling>("NORMAL");
   const [notes, setNotes] = useState("");
+  const [mapInteracting, setMapInteracting] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [currentPosition, setCurrentPosition] =
+    useState<RunMapCoordinate | null>(null);
   const load = useCallback(async () => {
     if (!id) return;
     const workout = await getWorkout(db, Number(id));
@@ -105,7 +113,9 @@ export default function ResultScreen() {
     setW(workout);
     setExisting(a);
     if (a) {
-      setDistance(String(a.distanceKm));
+      setDistance(
+        a.source === "GPS" ? a.distanceKm.toFixed(2) : String(a.distanceKm),
+      );
       setDuration(formatDuration(a.durationSeconds));
       setAvgHr(a.avgHeartRate ? String(a.avgHeartRate) : "");
       setMaxHr(a.maxHeartRate ? String(a.maxHeartRate) : "");
@@ -124,6 +134,11 @@ export default function ResultScreen() {
     }, [load]),
   );
   const seconds = useMemo(() => parseDuration(duration), [duration]);
+  const recordedRoute = useMemo(
+    () => parseRecordedRoute(existing?.rawData),
+    [existing?.rawData],
+  );
+  const routeEnd = recordedRoute.at(-1) ?? null;
   const km = Number(distance.replace(",", "."));
   const computedPace =
     Number.isFinite(seconds) && Number.isFinite(km) && km > 0
@@ -154,8 +169,8 @@ export default function ResultScreen() {
     }
     await saveManualActivity(db, {
       workoutId: w.id,
-      startTime: `${w.date}T12:00:00`,
-      distanceKm: km,
+      startTime: existing?.startTime ?? `${w.date}T12:00:00`,
+      distanceKm: Math.round(km * 100) / 100,
       durationSeconds: seconds,
       avgHeartRate: a,
       maxHeartRate: m,
@@ -179,12 +194,43 @@ export default function ResultScreen() {
         },
       },
     ]);
+  const locateCurrentPosition = async () => {
+    if (locating) return;
+    setLocating(true);
+    try {
+      if (!(await Location.hasServicesEnabledAsync())) {
+        showAlert(t("locationUnavailableTitle"), t("locationUnavailableHelp"));
+        return;
+      }
+      let permission = await Location.getForegroundPermissionsAsync();
+      if (permission.status !== Location.PermissionStatus.GRANTED) {
+        permission = await Location.requestForegroundPermissionsAsync();
+      }
+      if (permission.status !== Location.PermissionStatus.GRANTED) {
+        showAlert(t("locationDeniedTitle"), t("locationDeniedHelp"));
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      setCurrentPosition({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    } catch {
+      showAlert(t("locationUnavailableTitle"), t("locationUnavailableHelp"));
+    } finally {
+      setLocating(false);
+    }
+  };
   return (
     <GlassBackground>
       <ScrollView
         style={s.root}
         contentContainerStyle={s.content}
         keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled
+        scrollEnabled={!mapInteracting}
       >
       <Pressable onPress={() => router.back()}>
         <Text style={[s.back,{color:colors.textPrimary}]}>{t("back")}</Text>
@@ -197,6 +243,66 @@ export default function ResultScreen() {
         {language === "vi" ? "kế hoạch" : "planned"} {w.distanceKm} km ·{" "}
         {w.date}
       </Text>
+
+      {existing?.source === "GPS" && recordedRoute.length > 0 && (
+        <View
+          style={[
+            s.routeMap,
+            { borderColor: colors.bgCardBorder },
+          ]}
+        >
+          <RunMap
+            current={routeEnd}
+            route={recordedRoute}
+            isDark={isDark}
+            accentColor={colors.accent}
+            fitRoute
+            showsUserLocation={currentPosition != null}
+            focusCoordinate={currentPosition}
+            interactive
+            onInteractionChange={setMapInteracting}
+          />
+          <View
+            style={[
+              s.routeBadge,
+              {
+                backgroundColor: isDark
+                  ? "rgba(7,18,11,0.82)"
+                  : "rgba(255,255,255,0.88)",
+                borderColor: colors.bgCardBorder,
+              },
+            ]}
+          >
+            <Ionicons name="map-outline" size={15} color={colors.accent} />
+            <Text style={[s.routeBadgeText, { color: colors.textPrimary }]}>
+              {t("recordedRoute")} · {recordedRoute.length} {t("routePoints")}
+            </Text>
+          </View>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t("locateCurrentPosition")}
+            disabled={locating}
+            hitSlop={8}
+            onPress={locateCurrentPosition}
+            style={({ pressed }) => [
+              s.locateButton,
+              {
+                backgroundColor: isDark
+                  ? "rgba(7,18,11,0.88)"
+                  : "rgba(255,255,255,0.94)",
+                borderColor: colors.bgCardBorder,
+                opacity: pressed || locating ? 0.68 : 1,
+              },
+            ]}
+          >
+            <Ionicons
+              name={locating ? "hourglass-outline" : "locate"}
+              size={21}
+              color={colors.accent}
+            />
+          </Pressable>
+        </View>
+      )}
 
       <View style={[s.card,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder}]}>
         <Text style={[s.label,{color:colors.textLabel}]}>{t("actualDistance")}</Text>
@@ -328,6 +434,43 @@ const s = StyleSheet.create({
   back: { fontSize: 17, fontWeight: "800" },
   title: { fontSize: 32, fontWeight: "900", marginTop: 24 },
   sub: { fontSize: 15, color: "#667085", marginTop: 6 },
+  routeMap: {
+    height: 250,
+    marginTop: 16,
+    borderRadius: 22,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  routeBadge: {
+    position: "absolute",
+    top: 12,
+    left: 12,
+    maxWidth: "82%",
+    minHeight: 34,
+    paddingHorizontal: 11,
+    borderRadius: 17,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+  },
+  routeBadgeText: { fontSize: 10, fontWeight: "900", letterSpacing: 0.5 },
+  locateButton: {
+    position: "absolute",
+    right: 12,
+    bottom: 12,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000000",
+    shadowOpacity: 0.16,
+    shadowRadius: 9,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 7,
+  },
   card: {
     backgroundColor: "#fff",
     borderRadius: 20,
