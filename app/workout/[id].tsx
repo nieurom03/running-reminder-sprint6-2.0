@@ -76,8 +76,8 @@ export default function WorkoutDetail() {
   );
   if (!w)
     return (
-      <View style={[s.loading,{backgroundColor:colors.bgRoot}]}>
-        <Text style={{color:colors.textPrimary}}>{t("loading")}</Text>
+      <View style={[s.loading, { backgroundColor: colors.bgRoot }]}>
+        <Text style={{ color: colors.textPrimary }}>{t("loading")}</Text>
       </View>
     );
   const theme = statusTheme[w.status] ?? statusTheme.PLANNED;
@@ -139,7 +139,7 @@ export default function WorkoutDetail() {
     }
     const result = await scheduleWorkoutReminder(
       reminderAt,
-      `${w.type === "WALK" ? "🚶" : "🏃"} Workout Training`,
+      `${w.type === "WALK" ? "🚶" : "🏃"} Runmio`,
       `${typeLabel} · ${w.distanceKm} km · ${w.date}`,
     );
     showAlert(
@@ -150,148 +150,217 @@ export default function WorkoutDetail() {
   return (
     <GlassBackground>
       <ScrollView style={s.root} contentContainerStyle={s.content}>
-      <View style={s.top}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={[s.back,{color:colors.textPrimary}]}>{t("back")}</Text>
-        </Pressable>
-        <Pressable
-          style={[s.editBtn,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder}]}
-          onPress={() => router.push(`/workout/edit/${w.id}`)}
-        >
-          <Text style={[s.editTxt,{color:colors.textPrimary}]}>{t("edit")}</Text>
-        </Pressable>
-      </View>
-      <View style={[s.statusBadge, { backgroundColor: theme.badge }]}>
-        <Text style={[s.statusText, { color: theme.text }]}>
-          {theme.icon}{" "}
-          {w.status === "COMPLETED"
-            ? t("completed")
-            : w.status === "SKIPPED"
-              ? t("skipped")
-              : w.status === "MISSED"
-                ? t("missed")
-                : t("planned")}
+        <View style={s.top}>
+          <Pressable onPress={() => router.back()}>
+            <Text style={[s.back, { color: colors.textPrimary }]}>
+              {t("back")}
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[
+              s.editBtn,
+              {
+                backgroundColor: colors.bgCard,
+                borderColor: colors.bgCardBorder,
+              },
+            ]}
+            onPress={() => router.push(`/workout/edit/${w.id}`)}
+          >
+            <Text style={[s.editTxt, { color: colors.textPrimary }]}>
+              {t("edit")}
+            </Text>
+          </Pressable>
+        </View>
+        <View style={[s.statusBadge, { backgroundColor: theme.badge }]}>
+          <Text style={[s.statusText, { color: theme.text }]}>
+            {theme.icon}{" "}
+            {w.status === "COMPLETED"
+              ? t("completed")
+              : w.status === "SKIPPED"
+                ? t("skipped")
+                : w.status === "MISSED"
+                  ? t("missed")
+                  : t("planned")}
+          </Text>
+        </View>
+        <Text style={[s.type, { color: colors.textSecondary }]}>
+          {typeLabel.toUpperCase()}
         </Text>
-      </View>
-      <Text style={[s.type,{color:colors.textSecondary}]}>{typeLabel.toUpperCase()}</Text>
-      <Text style={[s.distance,{color:colors.textPrimary}]}>{w.distanceKm} km</Text>
-      <Text style={[s.date,{color:colors.textSecondary}]}>{w.date}</Text>
-      <View style={[s.box, { backgroundColor:colors.bgCard,borderColor:isDark?colors.bgCardBorder:theme.border }]}>
-        <Text style={[s.label,{color:colors.textLabel}]}>{t("targetPace")}</Text>
-        <Text style={[s.value,{color:colors.textPrimary}]}>
-          {pace(w.targetPaceMinSec)}–{pace(w.targetPaceMaxSec)} /km
+        <Text style={[s.distance, { color: colors.textPrimary }]}>
+          {w.distanceKm} km
         </Text>
-        <Text style={[s.label,{color:colors.textLabel}]}>{t("notes")}</Text>
-        <Text style={[s.notes,{color:colors.textPrimary}]}>{w.description || t("noNotes")}</Text>
-      </View>
-      {activity && (
-        <Pressable
+        <Text style={[s.date, { color: colors.textSecondary }]}>{w.date}</Text>
+        <View
           style={[
-            s.actual,
+            s.box,
             {
-              backgroundColor: isDark
-                ? colors.bgCard
-                : "rgba(236,253,243,0.40)",
+              backgroundColor: colors.bgCard,
+              borderColor: isDark ? colors.bgCardBorder : theme.border,
             },
           ]}
-          onPress={() => router.push(`/workout/result/${w.id}`)}
         >
-          <View style={{ flex: 1 }}>
-            <Text style={s.actualLabel}>
-              {t("actualResult")} · {activity.source}
-            </Text>
-            <Text style={s.actualValue}>
-              {activity.distanceKm.toFixed(2)} km ·{" "}
-              {duration(activity.durationSeconds)}
-            </Text>
-            <Text style={s.actualMeta}>
-              Pace {actualPace(activity)}
-              {activity.avgHeartRate
-                ? ` · Avg HR ${activity.avgHeartRate}`
-                : ""}
-            </Text>
-          </View>
-          <Text style={s.chev}>›</Text>
-        </Pressable>
-      )}
-      <Text style={[s.section,{color:colors.textSecondary}]}>
-        {activity ? t("result") : t("updateStatus")}
-      </Text>
-      {activity ? (
-        <Pressable
-          style={[s.fullAction, { backgroundColor: "#12B76A" }]}
-          onPress={() => router.push(`/workout/result/${w.id}`)}
-        >
-          <Text style={s.actionText}>✓ {t("editResult")}</Text>
-        </Pressable>
-      ) : (
-        <View style={s.actions}>
+          <Text style={[s.label, { color: colors.textLabel }]}>
+            {t("targetPace")}
+          </Text>
+          <Text style={[s.value, { color: colors.textPrimary }]}>
+            {pace(w.targetPaceMinSec)}–{pace(w.targetPaceMaxSec)} /km
+          </Text>
+          <Text style={[s.label, { color: colors.textLabel }]}>
+            {t("notes")}
+          </Text>
+          <Text style={[s.notes, { color: colors.textPrimary }]}>
+            {w.description || t("noNotes")}
+          </Text>
+        </View>
+        {activity && (
           <Pressable
-            style={[s.action, { backgroundColor: "#12B76A" }]}
+            style={[
+              s.actual,
+              {
+                backgroundColor: isDark
+                  ? colors.bgCard
+                  : "rgba(236,253,243,0.40)",
+              },
+            ]}
             onPress={() => router.push(`/workout/result/${w.id}`)}
           >
-            <Text style={s.actionText}>✓ {t("completed")}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={s.actualLabel}>
+                {t("actualResult")} · {activity.source}
+              </Text>
+              <Text style={s.actualValue}>
+                {activity.distanceKm.toFixed(2)} km ·{" "}
+                {duration(activity.durationSeconds)}
+              </Text>
+              <Text style={s.actualMeta}>
+                Pace {actualPace(activity)}
+                {activity.avgHeartRate
+                  ? ` · Avg HR ${activity.avgHeartRate}`
+                  : ""}
+              </Text>
+            </View>
+            <Text style={s.chev}>›</Text>
           </Pressable>
+        )}
+        <Text style={[s.section, { color: colors.textSecondary }]}>
+          {activity ? t("result") : t("updateStatus")}
+        </Text>
+        {activity ? (
           <Pressable
-            style={[s.action, { backgroundColor: "#F79009" }]}
-            onPress={() => mark("SKIPPED")}
+            style={[s.fullAction, { backgroundColor: "#12B76A" }]}
+            onPress={() => router.push(`/workout/result/${w.id}`)}
           >
-            <Text style={s.actionText}>↷ {t("skipped")}</Text>
+            <Text style={s.actionText}>✓ {t("editResult")}</Text>
           </Pressable>
-          <Pressable
-            style={[s.action, { backgroundColor: "#F04438" }]}
-            onPress={() => mark("MISSED")}
-          >
-            <Text style={s.actionText}>! {t("missed")}</Text>
-          </Pressable>
-        </View>
-      )}
-      {w.status !== "PLANNED" && !activity && (
-        <Pressable style={[s.reset,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder}]} onPress={() => mark("PLANNED")}>
-          <Text style={[s.resetTxt,{color:colors.textPrimary}]}>{t("resetPlanned")}</Text>
-        </Pressable>
-      )}
-
-      <View style={[s.reminderCard,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder}]}>
-        <Text style={[s.reminderTitle,{color:colors.textPrimary}]}>{t("reminderOptions")}</Text>
-        <Text style={[s.reminderHelp,{color:colors.textSecondary}]}>{t("reminderOptionsHelp")}</Text>
-        <View style={s.presetGrid}>
-          {PRESETS.map((m) => (
+        ) : (
+          <View style={s.actions}>
             <Pressable
-              key={m}
-              onPress={() => {
-                setOffsetMin(m);
-                setCustomDays("");
-              }}
-              style={[s.preset,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder}, offsetMin === m && !customDays && s.presetOn]}
+              style={[s.action, { backgroundColor: "#12B76A" }]}
+              onPress={() => router.push(`/workout/result/${w.id}`)}
             >
-              <Text
+              <Text style={s.actionText}>✓ {t("completed")}</Text>
+            </Pressable>
+            <Pressable
+              style={[s.action, { backgroundColor: "#F79009" }]}
+              onPress={() => mark("SKIPPED")}
+            >
+              <Text style={s.actionText}>↷ {t("skipped")}</Text>
+            </Pressable>
+            <Pressable
+              style={[s.action, { backgroundColor: "#F04438" }]}
+              onPress={() => mark("MISSED")}
+            >
+              <Text style={s.actionText}>! {t("missed")}</Text>
+            </Pressable>
+          </View>
+        )}
+        {w.status !== "PLANNED" && !activity && (
+          <Pressable
+            style={[
+              s.reset,
+              {
+                backgroundColor: colors.bgCard,
+                borderColor: colors.bgCardBorder,
+              },
+            ]}
+            onPress={() => mark("PLANNED")}
+          >
+            <Text style={[s.resetTxt, { color: colors.textPrimary }]}>
+              {t("resetPlanned")}
+            </Text>
+          </Pressable>
+        )}
+
+        <View
+          style={[
+            s.reminderCard,
+            {
+              backgroundColor: colors.bgCard,
+              borderColor: colors.bgCardBorder,
+            },
+          ]}
+        >
+          <Text style={[s.reminderTitle, { color: colors.textPrimary }]}>
+            {t("reminderOptions")}
+          </Text>
+          <Text style={[s.reminderHelp, { color: colors.textSecondary }]}>
+            {t("reminderOptionsHelp")}
+          </Text>
+          <View style={s.presetGrid}>
+            {PRESETS.map((m) => (
+              <Pressable
+                key={m}
+                onPress={() => {
+                  setOffsetMin(m);
+                  setCustomDays("");
+                }}
                 style={[
-                  s.presetText,
-                  {color:colors.textPrimary},
-                  offsetMin === m && !customDays && s.presetTextOn,
+                  s.preset,
+                  {
+                    backgroundColor: colors.bgCard,
+                    borderColor: colors.bgCardBorder,
+                  },
+                  offsetMin === m && !customDays && s.presetOn,
                 ]}
               >
-                {reminderLabel(m)}
-              </Text>
-            </Pressable>
-          ))}
+                <Text
+                  style={[
+                    s.presetText,
+                    { color: colors.textPrimary },
+                    offsetMin === m && !customDays && s.presetTextOn,
+                  ]}
+                >
+                  {reminderLabel(m)}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+          <Text style={[s.customLabel, { color: colors.textLabel }]}>
+            {t("reminderCustom")}
+          </Text>
+          <View style={s.customRow}>
+            <TextInput
+              style={[
+                s.customInput,
+                {
+                  backgroundColor: colors.bgCard,
+                  borderColor: colors.bgCardBorder,
+                  color: colors.textPrimary,
+                },
+              ]}
+              value={customDays}
+              onChangeText={setCustomDays}
+              keyboardType="decimal-pad"
+              placeholder="3"
+            />
+            <Text style={[s.customUnit, { color: colors.textPrimary }]}>
+              {t("daysBefore")}
+            </Text>
+          </View>
+          <Pressable style={s.reminderButton} onPress={scheduleReminder}>
+            <Text style={s.reminderButtonText}>{t("scheduleReminder")}</Text>
+          </Pressable>
         </View>
-        <Text style={[s.customLabel,{color:colors.textLabel}]}>{t("reminderCustom")}</Text>
-        <View style={s.customRow}>
-          <TextInput
-            style={[s.customInput,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder,color:colors.textPrimary}]}
-            value={customDays}
-            onChangeText={setCustomDays}
-            keyboardType="decimal-pad"
-            placeholder="3"
-          />
-          <Text style={[s.customUnit,{color:colors.textPrimary}]}>{t("daysBefore")}</Text>
-        </View>
-        <Pressable style={s.reminderButton} onPress={scheduleReminder}>
-          <Text style={s.reminderButtonText}>{t("scheduleReminder")}</Text>
-        </Pressable>
-      </View>
       </ScrollView>
     </GlassBackground>
   );

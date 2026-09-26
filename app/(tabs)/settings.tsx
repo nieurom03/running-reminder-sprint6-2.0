@@ -56,8 +56,9 @@ export default function Settings() {
   const [appearancePickerOpen, setAppearancePickerOpen] = useState(false);
   const [backupPasswordOpen, setBackupPasswordOpen] = useState(false);
   const [restorePasswordOpen, setRestorePasswordOpen] = useState(false);
-  const [pendingRestore, setPendingRestore] =
-    useState<PickedBackupFile | null>(null);
+  const [pendingRestore, setPendingRestore] = useState<PickedBackupFile | null>(
+    null,
+  );
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   useEffect(() => {
@@ -94,7 +95,7 @@ export default function Settings() {
     if (!busy) setBackupPasswordOpen(true);
   };
 
-  const createProtectedBackup = async (password: string) => {
+  const createBackup = async (password: string) => {
     if (busy) return;
     setBackupPasswordOpen(false);
     setBusy(true);
@@ -108,10 +109,7 @@ export default function Settings() {
     }
   };
 
-  const finishRestore = async (
-    file: PickedBackupFile,
-    password?: string,
-  ) => {
+  const finishRestore = async (file: PickedBackupFile, password?: string) => {
     if (busy) return;
     setBusy(true);
     try {
@@ -190,7 +188,7 @@ export default function Settings() {
       const message =
         error instanceof BackupFileError
           ? t("invalidBackupFile")
-          : error?.message ?? String(error);
+          : (error?.message ?? String(error));
       showAlert(t("restoreFailed"), message);
     } finally {
       setBusy(false);
@@ -206,7 +204,7 @@ export default function Settings() {
       },
       {
         dialogTitle: t("feedbackTitle"),
-        subject: `[Workout Training] ${t("feedbackTitle")}`,
+        subject: `[Runmio] ${t("feedbackTitle")}`,
         // Feedback is text to send through a communication app. Do not offer
         // the Files destination used by the separate Backup feature.
         excludedActivityTypes:
@@ -409,10 +407,11 @@ export default function Settings() {
         title={t("backupPasswordTitle")}
         message={t("backupPasswordHelp")}
         confirmPassword
+        allowNoPassword
         busy={busy}
         submitLabel={t("createBackup")}
         onRequestClose={() => setBackupPasswordOpen(false)}
-        onSubmit={createProtectedBackup}
+        onSubmit={createBackup}
       />
 
       <PasswordModal
@@ -446,6 +445,7 @@ function PasswordModal({
   message,
   submitLabel,
   confirmPassword = false,
+  allowNoPassword = false,
   busy,
   onRequestClose,
   onSubmit,
@@ -455,6 +455,7 @@ function PasswordModal({
   message: string;
   submitLabel: string;
   confirmPassword?: boolean;
+  allowNoPassword?: boolean;
   busy: boolean;
   onRequestClose: () => void;
   onSubmit: (password: string) => Promise<void>;
@@ -464,6 +465,7 @@ function PasswordModal({
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [usePassword, setUsePassword] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -471,12 +473,21 @@ function PasswordModal({
       setPassword("");
       setConfirmation("");
       setPasswordVisible(false);
+      setUsePassword(true);
       setError("");
     }
   }, [visible]);
 
   const submit = async () => {
     setError("");
+    if (allowNoPassword && !usePassword) {
+      try {
+        await onSubmit("");
+      } catch (submitError: any) {
+        setError(submitError?.message ?? String(submitError));
+      }
+      return;
+    }
     if (password.length < 8) {
       setError(t("backupPasswordMinLength"));
       return;
@@ -500,7 +511,11 @@ function PasswordModal({
     >
       <View style={s.modalHeader}>
         <View style={[s.modalIcon, { backgroundColor: colors.rowIconBg }]}>
-          <Ionicons name="lock-closed-outline" size={22} color={colors.accent} />
+          <Ionicons
+            name="lock-closed-outline"
+            size={22}
+            color={colors.accent}
+          />
         </View>
         <View style={s.modalHeading}>
           <Text style={[s.modalTitle, { color: colors.textPrimary }]}>
@@ -512,44 +527,94 @@ function PasswordModal({
         </View>
       </View>
 
-      <Text style={[s.inputLabel, { color: colors.textLabel }]}>
-        {t("backupPassword")}
-      </Text>
-      <View
-        style={[
-          s.passwordField,
-          { backgroundColor: colors.bgCard, borderColor: colors.modalBorder },
-        ]}
-      >
-        <TextInput
-          value={password}
-          onChangeText={(value) => {
-            setPassword(value);
-            setError("");
-          }}
-          editable={!busy}
-          secureTextEntry={!passwordVisible}
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholder={t("backupPasswordPlaceholder")}
-          placeholderTextColor={colors.textMuted}
-          style={[s.passwordInput, { color: colors.textPrimary }]}
-        />
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t("togglePasswordVisibility")}
-          onPress={() => setPasswordVisible((value) => !value)}
-          hitSlop={10}
+      {allowNoPassword && (
+        <View
+          style={[
+            s.backupProtectionRow,
+            { backgroundColor: colors.bgCard, borderColor: colors.modalBorder },
+          ]}
         >
-          <Ionicons
-            name={passwordVisible ? "eye-off-outline" : "eye-outline"}
-            size={20}
-            color={colors.textSecondary}
+          <View style={s.backupProtectionText}>
+            <Text
+              style={[s.backupProtectionTitle, { color: colors.textPrimary }]}
+            >
+              {t("backupUsePassword")}
+            </Text>
+            <Text
+              style={[
+                s.backupProtectionHelp,
+                { color: colors.textSecondary },
+              ]}
+            >
+              {t("backupUsePasswordHelp")}
+            </Text>
+          </View>
+          <Switch
+            value={usePassword}
+            disabled={busy}
+            onValueChange={(value) => {
+              setUsePassword(value);
+              setError("");
+            }}
+            trackColor={{ false: "#C7D5CD", true: "#72D9A3" }}
+            thumbColor="#fff"
           />
-        </Pressable>
-      </View>
+        </View>
+      )}
 
-      {confirmPassword && (
+      {usePassword ? (
+        <>
+          <Text style={[s.inputLabel, { color: colors.textLabel }]}>
+            {t("backupPassword")}
+          </Text>
+          <View
+            style={[
+              s.passwordField,
+              { backgroundColor: colors.bgCard, borderColor: colors.modalBorder },
+            ]}
+          >
+            <TextInput
+              value={password}
+              onChangeText={(value) => {
+                setPassword(value);
+                setError("");
+              }}
+              editable={!busy}
+              secureTextEntry={!passwordVisible}
+              autoCapitalize="none"
+              autoCorrect={false}
+              placeholder={t("backupPasswordPlaceholder")}
+              placeholderTextColor={colors.textMuted}
+              style={[s.passwordInput, { color: colors.textPrimary }]}
+            />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t("togglePasswordVisibility")}
+              onPress={() => setPasswordVisible((value) => !value)}
+              hitSlop={10}
+            >
+              <Ionicons
+                name={passwordVisible ? "eye-off-outline" : "eye-outline"}
+                size={20}
+                color={colors.textSecondary}
+              />
+            </Pressable>
+          </View>
+        </>
+      ) : (
+        <View
+          style={[s.noPasswordNotice, { backgroundColor: colors.rowIconBg }]}
+        >
+          <Ionicons name="warning-outline" size={19} color="#F79009" />
+          <Text
+            style={[s.noPasswordNoticeText, { color: colors.textSecondary }]}
+          >
+            {t("backupNoPasswordWarning")}
+          </Text>
+        </View>
+      )}
+
+      {confirmPassword && usePassword && (
         <>
           <Text style={[s.inputLabel, { color: colors.textLabel }]}>
             {t("confirmBackupPassword")}
@@ -593,7 +658,11 @@ function PasswordModal({
         <Pressable
           disabled={busy}
           onPress={() => void submit()}
-          style={[s.primaryButton, { backgroundColor: colors.accent }, busy && s.disabled]}
+          style={[
+            s.primaryButton,
+            { backgroundColor: colors.accent },
+            busy && s.disabled,
+          ]}
         >
           <Text style={s.primaryButtonText}>
             {busy ? t("pleaseWait") : submitLabel}
@@ -703,7 +772,11 @@ function FeedbackModal({
         <Pressable
           disabled={sending}
           onPress={() => void submit()}
-          style={[s.primaryButton, { backgroundColor: colors.accent }, sending && s.disabled]}
+          style={[
+            s.primaryButton,
+            { backgroundColor: colors.accent },
+            sending && s.disabled,
+          ]}
         >
           <Text style={s.primaryButtonText}>
             {sending ? t("pleaseWait") : t("sendFeedback")}
@@ -827,7 +900,12 @@ const s = StyleSheet.create({
   },
   modalHeading: { flex: 1 },
   modalTitle: { fontSize: 21, lineHeight: 27, fontWeight: "900" },
-  modalMessage: { marginTop: 5, fontSize: 13, lineHeight: 19, fontWeight: "600" },
+  modalMessage: {
+    marginTop: 5,
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "600",
+  },
   inputLabel: {
     marginTop: 11,
     marginBottom: 7,
@@ -846,6 +924,34 @@ const s = StyleSheet.create({
     gap: 10,
   },
   passwordInput: { flex: 1, minHeight: 50, fontSize: 16, fontWeight: "700" },
+  backupProtectionRow: {
+    minHeight: 66,
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  backupProtectionText: { flex: 1 },
+  backupProtectionTitle: { fontSize: 14, fontWeight: "800" },
+  backupProtectionHelp: { marginTop: 3, fontSize: 11, lineHeight: 15 },
+  noPasswordNotice: {
+    marginTop: 12,
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 9,
+  },
+  noPasswordNoticeText: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: "600",
+  },
   modalInput: {
     minHeight: 52,
     borderRadius: 16,

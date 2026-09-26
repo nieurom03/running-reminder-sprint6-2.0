@@ -6,6 +6,7 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AppState,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -24,6 +25,23 @@ import {
   saveRecordedActivity,
 } from "@/db/repository";
 import { useI18n } from "@/i18n";
+import {
+  startBackgroundRecordingUpdates,
+  stopBackgroundRecordingUpdates,
+} from "@/services/backgroundRecordingTask";
+import {
+  endRecordingLockScreen,
+  startRecordingLockScreen,
+  updateRecordingLockScreen,
+} from "@/services/recordingLockScreen";
+import {
+  beginRecordingSession,
+  clearRecordingSession,
+  getRecordingSnapshot,
+  pauseRecordingSession,
+  resumeRecordingSession,
+  type RecordingSnapshot,
+} from "@/services/recordingSession";
 import { useAppStore } from "@/store/useAppStore";
 import type {
   RecordedRoutePoint,
@@ -36,8 +54,6 @@ type SessionPhase = "ready" | "recording" | "paused" | "saving";
 type RecordSport = "RUN" | "WALK";
 type MapMode = "follow" | "route" | "free";
 
-const EARTH_RADIUS_M = 6_371_000;
-
 const todayIso = () => {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
@@ -45,19 +61,6 @@ const todayIso = () => {
 
 const localIso = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}T${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
-
-const toRadians = (value: number) => (value * Math.PI) / 180;
-
-const distanceBetween = (a: RecordedRoutePoint, b: RecordedRoutePoint) => {
-  const dLat = toRadians(b.latitude - a.latitude);
-  const dLon = toRadians(b.longitude - a.longitude);
-  const lat1 = toRadians(a.latitude);
-  const lat2 = toRadians(b.latitude);
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
-  return 2 * EARTH_RADIUS_M * Math.asin(Math.sqrt(h));
-};
 
 const formatDuration = (seconds: number) => {
   const safe = Math.max(0, Math.floor(seconds));
@@ -79,7 +82,7 @@ export default function StartScreen() {
   const db = useSQLiteContext();
   const refreshKey = useAppStore((state) => state.refreshKey);
   const refresh = useAppStore((state) => state.refresh);
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const { colors, isDark } = useTheme();
   const showAlert = useGlassAlert();
 
@@ -103,109 +106,105 @@ export default function StartScreen() {
 
   const phaseRef = useRef<SessionPhase>("ready");
   const sportRef = useRef<RecordSport>("RUN");
-  const locationSubscriptionRef = useRef<Location.LocationSubscription | null>(
-    null,
-  );
   const routeRef = useRef<RecordedRoutePoint[]>([]);
-  const lastPointRef = useRef<RecordedRoutePoint | null>(null);
   const distanceRef = useRef(0);
   const elevationRef = useRef(0);
   const sessionStartRef = useRef<Date | null>(null);
   const segmentStartRef = useRef<number | null>(null);
   const accumulatedMsRef = useRef(0);
+  const latestPointIdRef = useRef(0);
+  const sessionKeyRef = useRef<string | null>(null);
+  const syncingSessionRef = useRef(false);
 
   const setSessionPhase = useCallback((next: SessionPhase) => {
     phaseRef.current = next;
     setPhase(next);
   }, []);
 
-  const stopLocationUpdates = useCallback(() => {
-    locationSubscriptionRef.current?.remove();
-    locationSubscriptionRef.current = null;
-  }, []);
-
-  const acceptLocation = useCallback(
-    (location: Location.LocationObject) => {
-      const accuracy = location.coords.accuracy;
-      const point: RecordedRoutePoint = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        altitude: location.coords.altitude,
-        accuracy,
-        timestamp: location.timestamp,
-      };
-      setCurrentLocation(point);
-      setGpsAccuracy(accuracy);
-
-      if (accuracy != null && accuracy > 45) return;
-      const previous = lastPointRef.current;
-      if (previous) {
-        const deltaSeconds = Math.max(
-          0.25,
-          (point.timestamp - previous.timestamp) / 1000,
-        );
-        const segmentMeters = distanceBetween(previous, point);
-        const maxSpeed = sportRef.current === "WALK" ? 4.5 : 12;
-        if (
-          segmentMeters < 2 ||
-          segmentMeters > 120 ||
-          segmentMeters / deltaSeconds > maxSpeed
-        ) {
-          return;
-        }
-        distanceRef.current += segmentMeters;
-        setDistanceMeters(distanceRef.current);
-
-        if (previous.altitude != null && point.altitude != null) {
-          const climb = point.altitude - previous.altitude;
-          if (climb > 0 && climb < 20) {
-            elevationRef.current += climb;
-            setElevationGain(elevationRef.current);
-          }
-        }
+  const applyRecordingSnapshot = useCallback(
+    (snapshot: RecordingSnapshot) => {
+      const isNewSession = sessionKeyRef.current !== snapshot.sessionKey;
+      if (isNewSession) {
+        sessionKeyRef.current = snapshot.sessionKey;
+        latestPointIdRef.current = 0;
+        routeRef.current = [];
       }
-      lastPointRef.current = point;
-      routeRef.current = [...routeRef.current, point];
-      setRoute(routeRef.current);
+
+      const newPoints = snapshot.points.filter(
+        (point) => point.id > latestPointIdRef.current,
+      );
+      if (newPoints.length > 0) {
+        routeRef.current = [
+          ...routeRef.current,
+          ...newPoints.map(({ id: _id, ...point }) => point),
+        ];
+        latestPointIdRef.current = Math.max(
+          latestPointIdRef.current,
+          ...newPoints.map((point) => point.id),
+        );
+        setRoute(routeRef.current);
+      } else if (isNewSession) {
+        setRoute([]);
+      }
+
+      latestPointIdRef.current = Math.max(
+        latestPointIdRef.current,
+        snapshot.latestPointId,
+      );
+      distanceRef.current = snapshot.distanceMeters;
+      elevationRef.current = snapshot.elevationGain;
+      accumulatedMsRef.current = snapshot.accumulatedMs;
+      segmentStartRef.current = snapshot.segmentStartedAtMs;
+      sessionStartRef.current = new Date(snapshot.startedAtMs);
+      sportRef.current = snapshot.sport;
+      setSport(snapshot.sport);
+      setDistanceMeters(snapshot.distanceMeters);
+      setElevationGain(snapshot.elevationGain);
+      setElapsedSeconds(snapshot.elapsedSeconds);
+      if (snapshot.currentLocation) {
+        setCurrentLocation(snapshot.currentLocation);
+      }
+      setGpsAccuracy(snapshot.gpsAccuracy);
+      setSessionPhase(snapshot.phase);
     },
-    [],
+    [setSessionPhase],
   );
 
-  const beginLocationUpdates = useCallback(async () => {
-    stopLocationUpdates();
-    const subscription = await Location.watchPositionAsync(
-      {
-        accuracy: Location.Accuracy.BestForNavigation,
-        timeInterval: 1000,
-        distanceInterval: 2,
-      },
-      acceptLocation,
-    );
-    if (phaseRef.current !== "recording") {
-      subscription.remove();
-      return;
+  const syncPersistentRecording = useCallback(async () => {
+    if (syncingSessionRef.current) return;
+    syncingSessionRef.current = true;
+    try {
+      const snapshot = await getRecordingSnapshot(latestPointIdRef.current);
+      if (snapshot) applyRecordingSnapshot(snapshot);
+    } finally {
+      syncingSessionRef.current = false;
     }
-    locationSubscriptionRef.current = subscription;
-  }, [acceptLocation, stopLocationUpdates]);
+  }, [applyRecordingSnapshot]);
 
   const pauseSession = useCallback(
-    (withHaptic = true) => {
+    async (withHaptic = true) => {
       if (phaseRef.current !== "recording") return;
-      if (segmentStartRef.current != null) {
-        accumulatedMsRef.current += Date.now() - segmentStartRef.current;
+      try {
+        const snapshot = await pauseRecordingSession();
+        await stopBackgroundRecordingUpdates();
+        if (snapshot) {
+          applyRecordingSnapshot(snapshot);
+          await updateRecordingLockScreen(snapshot);
+        }
+        if (withHaptic) {
+          await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        }
+      } catch (error: any) {
+        showAlert(
+          t("locationUnavailableTitle"),
+          error?.message ?? t("locationUnavailableHelp"),
+        );
       }
-      segmentStartRef.current = null;
-      setElapsedSeconds(Math.floor(accumulatedMsRef.current / 1000));
-      stopLocationUpdates();
-      setSessionPhase("paused");
-      if (withHaptic)
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     },
-    [setSessionPhase, stopLocationUpdates],
+    [applyRecordingSnapshot, showAlert, t],
   );
 
   useEffect(() => {
-    if (phase !== "ready") return;
     let active = true;
     (async () => {
       const activePlan = await getActivePlan(db);
@@ -216,25 +215,60 @@ export default function StartScreen() {
         : null;
       if (!active) return;
       setWorkout(todayWorkout);
-      const initialSport = todayWorkout?.type === "WALK" ? "WALK" : "RUN";
-      sportRef.current = initialSport;
-      setSport(initialSport);
-
-      const response = await Location.getForegroundPermissionsAsync();
-      if (!active) return;
-      setPermission(response.status);
-      if (response.status === Location.PermissionStatus.GRANTED) {
-        const last = await Location.getLastKnownPositionAsync({
-          maxAge: 60_000,
-          requiredAccuracy: 200,
-        });
-        if (active && last) acceptLocation(last);
+      if (phaseRef.current === "ready") {
+        const initialSport = todayWorkout?.type === "WALK" ? "WALK" : "RUN";
+        sportRef.current = initialSport;
+        setSport(initialSport);
       }
     })().catch(() => {});
     return () => {
       active = false;
     };
-  }, [acceptLocation, db, phase, refreshKey]);
+  }, [db, refreshKey]);
+
+  useEffect(() => {
+    if (phase !== "ready") return;
+    let active = true;
+    (async () => {
+      const response = await Location.getForegroundPermissionsAsync();
+      if (!active) return;
+      setPermission(response.status);
+      if (response.status !== Location.PermissionStatus.GRANTED) return;
+
+      const last = await Location.getLastKnownPositionAsync({
+        maxAge: 60_000,
+        requiredAccuracy: 200,
+      });
+      if (active && last) {
+        setCurrentLocation({
+          latitude: last.coords.latitude,
+          longitude: last.coords.longitude,
+          altitude: last.coords.altitude,
+          accuracy: last.coords.accuracy,
+          timestamp: last.timestamp,
+        });
+        setGpsAccuracy(last.coords.accuracy);
+      }
+    })().catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [phase]);
+
+  useEffect(() => {
+    let active = true;
+    void getRecordingSnapshot(0).then((snapshot) => {
+      if (!active || !snapshot) return;
+      applyRecordingSnapshot(snapshot);
+      if (snapshot.phase === "recording") {
+        void startBackgroundRecordingUpdates(snapshot.language);
+      }
+      void updateRecordingLockScreen(snapshot);
+    });
+    return () => {
+      active = false;
+    };
+  }, [applyRecordingSnapshot]);
 
   useEffect(() => {
     if (phase !== "recording") return;
@@ -250,6 +284,15 @@ export default function StartScreen() {
     const timer = setInterval(update, 1000);
     return () => clearInterval(timer);
   }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "recording") return;
+    void syncPersistentRecording();
+    const timer = setInterval(() => {
+      void syncPersistentRecording();
+    }, 2_000);
+    return () => clearInterval(timer);
+  }, [phase, syncPersistentRecording]);
 
   useEffect(() => {
     if (
@@ -294,16 +337,26 @@ export default function StartScreen() {
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {
-      if (state !== "active" && phaseRef.current === "recording") {
-        pauseSession(false);
+      if (state === "active" && phaseRef.current !== "ready") {
+        void syncPersistentRecording();
       }
     });
     return () => subscription.remove();
-  }, [pauseSession]);
+  }, [syncPersistentRecording]);
 
-  useEffect(() => stopLocationUpdates, [stopLocationUpdates]);
+  const explainBackgroundPermission = () =>
+    new Promise<boolean>((resolve) => {
+      showAlert(t("backgroundLocationTitle"), t("backgroundLocationHelp"), [
+        {
+          text: t("cancel"),
+          style: "cancel",
+          onPress: () => resolve(false),
+        },
+        { text: t("continue"), onPress: () => resolve(true) },
+      ], () => resolve(false));
+    });
 
-  const ensureLocationPermission = async () => {
+  const ensureLocationPermission = async (requireBackground = false) => {
     const enabled = await Location.hasServicesEnabledAsync();
     if (!enabled) {
       showAlert(t("locationUnavailableTitle"), t("locationUnavailableHelp"));
@@ -317,6 +370,29 @@ export default function StartScreen() {
     if (response.status !== Location.PermissionStatus.GRANTED) {
       showAlert(t("locationDeniedTitle"), t("locationDeniedHelp"));
       return false;
+    }
+    if (!requireBackground) return true;
+
+    let background = await Location.getBackgroundPermissionsAsync();
+    if (background.status !== Location.PermissionStatus.GRANTED) {
+      if (background.canAskAgain) {
+        if (!(await explainBackgroundPermission())) return false;
+        background = await Location.requestBackgroundPermissionsAsync();
+      }
+      if (background.status !== Location.PermissionStatus.GRANTED) {
+        showAlert(
+          t("backgroundLocationTitle"),
+          t("backgroundLocationDeniedHelp"),
+          [
+            { text: t("cancel"), style: "cancel" },
+            {
+              text: t("openSettings"),
+              onPress: () => void Linking.openSettings(),
+            },
+          ],
+        );
+        return false;
+      }
     }
     return true;
   };
@@ -359,40 +435,58 @@ export default function StartScreen() {
       return;
     }
     try {
-      if (!(await ensureLocationPermission())) return;
+      if (!(await ensureLocationPermission(true))) return;
       routeRef.current = [];
-      lastPointRef.current = null;
+      latestPointIdRef.current = 0;
+      sessionKeyRef.current = null;
       distanceRef.current = 0;
       elevationRef.current = 0;
       accumulatedMsRef.current = 0;
-      sessionStartRef.current = new Date();
-      segmentStartRef.current = Date.now();
       setRoute([]);
       setDistanceMeters(0);
       setElevationGain(0);
       setElapsedSeconds(0);
       setMapMode("follow");
-      setSessionPhase("recording");
+      const snapshot = await beginRecordingSession({
+        sport,
+        language,
+        planId: plan.id,
+        workoutId: workout?.id ?? null,
+      });
+      await startRecordingLockScreen(snapshot);
+      await startBackgroundRecordingUpdates(language);
+      applyRecordingSnapshot(snapshot);
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      await beginLocationUpdates();
     } catch (error: any) {
-      stopLocationUpdates();
+      const snapshot = await getRecordingSnapshot(0).catch(() => null);
+      await stopBackgroundRecordingUpdates().catch(() => {});
+      await endRecordingLockScreen(snapshot).catch(() => {});
+      await clearRecordingSession().catch(() => {});
       setSessionPhase("ready");
       showAlert(
         t("locationUnavailableTitle"),
-        error?.message ?? t("locationUnavailableHelp"),
+        error?.message === "BACKGROUND_LOCATION_UNAVAILABLE"
+          ? t("backgroundLocationDeniedHelp")
+          : error?.message ?? t("locationUnavailableHelp"),
       );
     }
   };
 
   const resumeSession = async () => {
-    segmentStartRef.current = Date.now();
-    setSessionPhase("recording");
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
-      await beginLocationUpdates();
+      if (!(await ensureLocationPermission(true))) return;
+      const snapshot = await resumeRecordingSession();
+      if (!snapshot) return;
+      await startBackgroundRecordingUpdates(snapshot.language);
+      applyRecordingSnapshot(snapshot);
+      await updateRecordingLockScreen(snapshot);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     } catch (error: any) {
-      pauseSession(false);
+      const paused = await pauseRecordingSession().catch(() => null);
+      if (paused) {
+        applyRecordingSnapshot(paused);
+        await updateRecordingLockScreen(paused);
+      }
       showAlert(
         t("locationUnavailableTitle"),
         error?.message ?? t("locationUnavailableHelp"),
@@ -400,10 +494,10 @@ export default function StartScreen() {
     }
   };
 
-  const resetSession = useCallback(() => {
-    stopLocationUpdates();
+  const clearLocalSession = useCallback(() => {
     routeRef.current = [];
-    lastPointRef.current = null;
+    latestPointIdRef.current = 0;
+    sessionKeyRef.current = null;
     distanceRef.current = 0;
     elevationRef.current = 0;
     accumulatedMsRef.current = 0;
@@ -415,28 +509,41 @@ export default function StartScreen() {
     setElapsedSeconds(0);
     setMapMode("follow");
     setSessionPhase("ready");
-  }, [setSessionPhase, stopLocationUpdates]);
+  }, [setSessionPhase]);
+
+  const resetSession = useCallback(async () => {
+    const snapshot = await getRecordingSnapshot(0).catch(() => null);
+    await stopBackgroundRecordingUpdates().catch(() => {});
+    await endRecordingLockScreen(snapshot).catch(() => {});
+    await clearRecordingSession().catch(() => {});
+    clearLocalSession();
+  }, [clearLocalSession]);
 
   const saveSession = async () => {
-    if (!plan || !sessionStartRef.current) return;
     setSessionPhase("saving");
     try {
+      const snapshot = await getRecordingSnapshot(0);
+      if (!snapshot) throw new Error(t("invalidData"));
       await saveRecordedActivity(db, {
-        planId: plan.id,
-        workoutId: workout?.id ?? null,
-        workoutType: sport === "WALK" ? "WALK" : "EASY",
-        startTime: localIso(sessionStartRef.current),
-        distanceKm: distanceRef.current / 1000,
-        durationSeconds: Math.max(1, elapsedSeconds),
-        elevationGain: elevationRef.current,
-        route: routeRef.current,
+        planId: snapshot.planId,
+        workoutId: snapshot.workoutId,
+        workoutType: snapshot.sport === "WALK" ? "WALK" : "EASY",
+        startTime: localIso(new Date(snapshot.startedAtMs)),
+        distanceKm: snapshot.distanceMeters / 1000,
+        durationSeconds: Math.max(1, snapshot.elapsedSeconds),
+        elevationGain: snapshot.elevationGain,
+        route: snapshot.points.map(({ id: _id, ...point }) => point),
       });
       refresh();
+      await stopBackgroundRecordingUpdates().catch(() => {});
+      await endRecordingLockScreen(snapshot);
+      await clearRecordingSession();
+      clearLocalSession();
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       showAlert(
         t("activitySaved"),
-        `${t("activitySavedHelp")}\n${(distanceRef.current / 1000).toFixed(2)} ${t("kilometerShort")} · ${formatDuration(elapsedSeconds)}`,
-        [{ text: t("ok"), onPress: resetSession }],
+        `${t("activitySavedHelp")}\n${(snapshot.distanceMeters / 1000).toFixed(2)} ${t("kilometerShort")} · ${formatDuration(snapshot.elapsedSeconds)}`,
+        [{ text: t("ok") }],
       );
     } catch (error: any) {
       setSessionPhase("paused");
@@ -444,9 +551,9 @@ export default function StartScreen() {
     }
   };
 
-  const discardSession = () => {
-    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-    resetSession();
+  const discardSession = async () => {
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    await resetSession();
   };
 
   const confirmDiscard = () =>

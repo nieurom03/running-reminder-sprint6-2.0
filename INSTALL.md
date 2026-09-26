@@ -1,4 +1,4 @@
-# Running Reminder Sprint 5.1 — clean install
+# Runmio — clean install
 
 Use Node 22.13+.
 
@@ -12,7 +12,7 @@ npx expo-doctor
 Then regenerate the native iOS project so the new app name and native modules are applied:
 
 ```bash
-rm -rf ~/Library/Developer/Xcode/DerivedData/WorkoutTraining-*
+rm -rf ~/Library/Developer/Xcode/DerivedData/Runmio-*
 npx expo prebuild --clean -p ios
 npx expo run:ios --device
 npx expo run:ios --configuration release
@@ -21,10 +21,10 @@ npx expo run:ios --configuration release
 If you prefer Xcode:
 
 ```bash
-open ios/RunningReminder.xcworkspace
+open ios/Runmio.xcworkspace
 ```
 
-Always open `RunningReminder.xcworkspace`, not `RunningReminder.xcodeproj`. The
+Always open `Runmio.xcworkspace`, not `Runmio.xcodeproj`. The
 workspace includes the CocoaPods targets; opening only the project can cause
 errors such as `ExpoAsset/ExpoAsset.modulemap not found` when building for an
 iPhone.
@@ -52,7 +52,7 @@ Google Maps authenticates the Android application with a Google Cloud API key;
 it does not use the runner's Gmail account. In Google Cloud, enable **Maps SDK
 for Android**, create a key, and restrict it to:
 
-- Android package: `com.vovannieu.workouttraining`
+- Android package: `com.vovannieu.Runmio`
 - The SHA-1 fingerprints of every certificate used to sign the app (debug,
   release and Play App Signing as applicable)
 - API restriction: **Maps SDK for Android**

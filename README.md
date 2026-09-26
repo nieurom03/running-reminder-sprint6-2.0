@@ -1,10 +1,10 @@
-# Workout Training
+# Runmio
 
 React Native / Expo SDK 57 running-plan app, offline-first with SQLite.
 
 ## Sprint 5.1 changes
 
-- App was previously named **Running Reminder** and is now **Workout Training**.
+- The app is named **Runmio**.
 - Vietnamese / English runtime language switch, persisted in SQLite (`app_settings.language`).
 - Native date picker for race date and workout date.
 - Pace picker uses a dedicated MM:SS timer-style picker to support seconds (for example 7:30/km).
@@ -22,29 +22,31 @@ Core versions are intentionally preserved from Sprint 5 / Expo SDK 57.
 
 ## iOS note about device name
 
-On recent iOS versions, Apple may return a generic device name such as `iPhone` unless the app has the required entitlement. Workout Training falls back to the human-friendly model name when possible.
+On recent iOS versions, Apple may return a generic device name such as `iPhone` unless the app has the required entitlement. Runmio falls back to the human-friendly model name when possible.
 
 ## Bundle identifier
 
 The bundle identifier remains:
 
-`com.nieu.runplan`
+`com.vovannieu.Runmio`
 
-This is intentional to avoid disrupting your current signing/provisioning setup. You can change it later before App Store release if needed.
-
+The widget extension uses `com.vovannieu.Runmio.ExpoWidgetsTarget` and both targets share the `group.com.vovannieu.Runmio` App Group.
 
 ## Sprint 5.2
+
 - Dashboard hiển thị km đã chạy / km kế hoạch trong tuần và phần trăm hoàn thành.
 - Goal Time dùng picker giờ/phút/giây theo dạng wheel giống Current Pace.
 - App icon mới gồm 3 đường màu: Completed (xanh), Skipped (cam), Missed (đỏ).
 
 ## Sprint 5.6
-- Uses the Workout Training app icon for app icon, splash screen, and onboarding.
+
+- Uses the Runmio app icon for app icon, splash screen, and onboarding.
 - Fixes DateTimePicker 9.1 API migration: `onValueChange(event, selectedDate)` + `onDismiss`.
 - Prevents the previous `selectedDate.getTime()` runtime error by validating the second callback argument before converting it.
 - Version bumped to 0.5.6.
 
 ## Sprint 5.7
+
 - Full bilingual cleanup for new Dashboard, Plan, reminder and workout-result text.
 - Per-workout reminder presets: 1h, 2h, 6h, 12h, 1 day, 2 days, plus custom days before.
 - Edit Workout uses compact PacePicker to prevent icon overflow in two-column layout.
@@ -54,6 +56,7 @@ This is intentional to avoid disrupting your current signing/provisioning setup.
 - Dashboard weekly ring now reflects actual percentage instead of a permanently full green ring.
 
 ## Sprint 5.8
+
 - SQLite hotfix: removed parallel database reads in app startup/dashboard/workout detail and replaced manual BEGIN/COMMIT/ROLLBACK with `withTransactionAsync`.
 - App icon/splash artwork background changed to transparent PNG.
 - Dashboard weekly chart now shows `planned km / completed km` for every day; completed distance is green.
@@ -64,7 +67,7 @@ This is intentional to avoid disrupting your current signing/provisioning setup.
 - Added manual iCloud Drive backup/restore for local SQLite data.
   - Settings -> Backup & Restore -> Back up to iCloud Drive.
   - In the iOS share sheet choose Save to Files -> iCloud Drive.
-  - On a new iPhone install Workout Training, open Settings -> Restore from iCloud Drive, and select the backup file.
+  - On a new iPhone install Runmio, open Settings -> Restore from iCloud Drive, and select the backup file.
 - Backup includes training plans, workouts, activities/results, and app settings.
 - Restore is transactional and replaces current local data only after the selected backup is validated.
 

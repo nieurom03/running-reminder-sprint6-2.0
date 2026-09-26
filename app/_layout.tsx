@@ -6,6 +6,7 @@ import { migrateDb } from "@/db/database";
 import { markPastPlannedWorkoutsMissed } from "@/db/repository";
 import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import { GlassAlertProvider } from "@/components/GlassAlert";
+import "@/services/backgroundRecordingTask";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions({ duration: 350, fade: true });

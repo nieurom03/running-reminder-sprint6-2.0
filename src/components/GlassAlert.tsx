@@ -22,12 +22,14 @@ type GlassAlertConfig = {
   title: string;
   message?: string;
   buttons?: GlassAlertButton[];
+  onDismiss?: () => void;
 };
 
 type ShowGlassAlert = (
   title: string,
   message?: string,
   buttons?: GlassAlertButton[],
+  onDismiss?: () => void,
 ) => void;
 
 const GlassAlertContext = createContext<ShowGlassAlert | null>(null);
@@ -37,8 +39,8 @@ export function GlassAlertProvider({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const [dialog, setDialog] = useState<GlassAlertConfig | null>(null);
 
-  const showAlert = useCallback<ShowGlassAlert>((title, message, buttons) => {
-    setDialog({ title, message, buttons });
+  const showAlert = useCallback<ShowGlassAlert>((title, message, buttons, onDismiss) => {
+    setDialog({ title, message, buttons, onDismiss });
   }, []);
 
   const actions = useMemo(
@@ -49,7 +51,10 @@ export function GlassAlertProvider({ children }: { children: ReactNode }) {
     [dialog?.buttons, t],
   );
 
-  const close = useCallback(() => setDialog(null), []);
+  const close = useCallback(() => {
+    dialog?.onDismiss?.();
+    setDialog(null);
+  }, [dialog]);
   const choose = useCallback((button: GlassAlertButton) => {
     setDialog(null);
     const result = button.onPress?.();

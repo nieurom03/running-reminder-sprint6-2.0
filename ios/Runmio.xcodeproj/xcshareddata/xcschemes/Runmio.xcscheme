@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "WorkoutTraining.app"
-               BlueprintName = "WorkoutTraining"
-               ReferencedContainer = "container:WorkoutTraining.xcodeproj">
+               BuildableName = "Runmio.app"
+               BlueprintName = "Runmio"
+               ReferencedContainer = "container:Runmio.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,15 +33,15 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "WorkoutTrainingTests.xctest"
-               BlueprintName = "WorkoutTrainingTests"
-               ReferencedContainer = "container:WorkoutTraining.xcodeproj">
+               BuildableName = "RunmioTests.xctest"
+               BlueprintName = "RunmioTests"
+               ReferencedContainer = "container:Runmio.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "WorkoutTraining.app"
-            BlueprintName = "WorkoutTraining"
-            ReferencedContainer = "container:WorkoutTraining.xcodeproj">
+            BuildableName = "Runmio.app"
+            BlueprintName = "Runmio"
+            ReferencedContainer = "container:Runmio.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "WorkoutTraining.app"
-            BlueprintName = "WorkoutTraining"
-            ReferencedContainer = "container:WorkoutTraining.xcodeproj">
+            BuildableName = "Runmio.app"
+            BlueprintName = "Runmio"
+            ReferencedContainer = "container:Runmio.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -1,10 +1,10 @@
-# Workout Training — Project Memory
+# Runmio — Project Memory
 
-> Cập nhật lần cuối: 2026-09-21. Đây là ghi nhớ làm việc lâu dài cho các phiên Codex sau. Hãy đọc file này trước khi sửa dự án, rồi kiểm tra lại mã nguồn liên quan vì code có thể đã thay đổi.
+> Cập nhật lần cuối: 2026-09-25. Đây là ghi nhớ làm việc lâu dài cho các phiên Codex sau. Hãy đọc file này trước khi sửa dự án, rồi kiểm tra lại mã nguồn liên quan vì code có thể đã thay đổi.
 
 ## 1. Mục tiêu sản phẩm
 
-Workout Training là ứng dụng lập và theo dõi giáo án chạy bộ, ưu tiên iOS, hoạt động offline-first. Người dùng tạo giáo án theo cự ly race, ngày race, goal time, pace hiện tại và các ngày chạy; ứng dụng sinh workout, nhắc lịch, cho sửa từng buổi và nhập kết quả chạy thủ công.
+Runmio là ứng dụng lập và theo dõi giáo án chạy bộ, ưu tiên iOS, hoạt động offline-first. Người dùng tạo giáo án theo cự ly race, ngày race, goal time, pace hiện tại và các ngày chạy; ứng dụng sinh workout, nhắc lịch, cho sửa từng buổi và nhập kết quả chạy thủ công.
 
 Tính năng hiện có:
 
@@ -16,6 +16,7 @@ Tính năng hiện có:
 - Tiếng Việt/English và giao diện `light`/`dark`/`system`, lưu trong SQLite.
 - Backup/restore thủ công qua iOS share sheet và Files/iCloud Drive. Backup mới dùng file `.rrbackup` mã hóa bằng mật khẩu; restore vẫn đọc được backup JSON cũ. Đây không phải CloudKit sync tự động.
 - Settings có form Feedback dùng share sheet hệ thống, tự kèm phiên bản app và phiên bản hệ điều hành.
+- Tab Start tiếp tục ghi GPS khi app vào nền hoặc khóa màn hình; iOS hiển thị Live Activity trên Lock Screen/Dynamic Island, Android giữ foreground-service notification trên Lock Screen.
 - Onboarding, icon/splash và phong cách UI liquid-glass/mint.
 
 ## 2. Stack và cấu hình
@@ -23,10 +24,11 @@ Tính năng hiện có:
 - Expo SDK 57, React Native 0.86.3, React 19.2.3, TypeScript strict.
 - Expo Router file-based routing; entry là `expo-router/entry`.
 - Expo SQLite (`runplan.db`) là nguồn dữ liệu bền vững.
+- Phiên GPS đang hoạt động được checkpoint riêng trong `active-recording.db`; background task dùng `expo-task-manager`, còn Lock Screen iOS dùng `expo-widgets` + `@expo/ui`.
 - Zustand chỉ giữ state UI toàn cục nhỏ: language, color scheme và `refreshKey`.
 - Alias TypeScript: `@/*` trỏ tới `src/*`.
-- App name: `Workout Training`; scheme nội bộ vẫn là `runningreminder` để giữ tương thích.
-- Bundle ID/package hiện giữ nguyên: `com.vovannieu.runplan`.
+- App name: `Runmio`; URL scheme là `Runmio`.
+- Bundle ID/application ID: `com.vovannieu.Runmio`; widget ID là `com.vovannieu.Runmio.ExpoWidgetsTarget`; App Group là `group.com.vovannieu.Runmio`.
 - Scripts chính: `npm start`, `npm run ios`, `npm run android`, `npm run doctor`, `npm run typecheck`.
 - Tài liệu cài đặt yêu cầu Node 22.13+ và khuyến nghị prebuild sạch khi native dependency/asset thay đổi.
 
@@ -47,6 +49,9 @@ Tính năng hiện có:
 - `src/db/repository.ts`: toàn bộ truy vấn và transaction nghiệp vụ.
 - `src/services/trainingGenerator.ts`: thuật toán sinh giáo án.
 - `src/services/notifications.ts`: quyền và lịch local notification.
+- `src/services/backgroundRecordingTask.ts`: đăng ký task location toàn cục và bật/tắt background updates/Android foreground service.
+- `src/services/recordingSession.ts`: DB phiên GPS tạm, lọc điểm, cộng cự ly/độ cao và khôi phục phiên sau khi app remount/relaunch.
+- `src/services/recordingLockScreen*.ts`, `src/widgets/RunningLiveActivity.tsx`: bridge và giao diện Live Activity iOS.
 - `src/services/backup.ts`: export AES-256-GCM/PBKDF2 có mật khẩu, chọn file và import transactional; tương thích backup JSON cũ.
 - `src/types/models.ts`: domain types.
 - `src/i18n/index.ts`: dictionary VI/EN và `useI18n`.
@@ -60,6 +65,8 @@ Tính năng hiện có:
 ## 4. Dữ liệu và quy tắc nghiệp vụ
 
 SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activities`, `app_settings`.
+
+`active-recording.db` là DB vận hành tạm, không nằm trong backup. DB này chỉ giữ một `recording_session` cùng các `recording_points`; phải xóa sau khi Save hoặc Discard, nhưng giữ nguyên khi app đi background/khóa màn hình để có thể tiếp tục và phục hồi phiên.
 
 - Active plan là plan có `id` lớn nhất; dự án chưa có cờ active riêng.
 - `workouts.is_extra=1` đánh dấu buổi chạy phát sinh do người dùng thêm cho ngày hiện tại. Workout này không tham gia cấu trúc, progress, trạng thái tổng hoặc reminder của giáo án.
@@ -93,11 +100,13 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - Không thay bundle identifier nếu chưa được yêu cầu vì liên quan signing/provisioning.
 - Thay native dependency, icon hoặc splash có thể cần `expo prebuild --clean -p ios` và rebuild iOS.
 - Mã hóa backup dùng `randomblob` của SQLite đã được liên kết sẵn để tạo salt/nonce, PBKDF2-HMAC-SHA256 (310.000 vòng) để dẫn xuất khóa và AES-256-GCM để bảo mật/xác thực nội dung. Không lưu mật khẩu; mất mật khẩu thì không khôi phục được file. Không thêm native module chỉ để mã hóa vì development build cũ sẽ lỗi ngay khi tải Settings.
-- Tên hiển thị của app là `Workout Training`; target/project iOS là `WorkoutTraining`, bundle identifier iOS và application ID Android là `com.vovannieu.workouttraining`. Định danh nội bộ của định dạng backup vẫn giữ nguyên để đọc được file backup cũ.
+- Tên hiển thị và target/project/workspace iOS là `Runmio`; URL scheme là `Runmio`. Bundle identifier iOS và application ID Android là `com.vovannieu.Runmio`. Tên DB `runplan.db` và định danh nội bộ của định dạng backup vẫn giữ nguyên để bảo toàn dữ liệu/tương thích backup cũ.
 - Build bằng iOS 27 SDK bắt buộc dùng UIKit scene lifecycle. Giữ `expo-build-properties.ios.enableSceneSupport=true`, `AppDelegate` conform `ExpoReactNativeFactoryProvider`, không khởi tạo `UIWindow`/React Native trực tiếp trong `didFinishLaunching`, và giữ `UIApplicationSceneManifest` trỏ tới `EXExpoAppSceneDelegate`. Cần Expo SDK từ `57.0.23` trở lên cho cấu hình này.
-- Tab Start dùng `expo-location`, `expo-haptics` và `react-native-maps`; iOS phải giữ `NSLocationWhenInUseUsageDescription` và chạy `pod install` sau khi cài lại dependencies. Hiện chỉ ghi GPS khi app ở foreground; đưa app về nền sẽ tự Pause để không tính thời gian thiếu dữ liệu vị trí.
+- Tab Start dùng `expo-location`, `expo-task-manager`, `expo-widgets`, `@expo/ui`, `expo-haptics` và `react-native-maps`. Task nền phải được import từ `app/_layout.tsx` để `TaskManager.defineTask` chạy ở global scope. Start yêu cầu foreground rồi background/Always permission; không tự Pause khi app vào nền hoặc khóa màn hình. Pause/Finish/Discard mới dừng location updates. Nếu app bị hệ điều hành/force-quit, phiên vẫn còn trong `active-recording.db` để khôi phục nhưng không được hứa rằng GPS sẽ tiếp tục sau force-quit.
+- iOS phải giữ `UIBackgroundModes=location`, Always/When-In-Use usage descriptions, `NSSupportsLiveActivities`, App Group entitlement và target `ExpoWidgetsTarget`; thay widget/config phải prebuild rồi `pod install`. Android phải giữ background-location và foreground-service location permissions. Đây là native feature, không kiểm thử bằng Expo Go; cần development/production build mới.
+- Live Activity `RunningActivity` hiển thị trạng thái, thời gian, cự ly và pace trên Lock Screen/Dynamic Island; lỗi/việc người dùng tắt Live Activities không được làm dừng ghi GPS. Android dùng notification bắt buộc của foreground location service, nội dung VI/EN theo ngôn ngữ lúc bắt đầu phiên.
 - Màn hình Start giữ card thống kê/điều khiển cố định phía trên tab bar; vùng Map + workout dùng flex và chỉ vùng này cuộn khi màn hình thấp. Nhờ vậy bản đồ tự giãn trên Pro Max/iPad. Selector dùng `run-fast` cho Run và giữ `footsteps-outline` cho Walk; lựa chọn sport phải lưu qua `sportRef` để callback GPS không làm effect tải workout đặt lại tab.
-- Map được tách theo platform: iOS dùng Apple Maps, Android dùng Google Maps khi `GOOGLE_MAPS_ANDROID_API_KEY` có mặt lúc prebuild/build, web hoặc Android thiếu key dùng SVG fallback. Google Maps key thuộc dự án Cloud và phải giới hạn theo package `com.vovannieu.workouttraining`, SHA-1 cùng Maps SDK for Android; không yêu cầu người dùng đăng nhập Gmail. `app.config.js` chỉ bật plugin/key khi biến môi trường có giá trị.
+- Map được tách theo platform: iOS dùng Apple Maps, Android dùng Google Maps khi `GOOGLE_MAPS_ANDROID_API_KEY` có mặt lúc prebuild/build, web hoặc Android thiếu key dùng SVG fallback. Google Maps key thuộc dự án Cloud và phải giới hạn theo package `com.vovannieu.Runmio`, SHA-1 cùng Maps SDK for Android; không yêu cầu người dùng đăng nhập Gmail. `app.config.js` chỉ bật plugin/key khi biến môi trường có giá trị.
 - Các mô tả hệ thống cũ do generator lưu bằng tiếng Việt phải được ánh xạ qua i18n khi hiển thị; ghi chú tùy chỉnh của người dùng giữ nguyên. Start screen hiện xử lý các mô tả Easy/Long/Tempo/Interval/Recovery/Race Day/GPS cũ theo quy tắc này.
 - Cự ly activity GPS được làm tròn 2 chữ số thập phân ngay tại repository trước khi lưu; nếu GPS tạo workout extra thì `workouts.distance_km` dùng đúng cùng giá trị. Route nằm trong `activities.raw_data` được parse qua `src/utils/activityRoute.ts`; màn hình sửa kết quả GPS hiển thị toàn tuyến, fit viewport và marker đầu/cuối nhưng không hiển thị vị trí hiện tại của thiết bị.
 - Bản đồ route trong màn hình sửa kết quả có nút định vị. Chỉ khi nhấn nút mới xin quyền/lấy vị trí hiện tại rồi focus camera và bật user-location dot. Map cho phép pan/zoom/rotate/pitch; trong lúc chạm bản đồ phải tắt scroll của form cha để tránh tranh gesture, sau khi nhả phải bật lại.
@@ -105,7 +114,7 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - Cụm điều khiển Map ở Start có nút la bàn Bắc-up (`B` ở VI, `N` ở EN). Nhấn nút đọc camera qua `getCamera()`, đặt heading về 0° và bật lại `follow` mode để camera tiếp tục bám điện thoại. Khi Start screen ở trạng thái ready và đã có quyền, dùng foreground preview watch 2 giây/3 m chỉ để cập nhật marker/camera, tuyệt đối không cộng route hoặc cự ly; recording vẫn dùng watcher BestForNavigation riêng.
 - Feedback dùng `Share.share` cho nội dung text nhưng loại activity `SaveToFiles`/iCloud Drive trên iOS; lưu file chỉ thuộc luồng Backup. Popup Feedback chỉ đóng sau khi người dùng chọn một kênh chia sẻ.
 
-## 6. Tình trạng kiểm tra ngày 2026-09-21
+## 6. Tình trạng kiểm tra ngày 2026-09-25
 
 - Không tìm thấy `AGENTS.md` trong workspace.
 - Workspace hiện là Git repository; luôn giữ nguyên các thay đổi chưa commit không thuộc tác vụ hiện tại.
@@ -114,6 +123,7 @@ SQLite có bốn bảng được backup: `training_plans`, `workouts`, `activiti
 - `npm run typecheck`, export bundle iOS và Android chạy thành công sau thay đổi popup. Đã kiểm tra trực quan Light/Dark trên Simulator iPhone 17 Pro Max, iOS 26.3.
 - Bản Release đã build bằng iOS 27 SDK và khởi chạy thành công trên Simulator iPhone 18 Pro Max, iOS 27.0 sau khi chuyển sang scene lifecycle; không còn lỗi `UIScene life cycle is required`.
 - Tab Start đã được kiểm tra trực quan trên Simulator iPhone 18 Pro Max/iOS 27.0 với Apple Maps và native Liquid Glass tab bar 5 mục. TypeScript, iOS export và Release build đều thành công.
+- Background GPS/Lock Screen sprint: `npm run typecheck`, bundle export iOS + Android và iOS Simulator Release build đều thành công. Release build có compile/embed/validate `ExpoWidgetsTarget.appex`. `expo-doctor` đạt 20/21; cảnh báo duy nhất là các trường app config cần chạy prebuild để sync vì repo giữ thư mục native.
 - `tsconfig.json` tạm dùng `ignoreDeprecations: "6.0"` cho alias dựa trên `baseUrl`; cần migrate cấu hình trước TypeScript 7.
 - README chính có tiêu đề Sprint 5.1 nhưng chứa changelog đến 5.9; `README_SPRINT_6.md` mô tả UI 6.0.
 

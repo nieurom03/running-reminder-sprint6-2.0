@@ -15,7 +15,8 @@ const vi = {
   gpsPermissionRequired: "Cần quyền vị trí",
   todayWorkout: "BUỔI TẬP HÔM NAY",
   unplannedActivity: "Hoạt động phát sinh",
-  unplannedActivityHelp: "Kết quả vẫn được cộng vào tổng tuần và không thay đổi giáo án.",
+  unplannedActivityHelp:
+    "Kết quả vẫn được cộng vào tổng tuần và không thay đổi giáo án.",
   elapsedTime: "Thời gian",
   averagePace: "Pace trung bình",
   startRecording: "BẮT ĐẦU",
@@ -36,17 +37,28 @@ const vi = {
   activitySaved: "Đã lưu hoạt động",
   activitySavedHelp: "Dashboard đã được cập nhật với kết quả vừa ghi.",
   locationDeniedTitle: "Chưa có quyền vị trí",
-  locationDeniedHelp: "Cho phép truy cập vị trí khi dùng ứng dụng để đo cự ly và pace.",
+  locationDeniedHelp:
+    "Cho phép truy cập vị trí khi dùng ứng dụng để đo cự ly và pace.",
+  backgroundLocationTitle: "Chạy khi khóa màn hình",
+  backgroundLocationHelp:
+    "Runmio cần quyền vị trí Luôn luôn để tiếp tục ghi GPS khi màn hình khóa. Trạng thái chạy sẽ xuất hiện trên màn hình khóa để bạn không cần bật màn hình liên tục.",
+  backgroundLocationDeniedHelp:
+    "Mở Cài đặt và chọn Vị trí → Luôn luôn để ghi hoạt động khi khóa màn hình.",
+  openSettings: "Mở Cài đặt",
   locationUnavailableTitle: "Không thể sử dụng GPS",
   locationUnavailableHelp: "Hãy bật Dịch vụ định vị rồi thử lại.",
   recordingFailed: "Không thể lưu hoạt động",
-  createPlanToRecord: "Tạo giáo án trước để hoạt động được cộng vào tiến độ tuần.",
+  createPlanToRecord:
+    "Tạo giáo án trước để hoạt động được cộng vào tiến độ tuần.",
   todayWorkoutCompleted: "Buổi tập hôm nay đã hoàn thành.",
   elevationGainShort: "Độ cao",
   easyRunDescription: "Chạy nhẹ: giữ nhịp thoải mái, có thể nói chuyện.",
-  longRunDescription: "Chạy dài: ưu tiên hoàn thành cự ly, kiểm soát nhịp tim và tiếp nước.",
-  tempoRunDescription: "Tempo: khởi động 1–2 km, chạy phần giữa ở pace kiểm soát rồi thả lỏng.",
-  intervalRunDescription: "Interval: khởi động kỹ, chạy các đoạn nhanh ngắn xen kẽ hồi phục.",
+  longRunDescription:
+    "Chạy dài: ưu tiên hoàn thành cự ly, kiểm soát nhịp tim và tiếp nước.",
+  tempoRunDescription:
+    "Tempo: khởi động 1–2 km, chạy phần giữa ở pace kiểm soát rồi thả lỏng.",
+  intervalRunDescription:
+    "Interval: khởi động kỹ, chạy các đoạn nhanh ngắn xen kẽ hồi phục.",
   recoveryRunDescription: "Chạy phục hồi thật nhẹ, ưu tiên hồi phục cơ thể.",
   gpsWorkoutDescription: "Hoạt động được ghi bằng GPS.",
   raceDayGoal: "NGÀY THI ĐẤU · mục tiêu",
@@ -59,7 +71,7 @@ const vi = {
   kilometerShort: "km",
   meterShort: "m",
   perKilometer: "/km",
-  runningReminder: "Workout Training",
+  runningReminder: "Runmio",
   overview: "Tổng quan",
   thisWeek: "TUẦN NÀY",
   manual: "Thủ công",
@@ -72,8 +84,7 @@ const vi = {
   nextRun: "Buổi chạy tiếp theo",
   recentPlan: "KẾ HOẠCH GẦN NHẤT",
   noPlan: "Chưa có giáo án",
-  createFirst:
-    "Tạo giáo án đầu tiên để Workout Training theo dõi tiến độ cho bạn.",
+  createFirst: "Tạo giáo án đầu tiên để Runmio theo dõi tiến độ cho bạn.",
   createPlan: "TẠO GIÁO ÁN",
   viewPlan: "Xem giáo án",
   createPlanTitle: "Tạo giáo án mới",
@@ -113,7 +124,7 @@ const vi = {
   backupICloud: "Sao lưu vào iCloud Drive",
   restoreICloud: "Khôi phục từ iCloud Drive",
   encryptedBackupHelp:
-    "Đặt mật khẩu để mã hóa dữ liệu trước khi lưu file vào iCloud Drive.",
+    "Chọn sao lưu có mật khẩu hoặc không mã hóa vào iCloud Drive.",
   restoreFileHelp: "Chọn file .rrbackup hoặc file backup JSON cũ để khôi phục.",
   icloudNote:
     "Khi bảng chia sẻ iOS mở ra, chọn Lưu vào Tệp → iCloud Drive. Trên máy mới, chọn Khôi phục và mở file backup trong iCloud Drive.",
@@ -124,6 +135,10 @@ const vi = {
   backupPasswordTitle: "Bảo vệ file sao lưu",
   backupPasswordHelp:
     "Mật khẩu được dùng để mã hóa file. Hãy ghi nhớ vì ứng dụng không thể lấy lại mật khẩu này.",
+  backupUsePassword: "Dùng mật khẩu",
+  backupUsePasswordHelp: "Tắt để tạo file sao lưu không mã hóa.",
+  backupNoPasswordWarning:
+    "File sẽ không được mã hóa. Bất kỳ ai có file đều có thể đọc dữ liệu sao lưu.",
   backupPassword: "Mật khẩu",
   confirmBackupPassword: "Nhập lại mật khẩu",
   backupPasswordPlaceholder: "Tối thiểu 8 ký tự",
@@ -136,8 +151,9 @@ const vi = {
     "Dữ liệu hiện tại trên máy sẽ được thay thế bằng dữ liệu trong file backup.",
   restorePasswordTitle: "Nhập mật khẩu sao lưu",
   restorePasswordHelp: "Nhập mật khẩu đã dùng khi tạo file sao lưu này.",
-  incorrectBackupPassword: "Mật khẩu không đúng hoặc file sao lưu đã bị thay đổi.",
-  invalidBackupFile: "File đã chọn không phải file sao lưu hợp lệ của Workout Training.",
+  incorrectBackupPassword:
+    "Mật khẩu không đúng hoặc file sao lưu đã bị thay đổi.",
+  invalidBackupFile: "File đã chọn không phải file sao lưu hợp lệ của Runmio.",
   togglePasswordVisibility: "Hiện hoặc ẩn mật khẩu",
   restore: "Khôi phục",
   restoreComplete: "Khôi phục hoàn tất",
@@ -215,8 +231,7 @@ const vi = {
   editResult: "Sửa kết quả chạy",
   resetPlanned: "Đưa về Kế hoạch",
   reminderOptions: "NHẮC TRƯỚC BUỔI CHẠY",
-  reminderOptionsHelp:
-    "Chọn thời điểm Workout Training sẽ nhắc bạn trước giờ chạy.",
+  reminderOptionsHelp: "Chọn thời điểm Runmio sẽ nhắc bạn trước giờ chạy.",
   reminder1h: "Trước 1 giờ",
   reminder2h: "Trước 2 giờ",
   reminder6h: "Trước 6 giờ",
@@ -308,7 +323,8 @@ const en: typeof vi = {
   gpsPermissionRequired: "Location required",
   todayWorkout: "TODAY'S WORKOUT",
   unplannedActivity: "Extra activity",
-  unplannedActivityHelp: "It still counts toward this week without changing your training plan.",
+  unplannedActivityHelp:
+    "It still counts toward this week without changing your training plan.",
   elapsedTime: "Time",
   averagePace: "Average pace",
   startRecording: "START",
@@ -320,27 +336,42 @@ const en: typeof vi = {
   recordingPaused: "PAUSED",
   readyToRecord: "READY",
   finishActivityTitle: "Finish activity?",
-  finishActivityMessage: "Your GPS result will be saved to this week's activity.",
+  finishActivityMessage:
+    "Your GPS result will be saved to this week's activity.",
   saveActivity: "SAVE ACTIVITY",
   continueRecording: "KEEP RECORDING",
   discardActivity: "DISCARD ACTIVITY",
   discardActivityTitle: "Discard this activity?",
-  discardActivityMessage: "The recorded time, distance and route will be deleted.",
+  discardActivityMessage:
+    "The recorded time, distance and route will be deleted.",
   activitySaved: "Activity saved",
-  activitySavedHelp: "The dashboard has been updated with your recorded result.",
+  activitySavedHelp:
+    "The dashboard has been updated with your recorded result.",
   locationDeniedTitle: "Location access required",
-  locationDeniedHelp: "Allow location access while using the app to measure distance and pace.",
+  locationDeniedHelp:
+    "Allow location access while using the app to measure distance and pace.",
+  backgroundLocationTitle: "Run while screen is locked",
+  backgroundLocationHelp:
+    "Runmio needs Always location access to keep recording GPS while the screen is locked. Your workout appears on the Lock Screen so you do not need to keep the display on.",
+  backgroundLocationDeniedHelp:
+    "Open Settings and choose Location → Always to record while the screen is locked.",
+  openSettings: "Open Settings",
   locationUnavailableTitle: "GPS is unavailable",
   locationUnavailableHelp: "Turn on Location Services and try again.",
   recordingFailed: "Could not save activity",
-  createPlanToRecord: "Create a plan first so the activity can count toward weekly progress.",
+  createPlanToRecord:
+    "Create a plan first so the activity can count toward weekly progress.",
   todayWorkoutCompleted: "Today's workout is already completed.",
   elevationGainShort: "Elevation",
   easyRunDescription: "Easy run: stay relaxed at a conversational pace.",
-  longRunDescription: "Long run: prioritize the distance, control your effort and stay hydrated.",
-  tempoRunDescription: "Tempo: warm up for 1–2 km, run the middle at a controlled pace, then cool down.",
-  intervalRunDescription: "Intervals: warm up thoroughly, then alternate short fast efforts with recovery.",
-  recoveryRunDescription: "Keep this recovery run very easy and let your body recover.",
+  longRunDescription:
+    "Long run: prioritize the distance, control your effort and stay hydrated.",
+  tempoRunDescription:
+    "Tempo: warm up for 1–2 km, run the middle at a controlled pace, then cool down.",
+  intervalRunDescription:
+    "Intervals: warm up thoroughly, then alternate short fast efforts with recovery.",
+  recoveryRunDescription:
+    "Keep this recovery run very easy and let your body recover.",
   gpsWorkoutDescription: "Activity recorded with GPS.",
   raceDayGoal: "RACE DAY · goal",
   recordedRoute: "GPS ROUTE",
@@ -352,7 +383,7 @@ const en: typeof vi = {
   kilometerShort: "km",
   meterShort: "m",
   perKilometer: "/km",
-  runningReminder: "Workout Training",
+  runningReminder: "Runmio",
   overview: "Overview",
   thisWeek: "THIS WEEK",
   manual: "Manual",
@@ -365,8 +396,7 @@ const en: typeof vi = {
   nextRun: "Next Run",
   recentPlan: "UPCOMING PLAN",
   noPlan: "No training plan",
-  createFirst:
-    "Create your first plan so Workout Training can track your progress.",
+  createFirst: "Create your first plan so Runmio can track your progress.",
   createPlan: "CREATE PLAN",
   viewPlan: "View Plan",
   createPlanTitle: "Create training plan",
@@ -406,8 +436,9 @@ const en: typeof vi = {
   backupICloud: "Back up to iCloud Drive",
   restoreICloud: "Restore from iCloud Drive",
   encryptedBackupHelp:
-    "Set a password to encrypt your data before saving the file to iCloud Drive.",
-  restoreFileHelp: "Choose a .rrbackup file or an older JSON backup to restore.",
+    "Choose a password-protected or unencrypted iCloud Drive backup.",
+  restoreFileHelp:
+    "Choose a .rrbackup file or an older JSON backup to restore.",
   icloudNote:
     "When the iOS share sheet opens, choose Save to Files → iCloud Drive. On your new phone, choose Restore and open the backup file from iCloud Drive.",
   icloudBackupTitle: "Back up to iCloud Drive",
@@ -417,6 +448,10 @@ const en: typeof vi = {
   backupPasswordTitle: "Protect your backup",
   backupPasswordHelp:
     "This password encrypts the file. Keep it safe because the app cannot recover it.",
+  backupUsePassword: "Use a password",
+  backupUsePasswordHelp: "Turn off to create an unencrypted backup file.",
+  backupNoPasswordWarning:
+    "The file will not be encrypted. Anyone with the file can read the backup data.",
   backupPassword: "Password",
   confirmBackupPassword: "Confirm password",
   backupPasswordPlaceholder: "At least 8 characters",
@@ -429,8 +464,9 @@ const en: typeof vi = {
     "Current data on this device will be replaced by the selected backup file.",
   restorePasswordTitle: "Enter backup password",
   restorePasswordHelp: "Enter the password used when this backup was created.",
-  incorrectBackupPassword: "The password is incorrect or the backup file has been changed.",
-  invalidBackupFile: "The selected file is not a valid Workout Training backup.",
+  incorrectBackupPassword:
+    "The password is incorrect or the backup file has been changed.",
+  invalidBackupFile: "The selected file is not a valid Runmio backup.",
   togglePasswordVisibility: "Show or hide password",
   restore: "Restore",
   restoreComplete: "Restore complete",
@@ -508,7 +544,7 @@ const en: typeof vi = {
   resetPlanned: "Reset to Planned",
   reminderOptions: "REMIND ME BEFORE THIS RUN",
   reminderOptionsHelp:
-    "Choose when Workout Training should notify you before the workout.",
+    "Choose when Runmio should notify you before the workout.",
   reminder1h: "1 hour before",
   reminder2h: "2 hours before",
   reminder6h: "6 hours before",
