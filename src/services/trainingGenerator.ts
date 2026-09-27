@@ -1,4 +1,5 @@
 import type { PlanInput, WorkoutType } from "@/types/models";
+import type { AppLanguage } from "@/store/useAppStore";
 
 export interface GeneratedWorkout {
   date: string;
@@ -43,6 +44,7 @@ function peakLongRun(distance: number) {
 export function generateTrainingPlan(
   input: PlanInput,
   startDate = new Date(),
+  language: AppLanguage = "vi",
 ): GeneratedWorkout[] {
   const start = new Date(
     startDate.getFullYear(),
@@ -51,7 +53,38 @@ export function generateTrainingPlan(
     12,
   );
   const race = parseLocalDate(input.raceDate);
-  if (race <= start) throw new Error("Race date phải lớn hơn ngày hiện tại.");
+  if (race <= start) {
+    throw new Error(
+      language === "en"
+        ? "Race date must be later than today."
+        : "Race date phải lớn hơn ngày hiện tại.",
+    );
+  }
+
+  const descriptions =
+    language === "en"
+      ? {
+          easy: "Easy run: Keep a comfortable, conversational effort.",
+          longRun:
+            "Long run: Prioritize completing the distance, manage your heart rate, and stay hydrated.",
+          tempo:
+            "Tempo: Warm up for 1–2 km, run the middle section at a controlled pace, then cool down.",
+          interval:
+            "Interval: Warm up thoroughly, then alternate short fast efforts with recovery.",
+          recovery: "Recovery: Run very easy and focus on recovery.",
+          raceDay: "RACE DAY · target",
+        }
+      : {
+          easy: "Easy run: giữ nhịp thoải mái, có thể nói chuyện.",
+          longRun:
+            "Long run: ưu tiên hoàn thành cự ly, kiểm soát nhịp tim và tiếp nước.",
+          tempo:
+            "Tempo: 1–2 km khởi động, phần giữa ở pace kiểm soát, sau đó thả lỏng.",
+          interval:
+            "Interval: khởi động kỹ, chạy các đoạn nhanh ngắn xen kẽ hồi phục.",
+          recovery: "Recovery: chạy thật nhẹ, mục tiêu phục hồi.",
+          raceDay: "RACE DAY · mục tiêu",
+        };
 
   const totalWeeks = weeksBetween(start, race);
   const workouts: GeneratedWorkout[] = [];
@@ -94,28 +127,25 @@ export function generateTrainingPlan(
       );
       let minPace = input.currentPaceSec + 15;
       let maxPace = input.currentPaceSec + 45;
-      let description = "Easy run: giữ nhịp thoải mái, có thể nói chuyện.";
+      let description = descriptions.easy;
 
       if (isLong) {
         type = "LONG_RUN";
         distance = longDistance;
         minPace = input.currentPaceSec + 20;
         maxPace = input.currentPaceSec + 60;
-        description =
-          "Long run: ưu tiên hoàn thành cự ly, kiểm soát nhịp tim và tiếp nước.";
+        description = descriptions.longRun;
       } else if (isQuality) {
         type = week % 2 === 0 ? "TEMPO" : "INTERVAL";
         distance = clamp(Math.round((5 + progress * 3) * 2) / 2, 5, 8);
         if (type === "TEMPO") {
           minPace = Math.max(240, input.currentPaceSec - 20);
           maxPace = input.currentPaceSec + 5;
-          description =
-            "Tempo: 1–2 km khởi động, phần giữa ở pace kiểm soát, sau đó thả lỏng.";
+          description = descriptions.tempo;
         } else {
           minPace = Math.max(220, input.currentPaceSec - 35);
           maxPace = input.currentPaceSec - 10;
-          description =
-            "Interval: khởi động kỹ, chạy các đoạn nhanh ngắn xen kẽ hồi phục.";
+          description = descriptions.interval;
         }
       } else if (
         index === scheduledDates.length - 1 &&
@@ -126,7 +156,7 @@ export function generateTrainingPlan(
         distance = clamp(distance - 1.5, 3, 6);
         minPace = input.currentPaceSec + 35;
         maxPace = input.currentPaceSec + 75;
-        description = "Recovery: chạy thật nhẹ, mục tiêu phục hồi.";
+        description = descriptions.recovery;
       }
 
       workouts.push({
@@ -150,7 +180,7 @@ export function generateTrainingPlan(
     ),
     targetPaceMaxSec:
       Math.round((input.goalTimeMinutes * 60) / input.raceDistanceKm) + 10,
-    description: `RACE DAY · mục tiêu ${(() => {
+    description: `${descriptions.raceDay} ${(() => {
       const sec = Math.round(input.goalTimeMinutes * 60);
       return `${Math.floor(sec / 3600)}:${String(Math.floor((sec % 3600) / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
     })()}`,

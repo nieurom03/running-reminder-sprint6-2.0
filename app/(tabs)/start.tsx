@@ -19,6 +19,7 @@ import { GlassBackground, GlassCard } from "@/components/Glass";
 import { useGlassAlert } from "@/components/GlassAlert";
 import { RunMap } from "@/components/RunMap";
 import { useTheme } from "@/context/ThemeContext";
+import { localizeWorkoutDescription } from "@/utils/workoutDescription";
 import {
   getActivePlan,
   getWorkoutForDate,
@@ -649,51 +650,10 @@ export default function StartScreen() {
                 : t("rest");
 
   const workoutDescription = (current: Workout) => {
-    const description = current.description?.trim();
-    if (!description) return `${current.date} · ${plan?.name ?? ""}`;
-
-    if (
-      description === "Easy run: giữ nhịp thoải mái, có thể nói chuyện." ||
-      description === "Easy run, giữ nhịp thoải mái" ||
-      description === "Easy run"
-    ) {
-      return t("easyRunDescription");
-    }
-    if (
-      description ===
-        "Long run: ưu tiên hoàn thành cự ly, kiểm soát nhịp tim và tiếp nước." ||
-      description === "Long run, ưu tiên hoàn thành cự ly" ||
-      description === "Long run"
-    ) {
-      return t("longRunDescription");
-    }
-    if (
-      description ===
-        "Tempo: 1–2 km khởi động, phần giữa ở pace kiểm soát, sau đó thả lỏng." ||
-      description === "2 km easy + 3 km tempo + 2 km easy"
-    ) {
-      return t("tempoRunDescription");
-    }
-    if (
-      description ===
-        "Interval: khởi động kỹ, chạy các đoạn nhanh ngắn xen kẽ hồi phục." ||
-      description === "Khởi động 2 km, 4 x 400m, thả lỏng"
-    ) {
-      return t("intervalRunDescription");
-    }
-    if (
-      description === "Recovery: chạy thật nhẹ, mục tiêu phục hồi." ||
-      description === "Recovery run"
-    ) {
-      return t("recoveryRunDescription");
-    }
-    if (description === "GPS recorded activity") {
-      return t("gpsWorkoutDescription");
-    }
-    if (description.startsWith("RACE DAY · mục tiêu ")) {
-      return `${t("raceDayGoal")} ${description.slice("RACE DAY · mục tiêu ".length)}`;
-    }
-    return description;
+    return (
+      localizeWorkoutDescription(current.description, t) ??
+      `${current.date} · ${plan?.name ?? ""}`
+    );
   };
 
   return (

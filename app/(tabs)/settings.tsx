@@ -12,7 +12,7 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import appConfig from "../../app.json";
 import { getTrainingStats, setSetting, getSetting } from "@/db/repository";
@@ -333,23 +333,23 @@ export default function Settings() {
         </Text>
         <GlassCard style={s.group}>
           <Row
-            icon="refresh-outline"
-            title={t("replayOnboarding")}
-            onPress={replay}
-            colors={colors}
-          />
-          <Divider colors={colors} />
-          <Row
             icon="shield-checkmark-outline"
             title={t("privacyPolicy")}
-            value={t("appStore")}
+            onPress={() => router.push("/privacy" as Href)}
             colors={colors}
           />
           <Divider colors={colors} />
           <Row
             icon="document-text-outline"
             title={t("termsOfUse")}
-            value={t("appStore")}
+            onPress={() => router.push("/terms-of-use" as Href)}
+            colors={colors}
+          />
+          <Divider colors={colors} />
+          <Row
+            icon="refresh-outline"
+            title={t("replayOnboarding")}
+            onPress={replay}
             colors={colors}
           />
           <Divider colors={colors} />

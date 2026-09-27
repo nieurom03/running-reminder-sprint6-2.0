@@ -1,5 +1,6 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 import type { PlanInput, TrainingPlan, TrainingStats, Workout, WorkoutStatus } from '@/types/models';
+import type { AppLanguage } from '@/store/useAppStore';
 import { generateTrainingPlan } from '@/services/trainingGenerator';
 import { safePositive } from '@/utils/numbers';
 
@@ -63,8 +64,12 @@ export async function setWorkoutStatus(db: SQLiteDatabase, id: number, status: W
   );
 }
 
-export async function createGeneratedPlan(db: SQLiteDatabase, input: PlanInput) {
-  const workouts = generateTrainingPlan(input);
+export async function createGeneratedPlan(
+  db: SQLiteDatabase,
+  input: PlanInput,
+  language: AppLanguage = 'vi',
+) {
+  const workouts = generateTrainingPlan(input, new Date(), language);
   const name = `${input.raceDistanceKm <= 5 ? '5K' : input.raceDistanceKm <= 10 ? '10K' : input.raceDistanceKm <= 22 ? '21K' : '42K'} · ${input.raceDate}`;
   let createdId = 0;
   await db.withTransactionAsync(async () => {

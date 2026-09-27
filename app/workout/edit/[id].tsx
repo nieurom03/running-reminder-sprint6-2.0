@@ -18,6 +18,7 @@ import { useGlassAlert } from "@/components/GlassAlert";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
 import type { Workout, WorkoutType } from "@/types/models";
+import { localizeWorkoutDescription } from "@/utils/workoutDescription";
 const TYPES: WorkoutType[] = [
   "EASY",
   "TEMPO",
@@ -52,9 +53,9 @@ export default function EditWorkoutScreen() {
         setDistance(String(w.distanceKm));
         setPaceMin(w.targetPaceMinSec ?? 450);
         setPaceMax(w.targetPaceMaxSec ?? 480);
-        setNotes(w.description ?? "");
+        setNotes(localizeWorkoutDescription(w.description, t) ?? "");
       });
-    }, [db, id]),
+    }, [db, id, language]),
   );
   if (!workout)
     return (

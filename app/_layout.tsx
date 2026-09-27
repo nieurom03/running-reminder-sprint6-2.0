@@ -24,6 +24,11 @@ function AppStack() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="onboarding" />
+        <Stack.Screen name="privacy" options={{ presentation: "card" }} />
+        <Stack.Screen
+          name="terms-of-use"
+          options={{ presentation: "card" }}
+        />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="workout/[id]" options={{ presentation: "card" }} />
         <Stack.Screen

@@ -28,6 +28,7 @@ import type {
 } from "@/types/models";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
+import { localizeWorkoutDescription } from "@/utils/workoutDescription";
 
 const duration = (sec: number) =>
   `${Math.floor(sec / 3600)}:${String(Math.floor((sec % 3600) / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
@@ -209,7 +210,7 @@ export default function WorkoutDetail() {
             {t("notes")}
           </Text>
           <Text style={[s.notes, { color: colors.textPrimary }]}>
-            {w.description || t("noNotes")}
+            {localizeWorkoutDescription(w.description, t) ?? t("noNotes")}
           </Text>
         </View>
         {activity && (

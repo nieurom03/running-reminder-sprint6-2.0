@@ -10,6 +10,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   createGeneratedPlan,
   getActivePlan,
@@ -28,6 +29,7 @@ const iso = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 export default function CreatePlanScreen() {
   const db = useSQLiteContext();
+  const insets = useSafeAreaInsets();
   const refresh = useAppStore((s) => s.refresh);
   const { t, language } = useI18n();
   const { colors } = useTheme();
@@ -84,17 +86,21 @@ export default function CreatePlanScreen() {
     }
     setSaving(true);
     try {
-      const createdPlanId = await createGeneratedPlan(db, {
-        raceDistanceKm: distance,
-        raceDate,
-        goalTimeMinutes: goalSec / 60,
-        currentPaceSec: paceSec,
-        runsPerWeek: days.length,
-        runningDays: days,
-        longRunDay,
-        reminderHour: Math.min(23, Math.max(0, Number(hour) || 18)),
-        reminderMinute: Math.min(59, Math.max(0, Number(minute) || 0)),
-      });
+      const createdPlanId = await createGeneratedPlan(
+        db,
+        {
+          raceDistanceKm: distance,
+          raceDate,
+          goalTimeMinutes: goalSec / 60,
+          currentPaceSec: paceSec,
+          runsPerWeek: days.length,
+          runningDays: days,
+          longRunDay,
+          reminderHour: Math.min(23, Math.max(0, Number(hour) || 18)),
+          reminderMinute: Math.min(59, Math.max(0, Number(minute) || 0)),
+        },
+        language,
+      );
       const plan = await getActivePlan(db);
       const workouts = await getWorkouts(db, createdPlanId);
       refresh();
@@ -123,7 +129,10 @@ export default function CreatePlanScreen() {
     <GlassBackground>
       <ScrollView
         style={s.root}
-        contentContainerStyle={s.content}
+        contentContainerStyle={[
+          s.content,
+          { paddingTop: Math.max(20, insets.top + 12) },
+        ]}
         keyboardShouldPersistTaps="handled"
       >
       <View style={s.top}>
