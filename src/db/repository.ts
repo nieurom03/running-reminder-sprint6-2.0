@@ -158,6 +158,133 @@ export async function deleteSetting(db: SQLiteDatabase, key: string) {
   await db.runAsync('DELETE FROM app_settings WHERE key = ?', key);
 }
 
+export async function saveRunningGroup(
+  db: SQLiteDatabase,
+  group: import('@/types/models').RunningGroup,
+) {
+  await db.runAsync(
+    `INSERT INTO running_groups(id,name,owner_name,created_at) VALUES (?,?,?,?)
+     ON CONFLICT(id) DO UPDATE SET name=excluded.name, owner_name=excluded.owner_name`,
+    group.id,
+    group.name,
+    group.ownerName,
+    group.createdAt,
+  );
+}
+
+export async function getRunningGroups(
+  db: SQLiteDatabase,
+): Promise<import('@/types/models').RunningGroup[]> {
+  const rows = await db.getAllAsync<any>(
+    `SELECT * FROM running_groups ORDER BY created_at DESC`,
+  );
+  return rows.map((row) => ({
+    id: String(row.id),
+    name: String(row.name),
+    ownerName: String(row.owner_name),
+    createdAt: String(row.created_at),
+  }));
+}
+
+export async function getRunningGroup(
+  db: SQLiteDatabase,
+  groupId: string,
+): Promise<import('@/types/models').RunningGroup | null> {
+  const row = await db.getFirstAsync<any>(
+    `SELECT * FROM running_groups WHERE id=?`,
+    groupId,
+  );
+  return row
+    ? {
+        id: String(row.id),
+        name: String(row.name),
+        ownerName: String(row.owner_name),
+        createdAt: String(row.created_at),
+      }
+    : null;
+}
+
+export async function deleteRunningGroup(db: SQLiteDatabase, groupId: string) {
+  await db.runAsync(`DELETE FROM running_groups WHERE id=?`, groupId);
+}
+
+export async function saveGroupMember(
+  db: SQLiteDatabase,
+  groupId: string,
+  peerName: string,
+) {
+  const now = new Date().toISOString();
+  await db.runAsync(
+    `INSERT INTO group_members(group_id,peer_name,joined_at,last_seen_at)
+     VALUES (?,?,?,?)
+     ON CONFLICT(group_id,peer_name) DO UPDATE SET last_seen_at=excluded.last_seen_at`,
+    groupId,
+    peerName,
+    now,
+    now,
+  );
+}
+
+export async function getGroupMembers(
+  db: SQLiteDatabase,
+  groupId: string,
+): Promise<import('@/types/models').GroupMember[]> {
+  const rows = await db.getAllAsync<any>(
+    `SELECT * FROM group_members WHERE group_id=? ORDER BY joined_at ASC`,
+    groupId,
+  );
+  return rows.map((row) => ({
+    groupId: String(row.group_id),
+    peerName: String(row.peer_name),
+    joinedAt: String(row.joined_at),
+    lastSeenAt: String(row.last_seen_at),
+  }));
+}
+
+export async function saveSharedGroupResult(
+  db: SQLiteDatabase,
+  result: import('@/types/models').SharedGroupResult,
+) {
+  await db.runAsync(
+    `INSERT INTO shared_group_results(
+       id,group_id,sender_name,activity_start_time,distance_km,duration_seconds,received_at
+     ) VALUES (?,?,?,?,?,?,?)
+     ON CONFLICT(id) DO UPDATE SET
+       sender_name=excluded.sender_name,
+       activity_start_time=excluded.activity_start_time,
+       distance_km=excluded.distance_km,
+       duration_seconds=excluded.duration_seconds,
+       received_at=excluded.received_at`,
+    result.id,
+    result.groupId,
+    result.senderName,
+    result.activityStartTime,
+    result.distanceKm,
+    result.durationSeconds,
+    result.receivedAt,
+  );
+}
+
+export async function getSharedGroupResults(
+  db: SQLiteDatabase,
+  groupId: string,
+): Promise<import('@/types/models').SharedGroupResult[]> {
+  const rows = await db.getAllAsync<any>(
+    `SELECT * FROM shared_group_results
+     WHERE group_id=? ORDER BY activity_start_time DESC, received_at DESC`,
+    groupId,
+  );
+  return rows.map((row) => ({
+    id: String(row.id),
+    groupId: String(row.group_id),
+    senderName: String(row.sender_name),
+    activityStartTime: String(row.activity_start_time),
+    distanceKm: safePositive(row.distance_km),
+    durationSeconds: safePositive(row.duration_seconds),
+    receivedAt: String(row.received_at),
+  }));
+}
+
 export async function getWeeklyRunningSummary(db: SQLiteDatabase, planId: number, anchor = new Date()): Promise<import('@/types/models').WeeklyRunningSummary> {
   const local = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate());
   const day = local.getDay();

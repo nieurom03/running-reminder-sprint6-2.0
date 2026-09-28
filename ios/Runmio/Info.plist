@@ -49,6 +49,13 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_runmio-group._tcp</string>
+		<string>_runmio-group._udp</string>
+	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Allow Runmio to find nearby runners, send group invitations, and share running results directly between devices.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Allow Runmio to keep recording your route when the screen is locked.</string>
 	<key>NSLocationAlwaysUsageDescription</key>

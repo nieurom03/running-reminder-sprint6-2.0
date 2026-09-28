@@ -29,6 +29,7 @@ function AppStack() {
           name="terms-of-use"
           options={{ presentation: "card" }}
         />
+        <Stack.Screen name="groups" options={{ presentation: "card" }} />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="workout/[id]" options={{ presentation: "card" }} />
         <Stack.Screen

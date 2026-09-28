@@ -8,7 +8,7 @@ export type LegalDocument = {
 
 const privacy: Record<AppLanguage, LegalDocument> = {
   vi: {
-    updated: "Cập nhật ngày 27/09/2026",
+    updated: "Cập nhật ngày 28/09/2026",
     intro:
       "Runmio được thiết kế để dữ liệu chạy bộ của bạn được lưu riêng tư trên thiết bị.",
     sections: [
@@ -22,11 +22,11 @@ const privacy: Record<AppLanguage, LegalDocument> = {
       },
       {
         title: "Lưu trữ và chia sẻ",
-        body: "Dữ liệu ứng dụng được lưu cục bộ trên thiết bị. Runmio không bán dữ liệu, không theo dõi bạn cho quảng cáo và không tự động gửi dữ liệu lên máy chủ của nhà phát triển. File sao lưu chỉ được tạo và chia sẻ khi bạn yêu cầu; bạn chịu trách nhiệm bảo vệ file và mật khẩu sao lưu. Khi gửi phản hồi, nội dung và thông tin phiên bản chỉ được chuyển tới ứng dụng liên lạc do bạn chọn.",
+        body: "Dữ liệu ứng dụng được lưu cục bộ trên thiết bị. Runmio không bán dữ liệu, không theo dõi bạn cho quảng cáo và không tự động gửi dữ liệu lên máy chủ của nhà phát triển. Khi bạn dùng Nhóm chạy, tên hiển thị, lời mời nhóm và kết quả bạn chủ động chia sẻ được truyền trực tiếp tới thiết bị ở gần đã kết nối; kết quả nhận được được lưu trong nhóm trên thiết bị đó. File sao lưu chỉ được tạo và chia sẻ khi bạn yêu cầu; bạn chịu trách nhiệm bảo vệ file và mật khẩu sao lưu. Khi gửi phản hồi, nội dung và thông tin phiên bản chỉ được chuyển tới ứng dụng liên lạc do bạn chọn.",
       },
       {
         title: "Quyền truy cập",
-        body: "Quyền vị trí chỉ được dùng khi ghi hoạt động, bao gồm ghi nền nếu bạn cho phép để tiếp tục đo khi khóa màn hình. Quyền thông báo được dùng để nhắc workout. Bạn có thể thay đổi các quyền này bất cứ lúc nào trong Cài đặt của thiết bị.",
+        body: "Quyền vị trí chỉ được dùng khi ghi hoạt động, bao gồm ghi nền nếu bạn cho phép để tiếp tục đo khi khóa màn hình. Quyền thông báo được dùng để nhắc workout. Quyền mạng cục bộ được dùng để tìm, mời và trao đổi kết quả với thiết bị ở gần khi bạn mở Nhóm chạy. Bạn có thể thay đổi các quyền này bất cứ lúc nào trong Cài đặt của thiết bị.",
       },
       {
         title: "Kiểm soát dữ liệu",
@@ -39,7 +39,7 @@ const privacy: Record<AppLanguage, LegalDocument> = {
     ],
   },
   en: {
-    updated: "Updated September 27, 2026",
+    updated: "Updated September 28, 2026",
     intro:
       "Runmio is designed to keep your running data private and stored on your device.",
     sections: [
@@ -53,11 +53,11 @@ const privacy: Record<AppLanguage, LegalDocument> = {
       },
       {
         title: "Storage and sharing",
-        body: "App data is stored locally on your device. Runmio does not sell data, track you for advertising, or automatically send your data to a developer-operated server. A backup file is created and shared only when you request it; you are responsible for protecting the file and its password. When you send feedback, its content and version information go only to the communication app you select.",
+        body: "App data is stored locally on your device. Runmio does not sell data, track you for advertising, or automatically send your data to a developer-operated server. When you use Running Groups, your display name, group invitation, and any result you choose to share are sent directly to connected nearby devices; received results are stored in that group on the recipient's device. A backup file is created and shared only when you request it; you are responsible for protecting the file and its password. When you send feedback, its content and version information go only to the communication app you select.",
       },
       {
         title: "Permissions",
-        body: "Location permission is used only while recording an activity, including background recording when you allow it so measurement can continue with the screen locked. Notification permission is used for workout reminders. You can change these permissions at any time in your device settings.",
+        body: "Location permission is used only while recording an activity, including background recording when you allow it so measurement can continue with the screen locked. Notification permission is used for workout reminders. Local network permission is used to discover, invite, and exchange results with nearby devices while you use Running Groups. You can change these permissions at any time in your device settings.",
       },
       {
         title: "Your controls",

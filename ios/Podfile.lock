@@ -3191,6 +3191,8 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
+  - RunmioNearby (1.0.0):
+    - ExpoModulesCore
   - SocketRocket (0.7.1)
   - UMAppLoader (57.0.2)
   - Yoga (0.0.0)
@@ -3314,6 +3316,7 @@ DEPENDENCIES:
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNWorklets (from `../node_modules/react-native-worklets`)
+  - RunmioNearby (from `../modules/runmio-nearby/ios`)
   - SocketRocket (~> 0.7.1)
   - UMAppLoader (from `../node_modules/unimodules-app-loader/ios`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -3558,6 +3561,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   RNWorklets:
     :path: "../node_modules/react-native-worklets"
+  RunmioNearby:
+    :path: "../modules/runmio-nearby/ios"
   UMAppLoader:
     :path: "../node_modules/unimodules-app-loader/ios"
   Yoga:
@@ -3681,6 +3686,7 @@ SPEC CHECKSUMS:
   RNScreens: 9ef9bf849ca034edcbe4ea7bfe8164d492e1f128
   RNSVG: c6acd5c597d26625214295105756c5e488f5ae4c
   RNWorklets: 57279243f09ce1f3a4fc9cea2ce9b8e379688f30
+  RunmioNearby: e70129746de47d97d971acd5bd69d46e56292455
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   UMAppLoader: d69910810f31d2e2cfd49706e89ad372161b0561
   Yoga: d7173acd024fffc6a23d0f5f41df2d91bf9d5f58

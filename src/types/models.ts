@@ -63,6 +63,30 @@ export interface ActivitySummary {
   durationSeconds: number;
 }
 
+export interface RunningGroup {
+  id: string;
+  name: string;
+  ownerName: string;
+  createdAt: string;
+}
+
+export interface GroupMember {
+  groupId: string;
+  peerName: string;
+  joinedAt: string;
+  lastSeenAt: string;
+}
+
+export interface SharedGroupResult {
+  id: string;
+  groupId: string;
+  senderName: string;
+  activityStartTime: string;
+  distanceKm: number;
+  durationSeconds: number;
+  receivedAt: string;
+}
+
 export interface ManualActivityInput {
   workoutId: number;
   startTime: string;

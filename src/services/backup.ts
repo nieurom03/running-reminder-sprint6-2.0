@@ -6,22 +6,29 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import type { SQLiteDatabase } from "expo-sqlite";
 
-const BACKUP_SCHEMA_VERSION = 1;
+const BACKUP_SCHEMA_VERSION = 2;
 const ENCRYPTED_FORMAT_VERSION = 1;
 const PBKDF2_ITERATIONS = 310_000;
-const TABLES = [
+const CORE_TABLES = [
   "training_plans",
   "workouts",
   "activities",
   "app_settings",
 ] as const;
+const GROUP_TABLES = [
+  "running_groups",
+  "group_members",
+  "shared_group_results",
+] as const;
+const TABLES = [...CORE_TABLES, ...GROUP_TABLES] as const;
 type BackupTable = (typeof TABLES)[number];
 
 export type BackupPayload = {
   app: "Running Reminder";
   schemaVersion: number;
   exportedAt: string;
-  tables: Record<BackupTable, any[]>;
+  tables: Partial<Record<BackupTable, any[]>> &
+    Record<(typeof CORE_TABLES)[number], any[]>;
 };
 
 type EncryptedBackupEnvelope = {
@@ -223,11 +230,22 @@ function assertBackup(value: unknown): asserts value is BackupPayload {
       "This is not a valid Running Reminder backup file.",
     );
   }
-  for (const table of TABLES) {
+  for (const table of CORE_TABLES) {
     if (!Array.isArray(payload.tables[table])) {
       throw new BackupFileError(
         "INVALID_FILE",
         `Backup table is missing: ${table}`,
+      );
+    }
+  }
+  for (const table of GROUP_TABLES) {
+    if (
+      payload.tables[table] !== undefined &&
+      !Array.isArray(payload.tables[table])
+    ) {
+      throw new BackupFileError(
+        "INVALID_FILE",
+        `Backup table is invalid: ${table}`,
       );
     }
   }
@@ -357,7 +375,7 @@ async function decryptEnvelope(
 export async function createBackupPayload(
   db: SQLiteDatabase,
 ): Promise<BackupPayload> {
-  const tables = {} as Record<BackupTable, any[]>;
+  const tables = {} as BackupPayload["tables"];
   // Deliberately sequential: avoids concurrent prepareAsync calls on one Expo SQLite connection.
   for (const table of TABLES) {
     tables[table] = await db.getAllAsync(`SELECT * FROM ${table}`);
@@ -478,6 +496,9 @@ export async function restoreBackupPayload(
   assertBackup(payload);
   await db.withTransactionAsync(async () => {
     // Child tables first so FK relationships stay valid during replacement.
+    await db.runAsync("DELETE FROM shared_group_results");
+    await db.runAsync("DELETE FROM group_members");
+    await db.runAsync("DELETE FROM running_groups");
     await db.runAsync("DELETE FROM activities");
     await db.runAsync("DELETE FROM workouts");
     await db.runAsync("DELETE FROM training_plans");
@@ -487,6 +508,13 @@ export async function restoreBackupPayload(
     await insertRows(db, "workouts", payload.tables.workouts);
     await insertRows(db, "activities", payload.tables.activities);
     await insertRows(db, "app_settings", payload.tables.app_settings);
+    await insertRows(db, "running_groups", payload.tables.running_groups ?? []);
+    await insertRows(db, "group_members", payload.tables.group_members ?? []);
+    await insertRows(
+      db,
+      "shared_group_results",
+      payload.tables.shared_group_results ?? [],
+    );
   });
 }
 

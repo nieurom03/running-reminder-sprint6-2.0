@@ -333,6 +333,14 @@ export default function Settings() {
         </Text>
         <GlassCard style={s.group}>
           <Row
+            icon="people-outline"
+            title={t("runningGroups")}
+            subtitle={t("runningGroupsHelp")}
+            onPress={() => router.push("/groups" as Href)}
+            colors={colors}
+          />
+          <Divider colors={colors} />
+          <Row
             icon="shield-checkmark-outline"
             title={t("privacyPolicy")}
             onPress={() => router.push("/privacy" as Href)}

@@ -12,6 +12,13 @@
       "deploymentTarget": "16.4",
       "buildNumber": "4",
       "appleTeamId": "5J7ZGV2NQY",
+      "infoPlist": {
+        "NSLocalNetworkUsageDescription": "Allow Runmio to find nearby runners, send group invitations, and share running results directly between devices.",
+        "NSBonjourServices": [
+          "_runmio-group._tcp",
+          "_runmio-group._udp"
+        ]
+      },
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
           {

@@ -61,9 +61,37 @@ export async function migrateDb(db: SQLiteDatabase) {
       value TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS running_groups (
+      id TEXT PRIMARY KEY NOT NULL,
+      name TEXT NOT NULL,
+      owner_name TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS group_members (
+      group_id TEXT NOT NULL,
+      peer_name TEXT NOT NULL,
+      joined_at TEXT NOT NULL,
+      last_seen_at TEXT NOT NULL,
+      PRIMARY KEY(group_id, peer_name),
+      FOREIGN KEY(group_id) REFERENCES running_groups(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS shared_group_results (
+      id TEXT PRIMARY KEY NOT NULL,
+      group_id TEXT NOT NULL,
+      sender_name TEXT NOT NULL,
+      activity_start_time TEXT NOT NULL,
+      distance_km REAL NOT NULL,
+      duration_seconds INTEGER NOT NULL,
+      received_at TEXT NOT NULL,
+      FOREIGN KEY(group_id) REFERENCES running_groups(id) ON DELETE CASCADE
+    );
+
     CREATE INDEX IF NOT EXISTS idx_workouts_date ON workouts(date);
     CREATE INDEX IF NOT EXISTS idx_activities_start ON activities(start_time);
     CREATE INDEX IF NOT EXISTS idx_activities_workout ON activities(workout_id);
+    CREATE INDEX IF NOT EXISTS idx_group_results_group ON shared_group_results(group_id, activity_start_time);
   `);
 
   // Upgrade databases created by Sprint 1 without destroying user data.
