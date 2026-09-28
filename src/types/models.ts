@@ -57,6 +57,12 @@ export interface Activity {
   rawData: string | null;
 }
 
+export interface ActivitySummary {
+  activityCount: number;
+  distanceKm: number;
+  durationSeconds: number;
+}
+
 export interface ManualActivityInput {
   workoutId: number;
   startTime: string;

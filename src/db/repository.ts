@@ -202,6 +202,54 @@ export async function getRecentActivities(db: SQLiteDatabase, limit = 20): Promi
   }));
 }
 
+export async function getDailyActivitySummary(
+  db: SQLiteDatabase,
+  planId: number,
+  date: string,
+): Promise<import('@/types/models').ActivitySummary> {
+  const row = await db.getFirstAsync<{
+    activity_count: number;
+    distance_km: number;
+    duration_seconds: number;
+  }>(
+    `SELECT COUNT(a.id) activity_count,
+            COALESCE(SUM(a.distance_km), 0) distance_km,
+            COALESCE(SUM(a.duration_seconds), 0) duration_seconds
+     FROM activities a
+     INNER JOIN workouts w ON w.id = a.workout_id
+     WHERE w.plan_id = ? AND substr(a.start_time, 1, 10) = ?`,
+    planId,
+    date,
+  );
+  return {
+    activityCount: Number(row?.activity_count ?? 0),
+    distanceKm: safePositive(row?.distance_km),
+    durationSeconds: safePositive(row?.duration_seconds),
+  };
+}
+
+export async function getWorkoutActivitySummary(
+  db: SQLiteDatabase,
+  workoutId: number,
+): Promise<import('@/types/models').ActivitySummary> {
+  const row = await db.getFirstAsync<{
+    activity_count: number;
+    distance_km: number;
+    duration_seconds: number;
+  }>(
+    `SELECT COUNT(id) activity_count,
+            COALESCE(SUM(distance_km), 0) distance_km,
+            COALESCE(SUM(duration_seconds), 0) duration_seconds
+     FROM activities WHERE workout_id = ?`,
+    workoutId,
+  );
+  return {
+    activityCount: Number(row?.activity_count ?? 0),
+    distanceKm: safePositive(row?.distance_km),
+    durationSeconds: safePositive(row?.duration_seconds),
+  };
+}
+
 export async function updateWorkout(db: SQLiteDatabase, id: number, input: import('@/types/models').WorkoutEditInput) {
   await db.runAsync(
     `UPDATE workouts
@@ -334,10 +382,27 @@ export async function saveRecordedActivity(
   return workoutId;
 }
 
-export async function deleteManualActivityForWorkout(db: SQLiteDatabase, workoutId: number) {
+export async function deleteManualActivityForWorkout(
+  db: SQLiteDatabase,
+  workoutId: number,
+  activityId: number,
+) {
   await db.withTransactionAsync(async () => {
-    await db.runAsync(`DELETE FROM activities WHERE workout_id=?`, workoutId);
-    await db.runAsync(`UPDATE workouts SET status='PLANNED', completed_at=NULL WHERE id=?`, workoutId);
+    await db.runAsync(
+      `DELETE FROM activities WHERE id=? AND workout_id=? AND source='MANUAL'`,
+      activityId,
+      workoutId,
+    );
+    const remaining = await db.getFirstAsync<{ count: number }>(
+      `SELECT COUNT(*) count FROM activities WHERE workout_id=?`,
+      workoutId,
+    );
+    if (Number(remaining?.count ?? 0) === 0) {
+      await db.runAsync(
+        `UPDATE workouts SET status='PLANNED', completed_at=NULL WHERE id=?`,
+        workoutId,
+      );
+    }
   });
 }
 

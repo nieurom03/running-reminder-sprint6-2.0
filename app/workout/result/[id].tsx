@@ -181,19 +181,21 @@ export default function ResultScreen() {
     refresh();
     router.back();
   };
-  const remove = () =>
+  const remove = () => {
+    if (!existing) return;
     showAlert(t("deleteRunResult"), t("deleteRunResultMessage"), [
       { text: t("cancel"), style: "cancel" },
       {
         text: t("delete"),
         style: "destructive",
         onPress: async () => {
-          await deleteManualActivityForWorkout(db, w.id);
+          await deleteManualActivityForWorkout(db, w.id, existing.id);
           refresh();
           router.back();
         },
       },
     ]);
+  };
   const locateCurrentPosition = async () => {
     if (locating) return;
     setLocating(true);

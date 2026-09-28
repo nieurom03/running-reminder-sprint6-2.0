@@ -51,6 +51,11 @@ const vi = {
   createPlanToRecord:
     "Tạo giáo án trước để hoạt động được cộng vào tiến độ tuần.",
   todayWorkoutCompleted: "Buổi tập hôm nay đã hoàn thành.",
+  startAnotherActivity: "GHI THÊM HOẠT ĐỘNG",
+  todayTotal: "TỔNG HÔM NAY",
+  activitySingle: "hoạt động",
+  activityCount: "hoạt động",
+  editLatestResult: "Sửa hoạt động gần nhất",
   elevationGainShort: "Độ cao",
   easyRunDescription: "Chạy nhẹ: giữ nhịp thoải mái, có thể nói chuyện.",
   longRunDescription:
@@ -362,6 +367,11 @@ const en: typeof vi = {
   createPlanToRecord:
     "Create a plan first so the activity can count toward weekly progress.",
   todayWorkoutCompleted: "Today's workout is already completed.",
+  startAnotherActivity: "RECORD ANOTHER ACTIVITY",
+  todayTotal: "TODAY'S TOTAL",
+  activitySingle: "activity",
+  activityCount: "activities",
+  editLatestResult: "Edit latest activity",
   elevationGainShort: "Elevation",
   easyRunDescription: "Easy run: stay relaxed at a conversational pace.",
   longRunDescription:

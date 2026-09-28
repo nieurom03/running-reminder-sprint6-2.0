@@ -13,6 +13,7 @@ import {
   getActivePlan,
   getActivityForWorkout,
   getWorkout,
+  getWorkoutActivitySummary,
   setWorkoutStatus,
 } from "@/db/repository";
 import { pace, statusTheme } from "@/components/WorkoutCard";
@@ -22,6 +23,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { scheduleWorkoutReminder } from "@/services/notifications";
 import type {
   Activity,
+  ActivitySummary,
   TrainingPlan,
   Workout,
   WorkoutStatus,
@@ -32,7 +34,7 @@ import { localizeWorkoutDescription } from "@/utils/workoutDescription";
 
 const duration = (sec: number) =>
   `${Math.floor(sec / 3600)}:${String(Math.floor((sec % 3600) / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
-const actualPace = (a: Activity) => {
+const actualPace = (a: Pick<Activity, "distanceKm" | "durationSeconds">) => {
   if (
     !Number.isFinite(a.distanceKm) ||
     a.distanceKm <= 0 ||
@@ -54,17 +56,26 @@ export default function WorkoutDetail() {
   const showAlert = useGlassAlert();
   const [w, setW] = useState<Workout | null>(null);
   const [activity, setActivity] = useState<Activity | null>(null);
+  const [activitySummary, setActivitySummary] = useState<ActivitySummary>({
+    activityCount: 0,
+    distanceKm: 0,
+    durationSeconds: 0,
+  });
   const [plan, setPlan] = useState<TrainingPlan | null>(null);
   const [offsetMin, setOffsetMin] = useState<number>(60);
   const [customDays, setCustomDays] = useState("");
   const load = useCallback(async () => {
     if (!id) return;
     try {
-      const workout = await getWorkout(db, Number(id));
-      const a = await getActivityForWorkout(db, Number(id));
-      const p = await getActivePlan(db);
+      const [workout, a, p, summary] = await Promise.all([
+        getWorkout(db, Number(id)),
+        getActivityForWorkout(db, Number(id)),
+        getActivePlan(db),
+        getWorkoutActivitySummary(db, Number(id)),
+      ]);
       setW(workout);
       setActivity(a);
+      setActivitySummary(summary);
       setPlan(p);
     } catch (e) {
       console.error("Workout detail DB error:", e);
@@ -227,14 +238,16 @@ export default function WorkoutDetail() {
           >
             <View style={{ flex: 1 }}>
               <Text style={s.actualLabel}>
-                {t("actualResult")} · {activity.source}
+                {t("actualResult")} · {activitySummary.activityCount > 1
+                  ? `${activitySummary.activityCount} ${t("activityCount")}`
+                  : activity.source}
               </Text>
               <Text style={s.actualValue}>
-                {activity.distanceKm.toFixed(2)} km ·{" "}
-                {duration(activity.durationSeconds)}
+                {activitySummary.distanceKm.toFixed(2)} km ·{" "}
+                {duration(activitySummary.durationSeconds)}
               </Text>
               <Text style={s.actualMeta}>
-                Pace {actualPace(activity)}
+                Pace {actualPace(activitySummary)}
                 {activity.avgHeartRate
                   ? ` · Avg HR ${activity.avgHeartRate}`
                   : ""}
@@ -251,7 +264,11 @@ export default function WorkoutDetail() {
             style={[s.fullAction, { backgroundColor: "#12B76A" }]}
             onPress={() => router.push(`/workout/result/${w.id}`)}
           >
-            <Text style={s.actionText}>✓ {t("editResult")}</Text>
+            <Text style={s.actionText}>
+              ✓ {activitySummary.activityCount > 1
+                ? t("editLatestResult")
+                : t("editResult")}
+            </Text>
           </Pressable>
         ) : (
           <View style={s.actions}>

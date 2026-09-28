@@ -22,6 +22,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { localizeWorkoutDescription } from "@/utils/workoutDescription";
 import {
   getActivePlan,
+  getDailyActivitySummary,
   getWorkoutForDate,
   saveRecordedActivity,
 } from "@/db/repository";
@@ -45,6 +46,7 @@ import {
 } from "@/services/recordingSession";
 import { useAppStore } from "@/store/useAppStore";
 import type {
+  ActivitySummary,
   RecordedRoutePoint,
   TrainingPlan,
   Workout,
@@ -89,6 +91,11 @@ export default function StartScreen() {
 
   const [plan, setPlan] = useState<TrainingPlan | null>(null);
   const [workout, setWorkout] = useState<Workout | null>(null);
+  const [todaySummary, setTodaySummary] = useState<ActivitySummary>({
+    activityCount: 0,
+    distanceKm: 0,
+    durationSeconds: 0,
+  });
   const [sport, setSport] = useState<RecordSport>("RUN");
   const [phase, setPhase] = useState<SessionPhase>("ready");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -214,8 +221,12 @@ export default function StartScreen() {
       const todayWorkout = activePlan
         ? await getWorkoutForDate(db, activePlan.id, todayIso())
         : null;
+      const dailySummary = activePlan
+        ? await getDailyActivitySummary(db, activePlan.id, todayIso())
+        : { activityCount: 0, distanceKm: 0, durationSeconds: 0 };
       if (!active) return;
       setWorkout(todayWorkout);
+      setTodaySummary(dailySummary);
       if (phaseRef.current === "ready") {
         const initialSport = todayWorkout?.type === "WALK" ? "WALK" : "RUN";
         sportRef.current = initialSport;
@@ -431,10 +442,6 @@ export default function StartScreen() {
       ]);
       return;
     }
-    if (workout?.status === "COMPLETED") {
-      showAlert(t("completed"), t("todayWorkoutCompleted"));
-      return;
-    }
     try {
       if (!(await ensureLocationPermission(true))) return;
       routeRef.current = [];
@@ -535,6 +542,12 @@ export default function StartScreen() {
         elevationGain: snapshot.elevationGain,
         route: snapshot.points.map(({ id: _id, ...point }) => point),
       });
+      const updatedSummary = await getDailyActivitySummary(
+        db,
+        snapshot.planId,
+        localIso(new Date(snapshot.startedAtMs)).slice(0, 10),
+      );
+      setTodaySummary(updatedSummary);
       refresh();
       await stopBackgroundRecordingUpdates().catch(() => {});
       await endRecordingLockScreen(snapshot);
@@ -543,7 +556,7 @@ export default function StartScreen() {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       showAlert(
         t("activitySaved"),
-        `${t("activitySavedHelp")}\n${(snapshot.distanceMeters / 1000).toFixed(2)} ${t("kilometerShort")} · ${formatDuration(snapshot.elapsedSeconds)}`,
+        `${t("activitySavedHelp")}\n${(snapshot.distanceMeters / 1000).toFixed(2)} ${t("kilometerShort")} · ${formatDuration(snapshot.elapsedSeconds)}\n${t("todayTotal")}: ${updatedSummary.distanceKm.toFixed(2)} ${t("kilometerShort")} · ${formatDuration(updatedSummary.durationSeconds)}`,
         [{ text: t("ok") }],
       );
     } catch (error: any) {
@@ -922,6 +935,32 @@ export default function StartScreen() {
               />
             )}
           </GlassCard>
+          {todaySummary.activityCount > 0 && (
+            <GlassCard style={s.dailySummaryCard}>
+              <View
+                style={[
+                  s.dailySummaryIcon,
+                  { backgroundColor: colors.rowIconBg },
+                ]}
+              >
+                <Ionicons name="stats-chart" size={18} color={colors.accent} />
+              </View>
+              <View style={s.dailySummaryCopy}>
+                <Text style={[s.dailySummaryLabel, { color: colors.textLabel }]}>
+                  {t("todayTotal")} · {todaySummary.activityCount}{" "}
+                  {t(
+                    todaySummary.activityCount === 1
+                      ? "activitySingle"
+                      : "activityCount",
+                  )}
+                </Text>
+                <Text style={[s.dailySummaryValue, { color: colors.textPrimary }]}>
+                  {todaySummary.distanceKm.toFixed(2)} {t("kilometerShort")} ·{" "}
+                  {formatDuration(todaySummary.durationSeconds)}
+                </Text>
+              </View>
+            </GlassCard>
+          )}
           </ScrollView>
 
           <GlassCard style={s.statsCard}>
@@ -970,7 +1009,7 @@ export default function StartScreen() {
                       backgroundColor: colors.accent,
                       opacity: pressed
                         ? 0.74
-                        : plan && workout?.status !== "COMPLETED"
+                        : plan
                           ? 1
                           : 0.5,
                     },
@@ -1025,8 +1064,8 @@ export default function StartScreen() {
               <Text style={[s.controlLabel, { color: colors.textPrimary }]}>
                 {phase === "ready"
                   ? plan
-                    ? workout?.status === "COMPLETED"
-                      ? t("todayWorkoutCompleted")
+                    ? todaySummary.activityCount > 0
+                      ? t("startAnotherActivity")
                       : t("startRecording")
                     : t("createPlanToRecord")
                   : phase === "recording"
@@ -1260,6 +1299,25 @@ const s = StyleSheet.create({
     lineHeight: 15,
     fontWeight: "600",
   },
+  dailySummaryCard: {
+    flexShrink: 0,
+    minHeight: 58,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 11,
+  },
+  dailySummaryIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dailySummaryCopy: { flex: 1 },
+  dailySummaryLabel: { fontSize: 9, fontWeight: "900", letterSpacing: 0.8 },
+  dailySummaryValue: { marginTop: 3, fontSize: 15, fontWeight: "900" },
   statsCard: {
     flexShrink: 0,
     marginHorizontal: 16,
