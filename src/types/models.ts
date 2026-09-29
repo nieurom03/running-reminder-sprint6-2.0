@@ -87,6 +87,43 @@ export interface SharedGroupResult {
   receivedAt: string;
 }
 
+export interface GroupTrainingPlan {
+  id: string;
+  groupId: string;
+  raceDate: string;
+  raceDistanceKm: number;
+  goalTimeMinutes: number;
+  runsPerWeek: number;
+  runningDays: number[];
+  longRunDay: number;
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface GroupPlanMember {
+  planId: string;
+  memberName: string;
+  currentPaceSec: number;
+}
+
+export interface GroupPlanWorkout {
+  id: string;
+  planId: string;
+  memberName: string;
+  date: string;
+  type: WorkoutType;
+  distanceKm: number;
+  targetPaceMinSec: number | null;
+  targetPaceMaxSec: number | null;
+  description: string;
+}
+
+export interface GroupTrainingPlanBundle {
+  plan: GroupTrainingPlan;
+  members: GroupPlanMember[];
+  workouts: GroupPlanWorkout[];
+}
+
 export interface ManualActivityInput {
   workoutId: number;
   startTime: string;

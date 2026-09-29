@@ -22,7 +22,7 @@ const privacy: Record<AppLanguage, LegalDocument> = {
       },
       {
         title: "Lưu trữ và chia sẻ",
-        body: "Dữ liệu ứng dụng được lưu cục bộ trên thiết bị. Runmio không bán dữ liệu, không theo dõi bạn cho quảng cáo và không tự động gửi dữ liệu lên máy chủ của nhà phát triển. Khi bạn dùng Nhóm chạy, tên hiển thị, lời mời nhóm và kết quả bạn chủ động chia sẻ được truyền trực tiếp tới thiết bị ở gần đã kết nối; kết quả nhận được được lưu trong nhóm trên thiết bị đó. File sao lưu chỉ được tạo và chia sẻ khi bạn yêu cầu; bạn chịu trách nhiệm bảo vệ file và mật khẩu sao lưu. Khi gửi phản hồi, nội dung và thông tin phiên bản chỉ được chuyển tới ứng dụng liên lạc do bạn chọn.",
+        body: "Dữ liệu ứng dụng được lưu cục bộ trên thiết bị. Runmio không bán dữ liệu, không theo dõi bạn cho quảng cáo và không tự động gửi dữ liệu lên máy chủ của nhà phát triển. Khi bạn dùng Nhóm chạy, tên hiển thị, lời mời nhóm, pace hiện tại, giáo án nhóm và kết quả bạn chủ động chia sẻ được truyền trực tiếp tới thiết bị ở gần đã kết nối; dữ liệu nhận được được lưu trong nhóm trên thiết bị đó. File sao lưu chỉ được tạo và chia sẻ khi bạn yêu cầu; bạn chịu trách nhiệm bảo vệ file và mật khẩu sao lưu. Khi gửi phản hồi, nội dung và thông tin phiên bản chỉ được chuyển tới ứng dụng liên lạc do bạn chọn.",
       },
       {
         title: "Quyền truy cập",
@@ -53,7 +53,7 @@ const privacy: Record<AppLanguage, LegalDocument> = {
       },
       {
         title: "Storage and sharing",
-        body: "App data is stored locally on your device. Runmio does not sell data, track you for advertising, or automatically send your data to a developer-operated server. When you use Running Groups, your display name, group invitation, and any result you choose to share are sent directly to connected nearby devices; received results are stored in that group on the recipient's device. A backup file is created and shared only when you request it; you are responsible for protecting the file and its password. When you send feedback, its content and version information go only to the communication app you select.",
+        body: "App data is stored locally on your device. Runmio does not sell data, track you for advertising, or automatically send your data to a developer-operated server. When you use Running Groups, your display name, group invitation, current pace, group training plan, and any result you choose to share are sent directly to connected nearby devices; received data is stored in that group on the recipient's device. A backup file is created and shared only when you request it; you are responsible for protecting the file and its password. When you send feedback, its content and version information go only to the communication app you select.",
       },
       {
         title: "Permissions",

@@ -88,10 +88,47 @@ export async function migrateDb(db: SQLiteDatabase) {
       FOREIGN KEY(group_id) REFERENCES running_groups(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS group_training_plans (
+      id TEXT PRIMARY KEY NOT NULL,
+      group_id TEXT NOT NULL,
+      race_date TEXT NOT NULL,
+      race_distance_km REAL NOT NULL,
+      goal_time_minutes REAL NOT NULL,
+      runs_per_week INTEGER NOT NULL,
+      running_days TEXT NOT NULL,
+      long_run_day INTEGER NOT NULL,
+      created_by TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY(group_id) REFERENCES running_groups(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS group_plan_members (
+      plan_id TEXT NOT NULL,
+      member_name TEXT NOT NULL,
+      current_pace_sec INTEGER NOT NULL,
+      PRIMARY KEY(plan_id, member_name),
+      FOREIGN KEY(plan_id) REFERENCES group_training_plans(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS group_plan_workouts (
+      id TEXT PRIMARY KEY NOT NULL,
+      plan_id TEXT NOT NULL,
+      member_name TEXT NOT NULL,
+      date TEXT NOT NULL,
+      type TEXT NOT NULL,
+      distance_km REAL NOT NULL,
+      target_pace_min_sec INTEGER,
+      target_pace_max_sec INTEGER,
+      description TEXT NOT NULL,
+      FOREIGN KEY(plan_id) REFERENCES group_training_plans(id) ON DELETE CASCADE
+    );
+
     CREATE INDEX IF NOT EXISTS idx_workouts_date ON workouts(date);
     CREATE INDEX IF NOT EXISTS idx_activities_start ON activities(start_time);
     CREATE INDEX IF NOT EXISTS idx_activities_workout ON activities(workout_id);
     CREATE INDEX IF NOT EXISTS idx_group_results_group ON shared_group_results(group_id, activity_start_time);
+    CREATE INDEX IF NOT EXISTS idx_group_plans_group ON group_training_plans(group_id, created_at);
+    CREATE INDEX IF NOT EXISTS idx_group_plan_workouts ON group_plan_workouts(plan_id, member_name, date);
   `);
 
   // Upgrade databases created by Sprint 1 without destroying user data.

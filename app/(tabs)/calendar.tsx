@@ -11,6 +11,7 @@ import { GlassBackground, GlassCard } from "@/components/Glass";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
 import type { Workout } from "@/types/models";
+import { isClosedResourceError } from "@/utils/errors";
 const monthsEn = [
   "January",
   "February",
@@ -53,7 +54,19 @@ export default function CalendarScreen() {
     new Date(initial.getFullYear(), initial.getMonth(), 1, 12),
   );
   useEffect(() => {
-    getWorkouts(db).then(setRows);
+    let active = true;
+    void getWorkouts(db)
+      .then((nextRows) => {
+        if (active) setRows(nextRows);
+      })
+      .catch((error) => {
+        if (active && !isClosedResourceError(error)) {
+          console.error("Calendar DB error:", error);
+        }
+      });
+    return () => {
+      active = false;
+    };
   }, [db, key]);
   useEffect(() => {
     if (first && rows.length) {

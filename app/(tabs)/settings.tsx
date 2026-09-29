@@ -30,6 +30,7 @@ import {
 import { useGlassAlert } from "@/components/GlassAlert";
 import { useI18n, type TranslationKey } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
+import { isClosedResourceError } from "@/utils/errors";
 import type { TrainingStats } from "@/types/models";
 import {
   BackupFileError,
@@ -62,7 +63,19 @@ export default function Settings() {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   useEffect(() => {
-    getTrainingStats(db).then(setStats);
+    let active = true;
+    void getTrainingStats(db)
+      .then((nextStats) => {
+        if (active) setStats(nextStats);
+      })
+      .catch((error) => {
+        if (active && !isClosedResourceError(error)) {
+          console.error("Settings DB error:", error);
+        }
+      });
+    return () => {
+      active = false;
+    };
   }, [db, key]);
 
   const replay = async () => {

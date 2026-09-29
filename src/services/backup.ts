@@ -6,7 +6,9 @@ import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import type { SQLiteDatabase } from "expo-sqlite";
 
-const BACKUP_SCHEMA_VERSION = 2;
+// 1: core tables only. 2: running groups. 3: group training plans.
+const BACKUP_SCHEMA_VERSION = 3;
+const MIN_SUPPORTED_BACKUP_SCHEMA_VERSION = 1;
 const ENCRYPTED_FORMAT_VERSION = 1;
 const PBKDF2_ITERATIONS = 310_000;
 const CORE_TABLES = [
@@ -19,6 +21,9 @@ const GROUP_TABLES = [
   "running_groups",
   "group_members",
   "shared_group_results",
+  "group_training_plans",
+  "group_plan_members",
+  "group_plan_workouts",
 ] as const;
 const TABLES = [...CORE_TABLES, ...GROUP_TABLES] as const;
 type BackupTable = (typeof TABLES)[number];
@@ -222,12 +227,24 @@ function assertBackup(value: unknown): asserts value is BackupPayload {
   if (
     !payload ||
     payload.app !== "Running Reminder" ||
-    typeof payload.schemaVersion !== "number" ||
+    !Number.isInteger(payload.schemaVersion) ||
     !payload.tables
   ) {
     throw new BackupFileError(
       "INVALID_FILE",
       "This is not a valid Running Reminder backup file.",
+    );
+  }
+  if (payload.schemaVersion < MIN_SUPPORTED_BACKUP_SCHEMA_VERSION) {
+    throw new BackupFileError(
+      "INVALID_FILE",
+      "This backup uses an unsupported schema version.",
+    );
+  }
+  if (payload.schemaVersion > BACKUP_SCHEMA_VERSION) {
+    throw new BackupFileError(
+      "INVALID_FILE",
+      "This backup was created by a newer version of the app.",
     );
   }
   for (const table of CORE_TABLES) {
@@ -249,6 +266,27 @@ function assertBackup(value: unknown): asserts value is BackupPayload {
       );
     }
   }
+}
+
+function migrateBackupPayload(payload: BackupPayload): BackupPayload {
+  const tables = { ...payload.tables };
+  // Older backups omit later tables; restore them as empty so the payload
+  // matches the current schema instead of relying on ad-hoc ?? [] at insert.
+  if (payload.schemaVersion < 2) {
+    tables.running_groups ??= [];
+    tables.group_members ??= [];
+    tables.shared_group_results ??= [];
+  }
+  if (payload.schemaVersion < 3) {
+    tables.group_training_plans ??= [];
+    tables.group_plan_members ??= [];
+    tables.group_plan_workouts ??= [];
+  }
+  return {
+    ...payload,
+    schemaVersion: BACKUP_SCHEMA_VERSION,
+    tables,
+  };
 }
 
 async function parseBackupFile(uri: string) {
@@ -360,7 +398,7 @@ async function decryptEnvelope(
   try {
     const payload = JSON.parse(utf8Decoder.decode(plaintext)) as unknown;
     assertBackup(payload);
-    return payload;
+    return migrateBackupPayload(payload);
   } catch (error) {
     if (error instanceof BackupFileError) throw error;
     throw new BackupFileError(
@@ -469,7 +507,7 @@ export async function readBackupPayload(
     return decryptEnvelope(parsed, password);
   }
   assertBackup(parsed);
-  return parsed;
+  return migrateBackupPayload(parsed);
 }
 
 async function insertRows(db: SQLiteDatabase, table: BackupTable, rows: any[]) {
@@ -494,8 +532,12 @@ export async function restoreBackupPayload(
   payload: BackupPayload,
 ) {
   assertBackup(payload);
+  payload = migrateBackupPayload(payload);
   await db.withTransactionAsync(async () => {
     // Child tables first so FK relationships stay valid during replacement.
+    await db.runAsync("DELETE FROM group_plan_workouts");
+    await db.runAsync("DELETE FROM group_plan_members");
+    await db.runAsync("DELETE FROM group_training_plans");
     await db.runAsync("DELETE FROM shared_group_results");
     await db.runAsync("DELETE FROM group_members");
     await db.runAsync("DELETE FROM running_groups");
@@ -514,6 +556,21 @@ export async function restoreBackupPayload(
       db,
       "shared_group_results",
       payload.tables.shared_group_results ?? [],
+    );
+    await insertRows(
+      db,
+      "group_training_plans",
+      payload.tables.group_training_plans ?? [],
+    );
+    await insertRows(
+      db,
+      "group_plan_members",
+      payload.tables.group_plan_members ?? [],
+    );
+    await insertRows(
+      db,
+      "group_plan_workouts",
+      payload.tables.group_plan_workouts ?? [],
     );
   });
 }

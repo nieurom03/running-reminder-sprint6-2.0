@@ -22,6 +22,7 @@ import { useGlassAlert } from "@/components/GlassAlert";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
 import type { TrainingPlan, Workout } from "@/types/models";
+import { isClosedResourceError } from "@/utils/errors";
 
 export default function PlanScreen() {
   const db = useSQLiteContext();
@@ -33,11 +34,24 @@ export default function PlanScreen() {
   const [rows, setRows] = useState<Workout[]>([]);
   const [plan, setPlan] = useState<TrainingPlan | null>(null);
   useEffect(() => {
-    (async () => {
-      const p = await getActivePlan(db);
-      setPlan(p);
-      setRows(await getWorkouts(db, p?.id));
+    let active = true;
+    void (async () => {
+      try {
+        const p = await getActivePlan(db);
+        if (!active) return;
+        const nextRows = await getWorkouts(db, p?.id);
+        if (!active) return;
+        setPlan(p);
+        setRows(nextRows);
+      } catch (error) {
+        if (active && !isClosedResourceError(error)) {
+          console.error("Plan DB error:", error);
+        }
+      }
     })();
+    return () => {
+      active = false;
+    };
   }, [db, key]);
   const planRows = useMemo(() => rows.filter((w) => !w.isExtra), [rows]);
   const grouped = useMemo(

@@ -285,6 +285,130 @@ export async function getSharedGroupResults(
   }));
 }
 
+export async function saveGroupTrainingPlanBundle(
+  db: SQLiteDatabase,
+  bundle: import('@/types/models').GroupTrainingPlanBundle,
+) {
+  await db.withTransactionAsync(async () => {
+    await db.runAsync(
+      `DELETE FROM group_training_plans WHERE group_id=?`,
+      bundle.plan.groupId,
+    );
+    await db.runAsync(
+      `INSERT INTO group_training_plans(
+        id,group_id,race_date,race_distance_km,goal_time_minutes,runs_per_week,
+        running_days,long_run_day,created_by,created_at
+       ) VALUES (?,?,?,?,?,?,?,?,?,?)`,
+      bundle.plan.id,
+      bundle.plan.groupId,
+      bundle.plan.raceDate,
+      bundle.plan.raceDistanceKm,
+      bundle.plan.goalTimeMinutes,
+      bundle.plan.runsPerWeek,
+      JSON.stringify(bundle.plan.runningDays),
+      bundle.plan.longRunDay,
+      bundle.plan.createdBy,
+      bundle.plan.createdAt,
+    );
+    for (const member of bundle.members) {
+      await db.runAsync(
+        `INSERT INTO group_plan_members(plan_id,member_name,current_pace_sec)
+         VALUES (?,?,?)`,
+        bundle.plan.id,
+        member.memberName,
+        member.currentPaceSec,
+      );
+    }
+    for (const workout of bundle.workouts) {
+      await db.runAsync(
+        `INSERT INTO group_plan_workouts(
+          id,plan_id,member_name,date,type,distance_km,
+          target_pace_min_sec,target_pace_max_sec,description
+         ) VALUES (?,?,?,?,?,?,?,?,?)`,
+        workout.id,
+        bundle.plan.id,
+        workout.memberName,
+        workout.date,
+        workout.type,
+        workout.distanceKm,
+        workout.targetPaceMinSec,
+        workout.targetPaceMaxSec,
+        workout.description,
+      );
+    }
+  });
+}
+
+export async function getGroupTrainingPlanBundle(
+  db: SQLiteDatabase,
+  groupId: string,
+): Promise<import('@/types/models').GroupTrainingPlanBundle | null> {
+  const row = await db.getFirstAsync<any>(
+    `SELECT * FROM group_training_plans
+     WHERE group_id=? ORDER BY created_at DESC LIMIT 1`,
+    groupId,
+  );
+  if (!row) return null;
+  const [memberRows, workoutRows] = await Promise.all([
+    db.getAllAsync<any>(
+      `SELECT * FROM group_plan_members WHERE plan_id=? ORDER BY member_name`,
+      row.id,
+    ),
+    db.getAllAsync<any>(
+      `SELECT * FROM group_plan_workouts
+       WHERE plan_id=? ORDER BY member_name,date,id`,
+      row.id,
+    ),
+  ]);
+  let runningDays: number[] = [];
+  try {
+    const parsed = JSON.parse(String(row.running_days)) as unknown;
+    if (Array.isArray(parsed)) {
+      runningDays = parsed.filter(
+        (day): day is number => Number.isInteger(day) && day >= 0 && day <= 6,
+      );
+    }
+  } catch {
+    runningDays = [];
+  }
+  return {
+    plan: {
+      id: String(row.id),
+      groupId: String(row.group_id),
+      raceDate: String(row.race_date),
+      raceDistanceKm: safePositive(row.race_distance_km),
+      goalTimeMinutes: safePositive(row.goal_time_minutes),
+      runsPerWeek: Number(row.runs_per_week),
+      runningDays,
+      longRunDay: Number(row.long_run_day),
+      createdBy: String(row.created_by),
+      createdAt: String(row.created_at),
+    },
+    members: memberRows.map((member) => ({
+      planId: String(member.plan_id),
+      memberName: String(member.member_name),
+      currentPaceSec: safePositive(member.current_pace_sec),
+    })),
+    workouts: workoutRows.map((workout) => ({
+      id: String(workout.id),
+      planId: String(workout.plan_id),
+      memberName: String(workout.member_name),
+      date: String(workout.date),
+      type: workout.type as import('@/types/models').WorkoutType,
+      distanceKm: safePositive(workout.distance_km),
+      targetPaceMinSec:
+        workout.target_pace_min_sec == null
+          ? null
+          : safePositive(workout.target_pace_min_sec),
+      targetPaceMaxSec:
+        workout.target_pace_max_sec == null
+          ? null
+          : safePositive(workout.target_pace_max_sec),
+      description: String(workout.description),
+    })),
+  };
+}
+
 export async function getWeeklyRunningSummary(db: SQLiteDatabase, planId: number, anchor = new Date()): Promise<import('@/types/models').WeeklyRunningSummary> {
   const local = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate());
   const day = local.getDay();

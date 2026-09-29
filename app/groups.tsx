@@ -18,12 +18,14 @@ import { useTheme } from "@/context/ThemeContext";
 import {
   deleteRunningGroup,
   getGroupMembers,
+  getGroupTrainingPlanBundle,
   getRecentActivities,
   getRunningGroup,
   getRunningGroups,
   getSetting,
   getSharedGroupResults,
   saveGroupMember,
+  saveGroupTrainingPlanBundle,
   saveRunningGroup,
   saveSharedGroupResult,
   setSetting,
@@ -42,9 +44,11 @@ import {
 } from "@/services/nearbyGroups";
 import type {
   GroupMember,
+  GroupTrainingPlanBundle,
   RunningGroup,
   SharedGroupResult,
 } from "@/types/models";
+import { isClosedResourceError } from "@/utils/errors";
 
 const makeId = () =>
   `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
@@ -68,6 +72,9 @@ const formatDuration = (seconds: number) => {
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(rest).padStart(2, "0")}`;
 };
 
+const formatPace = (seconds: number) =>
+  `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, "0")}`;
+
 type GroupInviteContext = {
   type: "groupInvite";
   group: RunningGroup;
@@ -77,6 +84,21 @@ type GroupResultMessage = {
   type: "groupResult";
   result: SharedGroupResult;
 };
+
+type GroupPlanMessage = {
+  type: "groupPlan";
+  bundle: GroupTrainingPlanBundle;
+};
+
+const workoutTypes = new Set([
+  "EASY",
+  "TEMPO",
+  "INTERVAL",
+  "LONG_RUN",
+  "RECOVERY",
+  "WALK",
+  "REST",
+]);
 
 const isGroupInviteContext = (value: unknown): value is GroupInviteContext => {
   const context = value as Partial<GroupInviteContext> | null;
@@ -119,6 +141,101 @@ const isGroupResultMessage = (value: unknown): value is GroupResultMessage => {
   );
 };
 
+const isGroupPlanMessage = (value: unknown): value is GroupPlanMessage => {
+  const message = value as Partial<GroupPlanMessage> | null;
+  const bundle = message?.bundle as Partial<GroupTrainingPlanBundle> | undefined;
+  const plan = bundle?.plan as GroupTrainingPlanBundle["plan"] | undefined;
+  if (
+    message?.type !== "groupPlan" ||
+    !bundle ||
+    !plan ||
+    typeof plan.id !== "string" ||
+    !plan.id ||
+    plan.id.length > 120 ||
+    typeof plan.groupId !== "string" ||
+    !plan.groupId ||
+    plan.groupId.length > 120 ||
+    typeof plan.raceDate !== "string" ||
+    typeof plan.raceDistanceKm !== "number" ||
+    !Number.isFinite(plan.raceDistanceKm) ||
+    plan.raceDistanceKm <= 0 ||
+    plan.raceDistanceKm > 1000 ||
+    typeof plan.goalTimeMinutes !== "number" ||
+    !Number.isFinite(plan.goalTimeMinutes) ||
+    plan.goalTimeMinutes <= 0 ||
+    plan.goalTimeMinutes > 24 * 60 ||
+    !Number.isInteger(plan.runsPerWeek) ||
+    plan.runsPerWeek < 3 ||
+    plan.runsPerWeek > 7 ||
+    !Array.isArray(plan.runningDays) ||
+    plan.runningDays.length < 3 ||
+    plan.runsPerWeek !== plan.runningDays.length ||
+    plan.runningDays.some(
+      (day) => !Number.isInteger(day) || day < 0 || day > 6,
+    ) ||
+    !Number.isInteger(plan.longRunDay) ||
+    !plan.runningDays.includes(plan.longRunDay) ||
+    typeof plan.createdAt !== "string" ||
+    typeof plan.createdBy !== "string" ||
+    plan.createdBy.length > 80 ||
+    !Array.isArray(bundle.members) ||
+    bundle.members.length < 1 ||
+    bundle.members.length > 20 ||
+    !Array.isArray(bundle.workouts) ||
+    bundle.workouts.length < 1 ||
+    bundle.workouts.length > 6000
+  ) {
+    return false;
+  }
+  const memberNames = new Set<string>();
+  for (const member of bundle.members) {
+    if (
+      member.planId !== plan.id ||
+      typeof member.memberName !== "string" ||
+      !member.memberName.trim() ||
+      member.memberName.length > 80 ||
+      typeof member.currentPaceSec !== "number" ||
+      !Number.isFinite(member.currentPaceSec) ||
+      member.currentPaceSec < 180 ||
+      member.currentPaceSec > 900
+    ) {
+      return false;
+    }
+    const normalizedName = member.memberName.trim().toLocaleLowerCase();
+    if (memberNames.has(normalizedName)) return false;
+    memberNames.add(normalizedName);
+  }
+  const workoutIds = new Set<string>();
+  return bundle.workouts.every((workout) => {
+    if (workoutIds.has(workout.id)) return false;
+    workoutIds.add(workout.id);
+    return (
+      workout.planId === plan.id &&
+      typeof workout.id === "string" &&
+      workout.id.length > 0 &&
+      workout.id.length <= 300 &&
+      typeof workout.memberName === "string" &&
+      memberNames.has(workout.memberName.trim().toLocaleLowerCase()) &&
+      typeof workout.date === "string" &&
+      workoutTypes.has(workout.type) &&
+      typeof workout.distanceKm === "number" &&
+      Number.isFinite(workout.distanceKm) &&
+      workout.distanceKm >= 0 &&
+      workout.distanceKm <= 1000 &&
+      (workout.targetPaceMinSec === null ||
+        (typeof workout.targetPaceMinSec === "number" &&
+          Number.isFinite(workout.targetPaceMinSec) &&
+          workout.targetPaceMinSec >= 0)) &&
+      (workout.targetPaceMaxSec === null ||
+        (typeof workout.targetPaceMaxSec === "number" &&
+          Number.isFinite(workout.targetPaceMaxSec) &&
+          workout.targetPaceMaxSec >= 0)) &&
+      typeof workout.description === "string" &&
+      workout.description.length <= 1000
+    );
+  });
+};
+
 export default function GroupsScreen() {
   const db = useSQLiteContext();
   const { t, language } = useI18n();
@@ -132,6 +249,7 @@ export default function GroupsScreen() {
   const [selectedGroup, setSelectedGroup] = useState<RunningGroup | null>(null);
   const [members, setMembers] = useState<GroupMember[]>([]);
   const [results, setResults] = useState<SharedGroupResult[]>([]);
+  const [groupPlan, setGroupPlan] = useState<GroupTrainingPlanBundle | null>(null);
   const [peers, setPeers] = useState<NearbyPeer[]>([]);
   const [connectedPeers, setConnectedPeers] = useState<string[]>([]);
   const [scanning, setScanning] = useState(false);
@@ -141,14 +259,17 @@ export default function GroupsScreen() {
       if (!group) {
         setMembers([]);
         setResults([]);
+        setGroupPlan(null);
         return;
       }
-      const [nextMembers, nextResults] = await Promise.all([
+      const [nextMembers, nextResults, nextGroupPlan] = await Promise.all([
         getGroupMembers(db, group.id),
         getSharedGroupResults(db, group.id),
+        getGroupTrainingPlanBundle(db, group.id),
       ]);
       setMembers(nextMembers);
       setResults(nextResults);
+      setGroupPlan(nextGroupPlan);
     },
     [db],
   );
@@ -172,14 +293,23 @@ export default function GroupsScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      void loadInitial();
+      let active = true;
+      void loadInitial().catch((error) => {
+        if (active && !isClosedResourceError(error)) {
+          console.error("Running groups DB error:", error);
+        }
+      });
       return () => {
-        setScanning(false);
-        setPeers([]);
-        setConnectedPeers([]);
-        void stopNearby();
+        active = false;
       };
     }, [loadInitial]),
+  );
+
+  useEffect(
+    () => () => {
+      void stopNearby();
+    },
+    [],
   );
 
   useEffect(() => {
@@ -196,6 +326,22 @@ export default function GroupsScreen() {
         if (state === "connected" && selectedGroup) {
           await saveGroupMember(db, selectedGroup.id, peerName);
           await loadGroupData(selectedGroup);
+          if (
+            groupPlan &&
+            selectedGroup.ownerName === savedDisplayName
+          ) {
+            try {
+              await sendNearbyMessage(
+                { type: "groupPlan", bundle: groupPlan },
+                [peerName],
+              );
+            } catch (error) {
+              showAlert(
+                t("nearbyError"),
+                error instanceof Error ? error.message : "",
+              );
+            }
+          }
         }
       }),
       addNearbyListener("onInvitation", (invitation) => {
@@ -248,12 +394,26 @@ export default function GroupsScreen() {
         } catch {
           message = null;
         }
-        if (
-          !isGroupResultMessage(message) ||
-          !(await getRunningGroup(db, message.result.groupId))
-        ) {
+        if (isGroupPlanMessage(message)) {
+          const targetGroup = await getRunningGroup(db, message.bundle.plan.groupId);
+          if (!targetGroup || targetGroup.ownerName !== peerName) return;
+          const receivedBundle: GroupTrainingPlanBundle = {
+            ...message.bundle,
+            plan: {
+              ...message.bundle.plan,
+              createdBy: peerName,
+            },
+          };
+          await saveGroupTrainingPlanBundle(db, receivedBundle);
+          if (selectedGroup?.id === targetGroup.id) {
+            await loadGroupData(selectedGroup);
+          }
+          showAlert(t("groupPlanReceived"), targetGroup.name);
           return;
         }
+        if (!isGroupResultMessage(message)) return;
+        const resultGroup = await getRunningGroup(db, message.result.groupId);
+        if (!resultGroup) return;
         await saveSharedGroupResult(db, {
           ...message.result,
           senderName: peerName,
@@ -273,6 +433,7 @@ export default function GroupsScreen() {
     db,
     language,
     loadGroupData,
+    groupPlan,
     savedDisplayName,
     selectedGroup,
     showAlert,
@@ -385,6 +546,35 @@ export default function GroupsScreen() {
     await saveSharedGroupResult(db, result);
     await loadGroupData(selectedGroup);
     showAlert(t("resultShared"), `${sentCount} ${t("memberUnit")}`);
+  };
+
+  const shareCurrentGroupPlan = async () => {
+    if (
+      !selectedGroup ||
+      !groupPlan ||
+      selectedGroup.ownerName !== savedDisplayName
+    ) return;
+    const memberNames = new Set(members.map((member) => member.peerName));
+    const targets = connectedPeers.filter(
+      (peerName) =>
+        peerName !== savedDisplayName && memberNames.has(peerName),
+    );
+    if (!targets.length) {
+      showAlert(t("shareGroupTrainingPlan"), t("noConnectedRunners"));
+      return;
+    }
+    try {
+      const sentCount = await sendNearbyMessage(
+        { type: "groupPlan", bundle: groupPlan },
+        targets,
+      );
+      showAlert(
+        t("groupPlanSaved"),
+        `${t("groupPlanSharedCount")}: ${sentCount}`,
+      );
+    } catch (error) {
+      showAlert(t("nearbyError"), error instanceof Error ? error.message : "");
+    }
   };
 
   const leaveCurrentGroup = () => {
@@ -537,7 +727,11 @@ export default function GroupsScreen() {
                     key={group.id}
                     onPress={() => {
                       setSelectedGroup(group);
-                      void loadGroupData(group);
+                      void loadGroupData(group).catch((error) => {
+                        if (!isClosedResourceError(error)) {
+                          console.error("Could not load group data:", error);
+                        }
+                      });
                     }}
                     style={[
                       s.groupChip,
@@ -583,6 +777,109 @@ export default function GroupsScreen() {
                     {members.length} {t("memberUnit")} · {groupTotal.toFixed(2)} km
                   </Text>
                 </View>
+              </GlassCard>
+
+              <Text style={[s.sectionTitle, { color: colors.groupTitle }]}>
+                {t("groupTrainingPlan")}
+              </Text>
+              <GlassCard style={s.planCard}>
+                {groupPlan ? (
+                  <>
+                    <View style={s.planHeader}>
+                      <View style={[s.planIcon, { backgroundColor: colors.rowIconBg }]}>
+                        <Ionicons name="calendar" size={21} color={colors.accent} />
+                      </View>
+                      <View style={s.groupHeroCopy}>
+                        <Text style={[s.planTitle, { color: colors.textPrimary }]}>
+                          {groupPlan.plan.raceDistanceKm} km · {groupPlan.plan.raceDate}
+                        </Text>
+                        <Text style={[s.groupMeta, { color: colors.textSecondary }]}>
+                          {groupPlan.members.length} {t("groupPlanParticipants")} · {formatDuration(groupPlan.plan.goalTimeMinutes * 60)}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={s.planMembers}>
+                      {groupPlan.members.map((member) => (
+                        <View
+                          key={member.memberName}
+                          style={[s.planMemberChip, { backgroundColor: colors.rowIconBg }]}
+                        >
+                          <Text style={[s.planMemberName, { color: colors.textPrimary }]}>
+                            {member.memberName}
+                          </Text>
+                          <Text style={[s.planMemberPace, { color: colors.textSecondary }]}>
+                            {formatPace(member.currentPaceSec)}/km
+                          </Text>
+                        </View>
+                      ))}
+                    </View>
+                  </>
+                ) : (
+                  <Text style={[s.emptyText, { color: colors.textSecondary }]}>
+                    {t("noGroupTrainingPlan")}
+                  </Text>
+                )}
+                {selectedGroup.ownerName === savedDisplayName && (
+                  <View style={s.planActions}>
+                    <Pressable
+                      onPress={() =>
+                        router.push({
+                          pathname: "/group-plan",
+                          params: { groupId: selectedGroup.id },
+                        })
+                      }
+                      style={[s.planPrimaryButton, { backgroundColor: colors.accent }]}
+                    >
+                      <Ionicons name="create-outline" size={18} color="#fff" />
+                      <Text style={s.planPrimaryText}>
+                        {groupPlan
+                          ? t("updateGroupTrainingPlan")
+                          : t("createGroupTrainingPlan")}
+                      </Text>
+                    </Pressable>
+                    {groupPlan && (
+                      <>
+                        <Pressable
+                          onPress={() =>
+                            router.push({
+                              pathname: "/group-plan",
+                              params: { groupId: selectedGroup.id, mode: "view" },
+                            })
+                          }
+                          style={[s.planSecondaryButton, { borderColor: colors.accent }]}
+                        >
+                          <Ionicons name="reader-outline" size={18} color={colors.accent} />
+                          <Text style={[s.planSecondaryText, { color: colors.accent }]}>
+                            {t("viewGroupTrainingPlan")}
+                          </Text>
+                        </Pressable>
+                        <Pressable
+                          onPress={shareCurrentGroupPlan}
+                          style={[s.planSecondaryButton, { borderColor: colors.accent }]}
+                        >
+                          <Ionicons name="share-outline" size={18} color={colors.accent} />
+                          <Text style={[s.planSecondaryText, { color: colors.accent }]}>
+                            {t("shareGroupTrainingPlan")}
+                          </Text>
+                        </Pressable>
+                      </>
+                    )}
+                  </View>
+                )}
+                {groupPlan && selectedGroup.ownerName !== savedDisplayName && (
+                  <Pressable
+                    onPress={() =>
+                      router.push({
+                        pathname: "/group-plan",
+                        params: { groupId: selectedGroup.id },
+                      })
+                    }
+                    style={[s.planPrimaryButton, s.planViewButton, { backgroundColor: colors.accent }]}
+                  >
+                    <Ionicons name="reader-outline" size={18} color="#fff" />
+                    <Text style={s.planPrimaryText}>{t("viewGroupTrainingPlan")}</Text>
+                  </Pressable>
+                )}
               </GlassCard>
 
               <Text style={[s.sectionTitle, { color: colors.groupTitle }]}>
@@ -714,6 +1011,20 @@ const s = StyleSheet.create({
   groupHeroCopy: { flex: 1 },
   groupName: { fontSize: 21, fontWeight: "900" },
   groupMeta: { marginTop: 4, fontSize: 12, fontWeight: "600" },
+  planCard: { padding: 15 },
+  planHeader: { flexDirection: "row", alignItems: "center", gap: 11 },
+  planIcon: { width: 42, height: 42, borderRadius: 21, alignItems: "center", justifyContent: "center" },
+  planTitle: { fontSize: 16, fontWeight: "900" },
+  planMembers: { marginTop: 13, flexDirection: "row", flexWrap: "wrap", gap: 7 },
+  planMemberChip: { borderRadius: 14, paddingHorizontal: 10, paddingVertical: 8 },
+  planMemberName: { fontSize: 12, fontWeight: "900" },
+  planMemberPace: { marginTop: 2, fontSize: 10, fontWeight: "700" },
+  planActions: { marginTop: 14, gap: 9 },
+  planPrimaryButton: { minHeight: 46, borderRadius: 23, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, paddingHorizontal: 12 },
+  planPrimaryText: { color: "#fff", fontSize: 12, fontWeight: "900", textAlign: "center" },
+  planSecondaryButton: { minHeight: 44, borderRadius: 22, borderWidth: 1.5, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7, paddingHorizontal: 12 },
+  planSecondaryText: { fontSize: 12, fontWeight: "900", textAlign: "center" },
+  planViewButton: { marginTop: 14 },
   listCard: { paddingHorizontal: 14, paddingVertical: 6 },
   emptyText: { paddingVertical: 14, fontSize: 13, lineHeight: 19, textAlign: "center" },
   divider: { height: 1, marginLeft: 46 },

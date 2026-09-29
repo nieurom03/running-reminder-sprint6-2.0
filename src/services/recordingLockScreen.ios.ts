@@ -1,9 +1,16 @@
-import RunningLiveActivity from "@/widgets/RunningLiveActivity";
 import type { RecordingSnapshot } from "@/services/recordingSession";
 import { toLiveActivityProps } from "@/services/recordingLockScreen.types";
 
+const getRunningLiveActivity = () =>
+  (
+    require("@/widgets/RunningLiveActivity") as typeof import(
+      "@/widgets/RunningLiveActivity"
+    )
+  ).default;
+
 export const startRecordingLockScreen = async (snapshot: RecordingSnapshot) => {
   try {
+    const RunningLiveActivity = getRunningLiveActivity();
     const existing = RunningLiveActivity.getInstances();
     await Promise.all(existing.map((instance) => instance.end("immediate")));
     RunningLiveActivity.start(
@@ -20,6 +27,7 @@ export const updateRecordingLockScreen = async (
   snapshot: RecordingSnapshot,
 ) => {
   try {
+    const RunningLiveActivity = getRunningLiveActivity();
     const props = toLiveActivityProps(snapshot);
     const instances = RunningLiveActivity.getInstances();
     if (instances.length === 0) {
@@ -44,6 +52,7 @@ export const endRecordingLockScreen = async (
   snapshot?: RecordingSnapshot | null,
 ) => {
   try {
+    const RunningLiveActivity = getRunningLiveActivity();
     const props = snapshot ? toLiveActivityProps(snapshot) : undefined;
     await Promise.all(
       RunningLiveActivity.getInstances().map((instance) =>
