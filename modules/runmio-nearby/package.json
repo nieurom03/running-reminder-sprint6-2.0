@@ -1,0 +1,7 @@
+{
+  "name": "runmio-nearby",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Nearby peer-to-peer running groups for Runmio",
+  "license": "MIT"
+}
