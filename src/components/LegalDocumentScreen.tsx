@@ -7,11 +7,7 @@ import { getLegalDocument } from "@/content/legal";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/context/ThemeContext";
 
-export function LegalDocumentScreen({
-  type,
-}: {
-  type: "privacy" | "terms";
-}) {
+export function LegalDocumentScreen({ type }: { type: "privacy" | "terms" }) {
   const { t, language } = useI18n();
   const { colors } = useTheme();
   const document = getLegalDocument(type, language);

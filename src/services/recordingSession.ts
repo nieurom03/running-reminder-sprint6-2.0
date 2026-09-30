@@ -164,9 +164,7 @@ const pointFromLast = (row: RecordingRow): RecordedRoutePoint | null => {
   };
 };
 
-const currentPointFromRow = (
-  row: RecordingRow,
-): RecordedRoutePoint | null => {
+const currentPointFromRow = (row: RecordingRow): RecordedRoutePoint | null => {
   if (
     row.current_latitude == null ||
     row.current_longitude == null ||

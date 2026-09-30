@@ -5,10 +5,7 @@ import {
   monospacedDigit,
   padding,
 } from "@expo/ui/swift-ui/modifiers";
-import {
-  createLiveActivity,
-  type LiveActivityEnvironment,
-} from "expo-widgets";
+import { createLiveActivity, type LiveActivityEnvironment } from "expo-widgets";
 
 import type { RecordingLiveActivityProps } from "@/services/recordingLockScreen.types";
 
@@ -99,7 +96,9 @@ const RunningActivity = (
     ),
     compactLeading: <Image systemName={icon} size={17} color={accent} />,
     compactTrailing: (
-      <Text modifiers={[font({ size: 13, weight: "semibold" }), monospacedDigit()]}>
+      <Text
+        modifiers={[font({ size: 13, weight: "semibold" }), monospacedDigit()]}
+      >
         {props.distance}
       </Text>
     ),
@@ -113,7 +112,11 @@ const RunningActivity = (
       </VStack>
     ),
     expandedTrailing: (
-      <VStack alignment="trailing" spacing={2} modifiers={[padding({ all: 10 })]}>
+      <VStack
+        alignment="trailing"
+        spacing={2}
+        modifiers={[padding({ all: 10 })]}
+      >
         <Text modifiers={[font({ size: 10 }), foregroundStyle(secondary)]}>
           {props.timeLabel}
         </Text>
@@ -121,11 +124,18 @@ const RunningActivity = (
       </VStack>
     ),
     expandedBottom: (
-      <HStack spacing={24} modifiers={[padding({ horizontal: 12, bottom: 10 })]}>
-        <Text modifiers={[font({ size: 16, weight: "bold" }), monospacedDigit()]}>
+      <HStack
+        spacing={24}
+        modifiers={[padding({ horizontal: 12, bottom: 10 })]}
+      >
+        <Text
+          modifiers={[font({ size: 16, weight: "bold" }), monospacedDigit()]}
+        >
           {props.distance}
         </Text>
-        <Text modifiers={[font({ size: 16, weight: "bold" }), monospacedDigit()]}>
+        <Text
+          modifiers={[font({ size: 16, weight: "bold" }), monospacedDigit()]}
+        >
           {props.pace}
         </Text>
       </HStack>

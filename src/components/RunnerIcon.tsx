@@ -1,7 +1,7 @@
-import React from 'react';
-import { Image, StyleSheet } from 'react-native';
+import React from "react";
+import { Image, StyleSheet } from "react-native";
 
-const runnerPng = require('../../assets/images/runner.png');
+const runnerPng = require("../../assets/images/runner.png");
 
 /**
  * Runner icon cropped from the app icon.
@@ -9,7 +9,7 @@ const runnerPng = require('../../assets/images/runner.png');
  */
 export function RunnerIcon({
   size = 26,
-  color = '#2DB526',
+  color = "#2DB526",
 }: {
   size?: number;
   color?: string;
@@ -17,10 +17,7 @@ export function RunnerIcon({
   return (
     <Image
       source={runnerPng}
-      style={[
-        styles.img,
-        { width: size, height: size, tintColor: color },
-      ]}
+      style={[styles.img, { width: size, height: size, tintColor: color }]}
       resizeMode="contain"
     />
   );

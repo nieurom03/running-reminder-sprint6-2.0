@@ -1,14 +1,19 @@
 export type WorkoutType =
-  | 'EASY'
-  | 'TEMPO'
-  | 'INTERVAL'
-  | 'LONG_RUN'
-  | 'RECOVERY'
-  | 'WALK'
-  | 'REST';
-export type WorkoutStatus = 'PLANNED' | 'COMPLETED' | 'SKIPPED' | 'MISSED';
-export type ActivitySource = 'MANUAL' | 'GPS' | 'STRAVA' | 'GARMIN' | 'HEALTHKIT';
-export type RunFeeling = 'GREAT' | 'GOOD' | 'NORMAL' | 'HARD' | 'VERY_HARD';
+  | "EASY"
+  | "TEMPO"
+  | "INTERVAL"
+  | "LONG_RUN"
+  | "RECOVERY"
+  | "WALK"
+  | "REST";
+export type WorkoutStatus = "PLANNED" | "COMPLETED" | "SKIPPED" | "MISSED";
+export type ActivitySource =
+  | "MANUAL"
+  | "GPS"
+  | "STRAVA"
+  | "GARMIN"
+  | "HEALTHKIT";
+export type RunFeeling = "GREAT" | "GOOD" | "NORMAL" | "HARD" | "VERY_HARD";
 
 export interface TrainingPlan {
   id: number;
@@ -86,7 +91,7 @@ export interface RecordedRoutePoint {
 export interface RecordedActivityInput {
   planId: number;
   workoutId: number | null;
-  workoutType: 'EASY' | 'WALK';
+  workoutType: "EASY" | "WALK";
   startTime: string;
   distanceKm: number;
   durationSeconds: number;

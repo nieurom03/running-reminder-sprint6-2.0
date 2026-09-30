@@ -1,6 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
-import type { ReactNode } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import type { ReactNode } from "react";
 import {
   KeyboardAvoidingView,
   Modal,
@@ -11,9 +11,9 @@ import {
   View,
   type StyleProp,
   type ViewStyle,
-} from 'react-native';
+} from "react-native";
 
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme } from "@/context/ThemeContext";
 
 type LiquidGlassModalProps = {
   visible: boolean;
@@ -44,17 +44,17 @@ export function LiquidGlassModal({
       onRequestClose={onRequestClose}
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={s.root}
       >
-        {Platform.OS !== 'android' && (
+        {Platform.OS !== "android" && (
           <BlurView
             pointerEvents="none"
             intensity={isDark ? 18 : 12}
             tint={
               isDark
-                ? 'systemUltraThinMaterialDark'
-                : 'systemUltraThinMaterialLight'
+                ? "systemUltraThinMaterialDark"
+                : "systemUltraThinMaterialLight"
             }
             style={StyleSheet.absoluteFill}
           />
@@ -72,7 +72,7 @@ export function LiquidGlassModal({
 
         <View style={s.shadow} accessibilityViewIsModal>
           <View style={[s.clip, { borderColor: colors.modalBorder }]}>
-            {Platform.OS === 'android' ? (
+            {Platform.OS === "android" ? (
               <View
                 pointerEvents="none"
                 style={[
@@ -85,9 +85,7 @@ export function LiquidGlassModal({
                 pointerEvents="none"
                 intensity={isDark ? 48 : 38}
                 tint={
-                  isDark
-                    ? 'systemThinMaterialDark'
-                    : 'systemThinMaterialLight'
+                  isDark ? "systemThinMaterialDark" : "systemThinMaterialLight"
                 }
                 style={StyleSheet.absoluteFill}
               />
@@ -162,15 +160,15 @@ export function GlassOptionModal<T extends string>({
                   backgroundColor: selected
                     ? colors.rowIconBg
                     : isDark
-                      ? 'rgba(255,255,255,0.025)'
-                      : 'rgba(255,255,255,0.14)',
-                  borderColor: selected
-                    ? colors.accent
-                    : colors.modalBorder,
+                      ? "rgba(255,255,255,0.025)"
+                      : "rgba(255,255,255,0.14)",
+                  borderColor: selected ? colors.accent : colors.modalBorder,
                 },
               ]}
             >
-              <View style={[s.optionIcon, { backgroundColor: colors.rowIconBg }]}>
+              <View
+                style={[s.optionIcon, { backgroundColor: colors.rowIconBg }]}
+              >
                 <Ionicons
                   name={option.icon}
                   size={20}
@@ -184,12 +182,8 @@ export function GlassOptionModal<T extends string>({
                 style={[
                   s.selection,
                   {
-                    borderColor: selected
-                      ? colors.accent
-                      : colors.textMuted,
-                    backgroundColor: selected
-                      ? colors.accent
-                      : 'transparent',
+                    borderColor: selected ? colors.accent : colors.textMuted,
+                    backgroundColor: selected ? colors.accent : "transparent",
                   },
                 ]}
               >
@@ -208,17 +202,17 @@ export function GlassOptionModal<T extends string>({
 const s = StyleSheet.create({
   root: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 22,
     paddingVertical: 36,
   },
   shadow: {
-    width: '100%',
+    width: "100%",
     maxWidth: 420,
-    maxHeight: '86%',
+    maxHeight: "86%",
     borderRadius: 30,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.28,
     shadowRadius: 30,
     shadowOffset: { width: 0, height: 16 },
@@ -227,22 +221,22 @@ const s = StyleSheet.create({
   clip: {
     borderRadius: 30,
     borderWidth: 1,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   content: { padding: 20 },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     gap: 14,
   },
-  title: { flex: 1, fontSize: 23, lineHeight: 29, fontWeight: '900' },
+  title: { flex: 1, fontSize: 23, lineHeight: 29, fontWeight: "900" },
   close: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   options: { gap: 10, marginTop: 18 },
   option: {
@@ -251,24 +245,24 @@ const s = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 13,
     paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
   },
   optionIcon: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
-  optionLabel: { flex: 1, fontSize: 16, fontWeight: '800' },
+  optionLabel: { flex: 1, fontSize: 16, fontWeight: "800" },
   selection: {
     width: 24,
     height: 24,
     borderRadius: 12,
     borderWidth: 1.5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

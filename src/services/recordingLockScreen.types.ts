@@ -26,13 +26,14 @@ export const toLiveActivityProps = (
   const isVietnamese = snapshot.language === "vi";
   const now = Date.now();
   return {
-    sportLabel: snapshot.sport === "WALK"
-      ? isVietnamese
-        ? "Đi bộ"
-        : "Walk"
-      : isVietnamese
-        ? "Chạy bộ"
-        : "Run",
+    sportLabel:
+      snapshot.sport === "WALK"
+        ? isVietnamese
+          ? "Đi bộ"
+          : "Walk"
+        : isVietnamese
+          ? "Chạy bộ"
+          : "Run",
     statusLabel:
       snapshot.phase === "paused"
         ? isVietnamese

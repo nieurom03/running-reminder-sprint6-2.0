@@ -39,9 +39,12 @@ export function GlassAlertProvider({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const [dialog, setDialog] = useState<GlassAlertConfig | null>(null);
 
-  const showAlert = useCallback<ShowGlassAlert>((title, message, buttons, onDismiss) => {
-    setDialog({ title, message, buttons, onDismiss });
-  }, []);
+  const showAlert = useCallback<ShowGlassAlert>(
+    (title, message, buttons, onDismiss) => {
+      setDialog({ title, message, buttons, onDismiss });
+    },
+    [],
+  );
 
   const actions = useMemo(
     () =>
@@ -80,9 +83,7 @@ export function GlassAlertProvider({ children }: { children: ReactNode }) {
                 {dialog.message}
               </Text>
             )}
-            <View
-              style={[s.actions, actions.length > 2 && s.actionsStacked]}
-            >
+            <View style={[s.actions, actions.length > 2 && s.actionsStacked]}>
               {actions.map((button, index) => {
                 const destructive = button.style === "destructive";
                 const primary = button.style !== "cancel";
