@@ -10,7 +10,9 @@
     "android": "expo run:android",
     "prebuild:ios": "expo prebuild --clean -p ios",
     "doctor": "expo-doctor",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "content:today": "node content-bot/runmio-content-bot.mjs today",
+    "content:plan": "node content-bot/runmio-content-bot.mjs plan --days 30"
   },
   "dependencies": {
     "@expo/ui": "~57.0.21",

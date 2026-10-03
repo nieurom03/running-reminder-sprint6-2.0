@@ -1,0 +1,542 @@
+[
+  {
+    "date": "2026-10-01",
+    "theme": "Đánh giá giáo án",
+    "title": "Giáo án phải thích nghi với bạn",
+    "feature": "Edit Plan",
+    "hook": "Kế hoạch là công cụ hỗ trợ, không phải bản án phải hoàn thành bằng mọi giá.",
+    "action": "Cuối tuần, kiểm tra các workout đã hoàn thành và chỉnh tuần tới nếu tải hiện tại quá nhẹ hoặc quá nặng.",
+    "caption": "Kế hoạch là công cụ hỗ trợ, không phải bản án phải hoàn thành bằng mọi giá.\n\nNếu nhiều buổi liên tiếp quá nặng, hãy giảm tải. Nếu bạn hoàn thành ổn định và phục hồi tốt, có thể tăng nhẹ. Runmio giúp bạn chỉnh kế hoạch dựa trên thực tế.\n\n🎯 Việc nhỏ hôm nay: Cuối tuần, kiểm tra các workout đã hoàn thành và chỉnh tuần tới nếu tải hiện tại quá nhẹ hoặc quá nặng.\n\n📱 Runmio: Edit Plan\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Before/after của một giáo án được chỉnh nhẹ cho tuần kế tiếp.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-02",
+    "theme": "Backup dữ liệu",
+    "title": "Quá trình tập luyện đáng được lưu giữ",
+    "feature": "iCloud Backup",
+    "hook": "Hàng tháng dữ liệu tích lũy sẽ trở thành nhật ký tiến bộ của bạn.",
+    "action": "Kiểm tra backup để bảo vệ lịch sử giáo án và kết quả chạy khi đổi máy.",
+    "caption": "Hàng tháng dữ liệu tích lũy sẽ trở thành nhật ký tiến bộ của bạn.\n\nKết quả chạy, kế hoạch và ghi chú giúp bạn nhìn lại hành trình dài hạn. Backup định kỳ giúp giảm rủi ro mất dữ liệu khi đổi hoặc khôi phục thiết bị.\n\n🎯 Việc nhỏ hôm nay: Kiểm tra backup để bảo vệ lịch sử giáo án và kết quả chạy khi đổi máy.\n\n📱 Runmio: iCloud Backup\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Settings → iCloud Backup, sau đó montage các tháng tập luyện lướt qua.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-03",
+    "theme": "Tự tin khi chạy",
+    "title": "Bạn không cần chạy nhanh để được gọi là runner",
+    "feature": "Dashboard",
+    "hook": "Runner là người chạy và quay lại tập luyện, không phải người đạt một pace cụ thể.",
+    "action": "Hoàn thành buổi chạy đúng kế hoạch hôm nay, bất kể pace là bao nhiêu.",
+    "caption": "Runner là người chạy và quay lại tập luyện, không phải người đạt một pace cụ thể.\n\nPace thay đổi theo thể lực và hoàn cảnh. Điều đáng theo dõi là bạn có xuất hiện đều đặn, hoàn thành mục tiêu phù hợp và phục hồi tốt hay không.\n\n🎯 Việc nhỏ hôm nay: Hoàn thành buổi chạy đúng kế hoạch hôm nay, bất kể pace là bao nhiêu.\n\n📱 Runmio: Dashboard\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Nhiều runner với pace khác nhau, kết thúc bằng Dashboard ghi nhận workout hoàn thành.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-04",
+    "theme": "Negative Split",
+    "title": "Thử kết thúc nhanh hơn lúc bắt đầu",
+    "feature": "Workout Pace",
+    "hook": "Một buổi chạy có kiểm soát thường kết thúc mạnh hơn nó bắt đầu.",
+    "action": "Chạy nửa đầu thật kiểm soát, nửa sau tăng nhẹ nếu còn khỏe; không sprint ở cuối.",
+    "caption": "Một buổi chạy có kiểm soát thường kết thúc mạnh hơn nó bắt đầu.\n\nNegative split là bài học tốt về phân phối sức. Bắt đầu nhẹ giúp bạn tránh tích mệt quá sớm và hiểu rõ mức pace có thể duy trì.\n\n🎯 Việc nhỏ hôm nay: Chạy nửa đầu thật kiểm soát, nửa sau tăng nhẹ nếu còn khỏe; không sprint ở cuối.\n\n📱 Runmio: Workout Pace\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Biểu đồ pace hai nửa, nửa sau nhanh hơn nhẹ và ổn định.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-05",
+    "theme": "Tổng kết tuần",
+    "title": "Mỗi tuần hãy trả lời 3 câu hỏi này",
+    "feature": "Dashboard + Calendar",
+    "hook": "5 phút review có thể giúp cả tuần sau tập thông minh hơn.",
+    "action": "Xem lại: đã chạy bao nhiêu buổi, buổi nào khó nhất, tuần sau nên giữ hay chỉnh điều gì?",
+    "caption": "5 phút review có thể giúp cả tuần sau tập thông minh hơn.\n\nKhông cần phân tích phức tạp. Chỉ cần nhìn số buổi, tổng km và cảm nhận. Từ đó giữ những gì đang hiệu quả và chỉnh một điểm nhỏ cho tuần mới.\n\n🎯 Việc nhỏ hôm nay: Xem lại: đã chạy bao nhiêu buổi, buổi nào khó nhất, tuần sau nên giữ hay chỉnh điều gì?\n\n📱 Runmio: Dashboard + Calendar\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Checklist 3 câu hỏi xuất hiện cạnh Dashboard và Calendar.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-06",
+    "theme": "Bắt đầu tuần mới",
+    "title": "Đừng để lịch chạy chỉ nằm trong đầu",
+    "feature": "Plan + Calendar",
+    "hook": "Một tuần có lịch rõ ràng sẽ ít phụ thuộc vào cảm hứng.",
+    "action": "Lên lịch toàn bộ workout của tuần và chốt trước ngày long run, easy run, quality run, rest day.",
+    "caption": "Một tuần có lịch rõ ràng sẽ ít phụ thuộc vào cảm hứng.\n\nKhi mỗi buổi đã có vị trí trong Calendar, bạn dễ sắp xếp công việc và phục hồi hơn. Sau đó chỉ cần thực hiện từng ngày thay vì quyết định lại từ đầu.\n\n🎯 Việc nhỏ hôm nay: Lên lịch toàn bộ workout của tuần và chốt trước ngày long run, easy run, quality run, rest day.\n\n📱 Runmio: Plan + Calendar\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Animation các workout được kéo vào từng ngày trên Calendar Runmio.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-07",
+    "theme": "Khởi động hành trình",
+    "title": "Đừng chạy thật nhanh ở ngày đầu tiên",
+    "feature": "Create Plan",
+    "hook": "Tiến bộ khi chạy bộ bắt đầu từ một kế hoạch đủ dễ để bạn duy trì.",
+    "action": "Tạo mục tiêu tuần trong Runmio và chạy easy 20–30 phút ở mức có thể nói chuyện.",
+    "caption": "Tiến bộ khi chạy bộ bắt đầu từ một kế hoạch đủ dễ để bạn duy trì.\n\nNgày đầu không cần chứng minh tốc độ. Hãy chọn cự ly vừa sức, chạy chậm và kết thúc khi cơ thể vẫn còn năng lượng. Một buổi chạy thành công là buổi chạy khiến bạn muốn quay lại vào ngày mai.\n\n🎯 Việc nhỏ hôm nay: Tạo mục tiêu tuần trong Runmio và chạy easy 20–30 phút ở mức có thể nói chuyện.\n\n📱 Runmio: Create Plan\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Quay màn hình tạo giáo án trong Runmio, chuyển sang cảnh mang giày rồi bắt đầu buổi easy run.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-08",
+    "theme": "Theo dõi tiến độ",
+    "title": "Bạn chỉ cần tốt hơn chính mình của tuần trước",
+    "feature": "Dashboard",
+    "hook": "Đừng so pace của bạn với người khác. Hãy so sự đều đặn của bạn với chính bạn.",
+    "action": "Mở Dashboard, xem tổng km tuần và ghi lại một mục tiêu nhỏ có thể cải thiện trong tuần này.",
+    "caption": "Đừng so pace của bạn với người khác. Hãy so sự đều đặn của bạn với chính bạn.\n\nTiến độ chạy bộ không chỉ là pace. Tổng số buổi hoàn thành, số km tích lũy và cảm giác sau buổi chạy đều là dữ liệu đáng theo dõi. Tăng từng chút sẽ bền hơn cố tăng thật nhanh.\n\n🎯 Việc nhỏ hôm nay: Mở Dashboard, xem tổng km tuần và ghi lại một mục tiêu nhỏ có thể cải thiện trong tuần này.\n\n📱 Runmio: Dashboard\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Zoom vào vòng tiến độ và biểu đồ km tuần trên Dashboard, chèn chữ “+1% mỗi ngày”.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-09",
+    "theme": "Easy Run",
+    "title": "Chạy chậm chính là bài tập quan trọng nhất",
+    "feature": "Plan",
+    "hook": "Nếu buổi nào cũng chạy nhanh, cơ thể sẽ khó có thời gian để mạnh lên.",
+    "action": "Chọn một buổi Easy Run trong Plan và giữ pace thoải mái trong toàn bộ buổi chạy.",
+    "caption": "Nếu buổi nào cũng chạy nhanh, cơ thể sẽ khó có thời gian để mạnh lên.\n\nEasy run giúp bạn tích lũy quãng đường, xây nền aerobic và phục hồi giữa các buổi nặng. Dấu hiệu đơn giản: bạn vẫn nói được câu ngắn mà không hụt hơi.\n\n🎯 Việc nhỏ hôm nay: Chọn một buổi Easy Run trong Plan và giữ pace thoải mái trong toàn bộ buổi chạy.\n\n📱 Runmio: Plan\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Split screen: lịch Easy Run trong Runmio và đoạn chạy ngoài trời với nhịp ổn định.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-10",
+    "theme": "Lợi ích chạy bộ",
+    "title": "30 phút chạy hôm nay có giá trị hơn một kế hoạch hoàn hảo để ngày mai",
+    "feature": "Run Reminder",
+    "hook": "Thói quen thắng động lực khi bạn không muốn xỏ giày.",
+    "action": "Đặt nhắc chạy trong Runmio cho khung giờ bạn ít bị công việc chen vào nhất.",
+    "caption": "Thói quen thắng động lực khi bạn không muốn xỏ giày.\n\nMột lịch nhắc đơn giản giúp giảm số lần bạn phải tự hỏi “hôm nay có chạy không?”. Khi thời gian chạy đã được lên lịch, việc còn lại chỉ là bắt đầu.\n\n🎯 Việc nhỏ hôm nay: Đặt nhắc chạy trong Runmio cho khung giờ bạn ít bị công việc chen vào nhất.\n\n📱 Runmio: Run Reminder\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Cảnh bật thông báo nhắc chạy trong Settings rồi chuyển sang đồng hồ đếm thời gian chạy.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-11",
+    "theme": "Pace",
+    "title": "Pace phù hợp quan trọng hơn pace đẹp",
+    "feature": "Workout Pace",
+    "hook": "Chạy nhanh ngay từ đầu thường khiến nửa sau của buổi chạy trở thành cuộc chiến.",
+    "action": "Trong buổi chạy hôm nay, giữ pace ổn định thay vì tăng tốc liên tục ở những km đầu.",
+    "caption": "Chạy nhanh ngay từ đầu thường khiến nửa sau của buổi chạy trở thành cuộc chiến.\n\nHãy bắt đầu chậm hơn mức bạn nghĩ một chút. Khi nhịp thở ổn định, bạn mới tăng nhẹ nếu cơ thể còn khỏe. Pace đều giúp đánh giá thể lực chính xác hơn.\n\n🎯 Việc nhỏ hôm nay: Trong buổi chạy hôm nay, giữ pace ổn định thay vì tăng tốc liên tục ở những km đầu.\n\n📱 Runmio: Workout Pace\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Hiển thị pace mục tiêu trên Runmio, sau đó overlay pace từng km khi chạy.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-12",
+    "theme": "Phục hồi",
+    "title": "Ngày nghỉ cũng là một phần của giáo án",
+    "feature": "Calendar",
+    "hook": "Cơ thể không mạnh lên trong lúc bạn ép nó chạy. Cơ thể mạnh lên khi được phục hồi sau buổi tập.",
+    "action": "Xem Calendar và giữ đúng ngày nghỉ; ưu tiên đi bộ nhẹ, ngủ đủ và uống nước.",
+    "caption": "Cơ thể không mạnh lên trong lúc bạn ép nó chạy. Cơ thể mạnh lên khi được phục hồi sau buổi tập.\n\nNgày nghỉ giúp cơ, gân và hệ thần kinh hấp thụ tải tập. Bỏ qua phục hồi quá thường xuyên dễ khiến chất lượng các buổi sau giảm dần.\n\n🎯 Việc nhỏ hôm nay: Xem Calendar và giữ đúng ngày nghỉ; ưu tiên đi bộ nhẹ, ngủ đủ và uống nước.\n\n📱 Runmio: Calendar\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Màn Calendar có ngày nghỉ, kèm cảnh giãn cơ nhẹ và uống nước.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-13",
+    "theme": "Long Run",
+    "title": "Long run là bài tập của sự kiên nhẫn",
+    "feature": "Plan",
+    "hook": "Long run dạy cơ thể đi xa và dạy đầu óc bình tĩnh khi mệt.",
+    "action": "Chạy long run theo đúng cự ly kế hoạch, không biến buổi này thành cuộc đua pace.",
+    "caption": "Long run dạy cơ thể đi xa và dạy đầu óc bình tĩnh khi mệt.\n\nMục tiêu của long run là thời gian trên chân và sức bền. Giữ nhịp dễ chịu ở phần lớn quãng đường sẽ giúp bạn hoàn thành tốt hơn và phục hồi nhanh hơn.\n\n🎯 Việc nhỏ hôm nay: Chạy long run theo đúng cự ly kế hoạch, không biến buổi này thành cuộc đua pace.\n\n📱 Runmio: Plan\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Màn hình Plan với buổi Long Run, sau đó montage các km tăng dần trên đường chạy.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-14",
+    "theme": "Kỹ thuật chạy",
+    "title": "Đừng cố sải chân thật dài",
+    "feature": "Workout Result",
+    "hook": "Bước chân êm và tự nhiên thường hiệu quả hơn cố với chân ra phía trước.",
+    "action": "Trong 10 phút giữa buổi chạy, tập bước chân nhẹ, tiếp đất gần dưới trọng tâm và giữ thân người thư giãn.",
+    "caption": "Bước chân êm và tự nhiên thường hiệu quả hơn cố với chân ra phía trước.\n\nBạn không cần thay đổi kỹ thuật trong một ngày. Chỉ cần tập trung vào cảm giác bước chân nhẹ, vai thả lỏng và nhịp đều. Sau buổi chạy, ghi chú cảm nhận để so sánh.\n\n🎯 Việc nhỏ hôm nay: Trong 10 phút giữa buổi chạy, tập bước chân nhẹ, tiếp đất gần dưới trọng tâm và giữ thân người thư giãn.\n\n📱 Runmio: Workout Result\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Quay ngang dáng chạy chậm, chèn 3 nhãn: vai thả lỏng, thân ổn định, bước chân nhẹ.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-15",
+    "theme": "Interval",
+    "title": "Muốn chạy nhanh hơn? Hãy nhanh có kiểm soát",
+    "feature": "Create Plan",
+    "hook": "Interval hiệu quả không có nghĩa là mỗi rep phải chạy hết sức.",
+    "action": "Thực hiện 5 x 2 phút nhanh vừa, xen kẽ 2 phút chạy/chậm hoặc đi bộ; khởi động và thả lỏng đầy đủ.",
+    "caption": "Interval hiệu quả không có nghĩa là mỗi rep phải chạy hết sức.\n\nBạn nên kết thúc rep cuối với kỹ thuật vẫn ổn. Mục tiêu là tích lũy thời gian chạy nhanh chất lượng, không phải tạo ra một buổi tập khiến vài ngày sau đều mệt.\n\n🎯 Việc nhỏ hôm nay: Thực hiện 5 x 2 phút nhanh vừa, xen kẽ 2 phút chạy/chậm hoặc đi bộ; khởi động và thả lỏng đầy đủ.\n\n📱 Runmio: Create Plan\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Timeline 5 rep xuất hiện trên màn hình, xen cảnh chạy nhanh và recovery.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-16",
+    "theme": "Ghi nhận kết quả",
+    "title": "Một buổi chạy chưa lưu lại là một dữ liệu bị bỏ lỡ",
+    "feature": "Edit Result",
+    "hook": "Dữ liệu nhỏ hôm nay sẽ giúp bạn hiểu cơ thể tốt hơn sau vài tuần.",
+    "action": "Sau buổi chạy, cập nhật cự ly, thời gian và cảm nhận trong Runmio.",
+    "caption": "Dữ liệu nhỏ hôm nay sẽ giúp bạn hiểu cơ thể tốt hơn sau vài tuần.\n\nĐừng chỉ lưu con số đẹp. Hãy ghi cả buổi chạy nặng, buổi hụt pace và ngày cảm thấy khỏe. Khi nhìn lại, bạn sẽ thấy xu hướng rõ hơn một buổi đơn lẻ.\n\n🎯 Việc nhỏ hôm nay: Sau buổi chạy, cập nhật cự ly, thời gian và cảm nhận trong Runmio.\n\n📱 Runmio: Edit Result\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Quay luồng hoàn tất workout → Edit Result → lưu cảm nhận.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-17",
+    "theme": "Thói quen",
+    "title": "Mục tiêu nhỏ khiến bạn dễ bắt đầu hơn",
+    "feature": "Run Reminder",
+    "hook": "Ngày thiếu động lực, hãy giảm ngưỡng bắt đầu thay vì hủy cả buổi.",
+    "action": "Đặt quy tắc: chỉ cần thay đồ và đi bộ 5 phút. Nếu cơ thể ổn, tiếp tục buổi chạy đã lên lịch.",
+    "caption": "Ngày thiếu động lực, hãy giảm ngưỡng bắt đầu thay vì hủy cả buổi.\n\nMột thói quen bền không cần lúc nào cũng hoàn hảo. Duy trì chuỗi xuất hiện đều đặn giúp việc chạy trở thành một phần tự nhiên của lịch sống.\n\n🎯 Việc nhỏ hôm nay: Đặt quy tắc: chỉ cần thay đồ và đi bộ 5 phút. Nếu cơ thể ổn, tiếp tục buổi chạy đã lên lịch.\n\n📱 Runmio: Run Reminder\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Notification nhắc chạy → thay giày → đồng hồ bắt đầu 5 phút.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-18",
+    "theme": "Tempo",
+    "title": "Tempo không phải chạy hết tốc lực",
+    "feature": "Workout Pace",
+    "hook": "Tempo tốt là nhanh đủ để kích thích cơ thể, nhưng vẫn giữ được nhịp ổn định.",
+    "action": "Khởi động 10 phút, chạy tempo 15–20 phút ở mức khó nhưng kiểm soát được, rồi thả lỏng 10 phút.",
+    "caption": "Tempo tốt là nhanh đủ để kích thích cơ thể, nhưng vẫn giữ được nhịp ổn định.\n\nNếu pace tụt mạnh ở nửa sau, bạn có thể đã bắt đầu quá nhanh. Hãy ưu tiên cảm giác kiểm soát và chất lượng toàn bài.\n\n🎯 Việc nhỏ hôm nay: Khởi động 10 phút, chạy tempo 15–20 phút ở mức khó nhưng kiểm soát được, rồi thả lỏng 10 phút.\n\n📱 Runmio: Workout Pace\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Đồ họa 3 đoạn Warm-up / Tempo / Cool-down kèm pace trên Runmio.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-19",
+    "theme": "Mục tiêu",
+    "title": "Biến mục tiêu lớn thành từng tuần nhỏ",
+    "feature": "Plan",
+    "hook": "Một cuộc đua cách vài tháng sẽ bớt áp lực khi bạn chỉ tập trung vào tuần hiện tại.",
+    "action": "Chọn mục tiêu 5K, 10K hoặc HM và chia thành mục tiêu km/tuần phù hợp.",
+    "caption": "Một cuộc đua cách vài tháng sẽ bớt áp lực khi bạn chỉ tập trung vào tuần hiện tại.\n\nMục tiêu tốt cần đủ cụ thể để bạn biết hôm nay phải làm gì. Thay vì chỉ ghi “chạy HM”, hãy theo dõi số buổi, long run và tổng km từng tuần.\n\n🎯 Việc nhỏ hôm nay: Chọn mục tiêu 5K, 10K hoặc HM và chia thành mục tiêu km/tuần phù hợp.\n\n📱 Runmio: Plan\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Từ mục tiêu lớn trên màn hình chuyển thành 4 thẻ tuần nhỏ trong Runmio.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-20",
+    "theme": "Cảm nhận cơ thể",
+    "title": "Pace giống nhau nhưng cảm giác có thể rất khác",
+    "feature": "Workout Notes",
+    "hook": "Con số cho biết bạn chạy thế nào. Cảm nhận cho biết cơ thể đã trả giá ra sao.",
+    "action": "Sau buổi chạy, chấm cảm nhận 1–5 và ghi một câu về chân, nhịp thở hoặc năng lượng.",
+    "caption": "Con số cho biết bạn chạy thế nào. Cảm nhận cho biết cơ thể đã trả giá ra sao.\n\nKhi cùng một pace dần trở nên nhẹ hơn, đó là dấu hiệu tiến bộ. Khi pace quen thuộc bỗng rất nặng vài ngày liên tiếp, bạn nên xem lại tải tập và phục hồi.\n\n🎯 Việc nhỏ hôm nay: Sau buổi chạy, chấm cảm nhận 1–5 và ghi một câu về chân, nhịp thở hoặc năng lượng.\n\n📱 Runmio: Workout Notes\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Màn Edit Result với trường cảm nhận, sau đó biểu cảm từ mệt đến khỏe.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-21",
+    "theme": "Consistency",
+    "title": "3 buổi đều mỗi tuần tốt hơn 1 buổi thật khủng",
+    "feature": "Calendar",
+    "hook": "Cơ thể thích tín hiệu lặp lại hơn những cú bùng nổ thất thường.",
+    "action": "Sắp xếp 3 buổi chạy cố định trong tuần trước khi thêm bài tập thứ 4.",
+    "caption": "Cơ thể thích tín hiệu lặp lại hơn những cú bùng nổ thất thường.\n\nMột lịch chạy vừa sức giúp bạn duy trì nhiều tuần liên tục. Khi đã ổn định, bạn mới tăng dần cự ly hoặc chất lượng.\n\n🎯 Việc nhỏ hôm nay: Sắp xếp 3 buổi chạy cố định trong tuần trước khi thêm bài tập thứ 4.\n\n📱 Runmio: Calendar\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Calendar đánh dấu 3 ngày chạy đều đặn, animation nối thành streak.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-22",
+    "theme": "Tăng tải",
+    "title": "Tăng một thứ mỗi lần",
+    "feature": "Edit Plan",
+    "hook": "Tăng cả cự ly, tốc độ và số buổi cùng lúc khiến bạn khó biết cơ thể đang phản ứng với điều gì.",
+    "action": "Tuần này chỉ tăng nhẹ tổng km hoặc thời lượng long run; giữ các buổi còn lại ổn định.",
+    "caption": "Tăng cả cự ly, tốc độ và số buổi cùng lúc khiến bạn khó biết cơ thể đang phản ứng với điều gì.\n\nTiến bộ bền đến từ tải tập được tăng có kiểm soát. Khi bạn chỉnh giáo án trong Runmio, hãy thay đổi từng biến số nhỏ để dễ theo dõi phản ứng.\n\n🎯 Việc nhỏ hôm nay: Tuần này chỉ tăng nhẹ tổng km hoặc thời lượng long run; giữ các buổi còn lại ổn định.\n\n📱 Runmio: Edit Plan\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Quay thao tác Edit Plan, highlight chỉ một trường được tăng.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-23",
+    "theme": "Khởi động",
+    "title": "5 phút đầu quyết định chất lượng phần còn lại",
+    "feature": "Workout",
+    "hook": "Cơ thể cần thời gian chuyển từ ngồi làm việc sang chạy.",
+    "action": "Đi bộ nhanh hoặc jog nhẹ 5–10 phút trước bài chạy chính; thêm vài động tác xoay khớp động.",
+    "caption": "Cơ thể cần thời gian chuyển từ ngồi làm việc sang chạy.\n\nKhởi động giúp nhịp tim và cơ bắp tăng dần thay vì bị đẩy lên quá nhanh. Đặc biệt trước tempo hoặc interval, đừng bỏ qua bước này.\n\n🎯 Việc nhỏ hôm nay: Đi bộ nhanh hoặc jog nhẹ 5–10 phút trước bài chạy chính; thêm vài động tác xoay khớp động.\n\n📱 Runmio: Workout\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Đếm ngược 5 phút kèm 3 động tác khởi động trước khi bấm Start Workout.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-24",
+    "theme": "Thả lỏng",
+    "title": "Đừng dừng ngay khi đồng hồ vừa đủ km",
+    "feature": "Workout Result",
+    "hook": "Phần cuối nhẹ nhàng giúp cơ thể chuyển trạng thái tốt hơn.",
+    "action": "Sau buổi chạy, đi bộ 5 phút và ghi lại cảm giác chân trước khi kết thúc hoàn toàn.",
+    "caption": "Phần cuối nhẹ nhàng giúp cơ thể chuyển trạng thái tốt hơn.\n\nCool-down không cần phức tạp. Hạ nhịp dần bằng jog hoặc đi bộ, uống nước và ghi cảm nhận để lần sau điều chỉnh bài tập.\n\n🎯 Việc nhỏ hôm nay: Sau buổi chạy, đi bộ 5 phút và ghi lại cảm giác chân trước khi kết thúc hoàn toàn.\n\n📱 Runmio: Workout Result\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Kết thúc GPS workout rồi tiếp tục đi bộ, overlay “5 phút cool-down”.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-25",
+    "theme": "GPS Workout",
+    "title": "Đừng để pace tức thời điều khiển cả buổi chạy",
+    "feature": "GPS Workout",
+    "hook": "GPS có thể dao động theo cây cao, nhà cao tầng và góc cua.",
+    "action": "Trong buổi easy, chỉ kiểm tra pace theo từng đoạn thay vì nhìn màn hình liên tục.",
+    "caption": "GPS có thể dao động theo cây cao, nhà cao tầng và góc cua.\n\nHãy kết hợp pace với cảm giác và nhịp thở. Mục tiêu của workout là đúng cường độ, không phải chạy theo từng con số nhảy lên xuống trên màn hình.\n\n🎯 Việc nhỏ hôm nay: Trong buổi easy, chỉ kiểm tra pace theo từng đoạn thay vì nhìn màn hình liên tục.\n\n📱 Runmio: GPS Workout\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Màn GPS Workout dao động pace, sau đó chuyển sang cảnh runner nhìn thẳng về phía trước.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-26",
+    "theme": "4 tuần tiến bộ",
+    "title": "Đừng đánh giá giáo án chỉ sau 2 buổi",
+    "feature": "Dashboard",
+    "hook": "Tiến bộ chạy bộ thường hiện ra rõ nhất khi nhìn theo tuần, không phải từng ngày.",
+    "action": "So sánh tổng km, số buổi hoàn thành và cảm nhận trong 4 tuần gần nhất.",
+    "caption": "Tiến bộ chạy bộ thường hiện ra rõ nhất khi nhìn theo tuần, không phải từng ngày.\n\nMột buổi tệ không phá hỏng cả quá trình. Một buổi tốt cũng chưa chứng minh mọi thứ đã thay đổi. Hãy nhìn xu hướng trong vài tuần.\n\n🎯 Việc nhỏ hôm nay: So sánh tổng km, số buổi hoàn thành và cảm nhận trong 4 tuần gần nhất.\n\n📱 Runmio: Dashboard\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Dùng 4 cột tuần trên Dashboard, animation tăng dần vừa phải.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-27",
+    "theme": "Ngày bận",
+    "title": "20 phút vẫn được tính",
+    "feature": "Edit Plan",
+    "hook": "Kế hoạch tốt là kế hoạch sống được cùng lịch làm việc thật của bạn.",
+    "action": "Nếu lịch bận, rút buổi easy xuống 20 phút thay vì bỏ hoàn toàn; cập nhật lại workout trong Runmio.",
+    "caption": "Kế hoạch tốt là kế hoạch sống được cùng lịch làm việc thật của bạn.\n\nKhông phải buổi nào cũng cần hoàn thành 100% thời lượng. Với ngày bận, một phiên bản ngắn hơn vẫn giữ được nhịp thói quen và giảm cảm giác bỏ cuộc.\n\n🎯 Việc nhỏ hôm nay: Nếu lịch bận, rút buổi easy xuống 20 phút thay vì bỏ hoàn toàn; cập nhật lại workout trong Runmio.\n\n📱 Runmio: Edit Plan\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Edit workout từ 40 phút xuống 20 phút, sau đó cảnh chạy ngắn lúc chiều tối.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-28",
+    "theme": "Chạy theo cảm giác",
+    "title": "Có ngày pace chậm hơn nhưng buổi chạy vẫn rất tốt",
+    "feature": "Workout Notes",
+    "hook": "Pace là kết quả của rất nhiều yếu tố, không phải điểm số của bạn.",
+    "action": "Nếu nóng, thiếu ngủ hoặc mệt, giảm pace và ghi nguyên nhân vào kết quả buổi chạy.",
+    "caption": "Pace là kết quả của rất nhiều yếu tố, không phải điểm số của bạn.\n\nThời tiết, giấc ngủ, stress và địa hình đều tác động đến pace. Điều chỉnh theo cơ thể giúp bạn giữ đúng mục tiêu của buổi chạy.\n\n🎯 Việc nhỏ hôm nay: Nếu nóng, thiếu ngủ hoặc mệt, giảm pace và ghi nguyên nhân vào kết quả buổi chạy.\n\n📱 Runmio: Workout Notes\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Hiển thị pace chậm hơn kế hoạch nhưng gắn nhãn “Easy đúng cường độ”.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-29",
+    "theme": "Chia nhỏ cự ly",
+    "title": "10K dễ hơn khi bạn chỉ nghĩ về km tiếp theo",
+    "feature": "GPS Workout",
+    "hook": "Não thường thấy 10 km rất dài nhưng 2 km thì dễ xử lý hơn nhiều.",
+    "action": "Chia buổi chạy dài thành các block 2 km và chỉ tập trung hoàn thành block hiện tại.",
+    "caption": "Não thường thấy 10 km rất dài nhưng 2 km thì dễ xử lý hơn nhiều.\n\nChia cự ly thành đoạn nhỏ giúp kiểm soát nhịp và giảm áp lực tâm lý. Sau mỗi block, tự kiểm tra nhịp thở, tư thế và năng lượng.\n\n🎯 Việc nhỏ hôm nay: Chia buổi chạy dài thành các block 2 km và chỉ tập trung hoàn thành block hiện tại.\n\n📱 Runmio: GPS Workout\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Thanh tiến độ 10K chia thành 5 block 2K trên nền GPS Workout.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  },
+  {
+    "date": "2026-10-30",
+    "theme": "Rest Day",
+    "title": "Nghỉ đúng lúc để chạy tốt hơn vào ngày mai",
+    "feature": "Calendar",
+    "hook": "Ngày nghỉ không làm bạn mất fitness sau một đêm.",
+    "action": "Giữ một ngày không chạy; nếu muốn vận động, chỉ đi bộ hoặc mobility nhẹ.",
+    "caption": "Ngày nghỉ không làm bạn mất fitness sau một đêm.\n\nMột ngày hồi phục đúng lúc có thể giúp buổi chất lượng tiếp theo tốt hơn. Hãy coi recovery là một phần của giáo án, không phải khoảng trống.\n\n🎯 Việc nhỏ hôm nay: Giữ một ngày không chạy; nếu muốn vận động, chỉ đi bộ hoặc mobility nhẹ.\n\n📱 Runmio: Calendar\n\n#Runmio #ChayBo #Running #RunningPlan #TapLuyen #RunnerVietnam",
+    "visualIdea": "Calendar với Rest Day, cảnh đi bộ nhẹ hoặc foam rolling.",
+    "hashtags": [
+      "#Runmio",
+      "#ChayBo",
+      "#Running",
+      "#RunningPlan",
+      "#TapLuyen",
+      "#RunnerVietnam"
+    ]
+  }
+]
