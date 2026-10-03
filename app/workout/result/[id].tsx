@@ -119,7 +119,9 @@ export default function ResultScreen() {
       setDuration(formatDuration(a.durationSeconds));
       setAvgHr(a.avgHeartRate ? String(a.avgHeartRate) : "");
       setMaxHr(a.maxHeartRate ? String(a.maxHeartRate) : "");
-      setElevation(a.elevationGain != null ? String(a.elevationGain) : "");
+      setElevation(
+        a.elevationGain != null ? String(Math.round(a.elevationGain)) : "",
+      );
       setFeeling(a.feeling ?? "NORMAL");
       setNotes(a.notes ?? "");
     } else if (workout) {
@@ -174,7 +176,7 @@ export default function ResultScreen() {
       durationSeconds: seconds,
       avgHeartRate: a,
       maxHeartRate: m,
-      elevationGain: e,
+      elevationGain: e == null ? null : Math.round(e),
       feeling,
       notes: notes.trim() || null,
     });
@@ -354,7 +356,7 @@ export default function ResultScreen() {
           style={[s.input,{backgroundColor:colors.bgCard,borderColor:colors.bgCardBorder,color:colors.textPrimary}]}
           value={elevation}
           onChangeText={setElevation}
-          keyboardType="decimal-pad"
+          keyboardType="number-pad"
           placeholder="85"
         />
       </View>

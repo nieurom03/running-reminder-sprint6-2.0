@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import Constants from "expo-constants";
 import { router, type Href } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import appConfig from "../../app.json";
@@ -60,6 +61,10 @@ export default function Settings() {
     null,
   );
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const appVersion =
+    Constants.nativeApplicationVersion ?? appConfig.expo.version;
+  const buildNumber =
+    Constants.nativeBuildVersion ?? appConfig.expo.ios.buildNumber;
 
   useEffect(() => {
     getTrainingStats(db).then(setStats);
@@ -233,19 +238,21 @@ export default function Settings() {
             source={require("../../assets/images/icon.png")}
             style={s.logo}
           />
-          <View style={{ flex: 1 }}>
+          <View style={s.appIdentity}>
             <Text style={[s.appName, { color: colors.textPrimary }]}>
               {t("runningReminder")}
             </Text>
-            <Text style={[s.appVer, { color: colors.textMuted }]}>
-              {t("version")} {appConfig.expo.version}
+            <Text style={[s.appTagline, { color: colors.textSecondary }]}>
+              {t("appTagline")}
             </Text>
+            <View
+              style={[s.versionBadge, { backgroundColor: colors.rowIconBg }]}
+            >
+              <Text style={[s.versionBadgeText, { color: colors.textMuted }]}>
+                {appVersion} ({buildNumber})
+              </Text>
+            </View>
           </View>
-          {/* <Ionicons
-            name="chevron-forward"
-            size={18}
-            color={colors.textSecondary}
-          /> */}
         </GlassCard>
 
         <Text style={[s.groupTitle, { color: colors.groupTitle }]}>
@@ -329,7 +336,20 @@ export default function Settings() {
         </GlassCard>
 
         <Text style={[s.groupTitle, { color: colors.groupTitle }]}>
-          {t("settingsOther")}
+          {t("support")}
+        </Text>
+        <GlassCard style={s.group}>
+          <Row
+            icon="chatbubble-ellipses-outline"
+            title={t("feedback")}
+            subtitle={t("feedbackHelp")}
+            onPress={() => setFeedbackOpen(true)}
+            colors={colors}
+          />
+        </GlassCard>
+
+        <Text style={[s.groupTitle, { color: colors.groupTitle }]}>
+          {t("legal")}
         </Text>
         <GlassCard style={s.group}>
           <Row
@@ -345,22 +365,40 @@ export default function Settings() {
             onPress={() => router.push("/terms-of-use" as Href)}
             colors={colors}
           />
-          <Divider colors={colors} />
+        </GlassCard>
+
+        {/* <Text style={[s.groupTitle, { color: colors.groupTitle }]}>
+          {t("developer")}
+        </Text>
+        <GlassCard style={s.group}>
+          <Row
+            icon="person-circle-outline"
+            title={t("owner")}
+            value="Nieu Rom"
+            colors={colors}
+          />
+        </GlassCard> */}
+
+        <Text style={[s.groupTitle, { color: colors.groupTitle }]}>
+          {t("settingsOther")}
+        </Text>
+        <GlassCard style={s.group}>
           <Row
             icon="refresh-outline"
             title={t("replayOnboarding")}
             onPress={replay}
             colors={colors}
           />
-          <Divider colors={colors} />
-          <Row
-            icon="chatbubble-ellipses-outline"
-            title={t("feedback")}
-            subtitle={t("feedbackHelp")}
-            onPress={() => setFeedbackOpen(true)}
-            colors={colors}
-          />
         </GlassCard>
+
+        <View style={s.footerBrand}>
+          <Text style={[s.footerBrandName, { color: colors.textSecondary }]}>
+            Runmio
+          </Text>
+          <Text style={[s.copyright, { color: colors.textMuted }]}>
+            © {new Date().getFullYear()} Runmio. {t("allRightsReserved")}
+          </Text>
+        </View>
       </ScrollView>
 
       <GlassOptionModal<AppLanguage>
@@ -541,10 +579,7 @@ function PasswordModal({
               {t("backupUsePassword")}
             </Text>
             <Text
-              style={[
-                s.backupProtectionHelp,
-                { color: colors.textSecondary },
-              ]}
+              style={[s.backupProtectionHelp, { color: colors.textSecondary }]}
             >
               {t("backupUsePasswordHelp")}
             </Text>
@@ -570,7 +605,10 @@ function PasswordModal({
           <View
             style={[
               s.passwordField,
-              { backgroundColor: colors.bgCard, borderColor: colors.modalBorder },
+              {
+                backgroundColor: colors.bgCard,
+                borderColor: colors.modalBorder,
+              },
             ]}
           >
             <TextInput
@@ -831,7 +869,13 @@ function Row({
       {value && (
         <Text style={[s.rowValue, { color: colors.rowValue }]}>{value}</Text>
       )}
-      <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+      {onPress && (
+        <Ionicons
+          name="chevron-forward"
+          size={16}
+          color={colors.textSecondary}
+        />
+      )}
     </Pressable>
   );
 }
@@ -847,10 +891,24 @@ function Stat({ v, l, colors }: { v: string; l: string; colors: any }) {
 
 const s = StyleSheet.create({
   content: { paddingHorizontal: 18, paddingTop: 4, paddingBottom: 112 },
-  appCard: { padding: 14, flexDirection: "row", alignItems: "center", gap: 12 },
-  logo: { width: 54, height: 54, borderRadius: 15 },
-  appName: { fontSize: 18, fontWeight: "900" },
-  appVer: { fontSize: 12, marginTop: 3 },
+  appCard: {
+    padding: 18,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
+  },
+  logo: { width: 66, height: 66, borderRadius: 18 },
+  appIdentity: { flex: 1, minWidth: 0 },
+  appName: { fontSize: 22, lineHeight: 27, fontWeight: "900" },
+  appTagline: { fontSize: 12, lineHeight: 17, marginTop: 2, fontWeight: "600" },
+  versionBadge: {
+    alignSelf: "flex-start",
+    borderRadius: 999,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    marginTop: 8,
+  },
+  versionBadgeText: { fontSize: 10, lineHeight: 13, fontWeight: "800" },
   groupTitle: {
     fontSize: 12,
     fontWeight: "900",
@@ -879,8 +937,21 @@ const s = StyleSheet.create({
     justifyContent: "center",
   },
   rowSub: { fontSize: 10, marginTop: 3, lineHeight: 14 },
-  rowValue: { fontSize: 12, maxWidth: 90, textAlign: "right" },
+  rowValue: {
+    fontSize: 11,
+    maxWidth: 165,
+    flexShrink: 1,
+    textAlign: "right",
+  },
   divider: { height: 1, marginLeft: 50 },
+  copyright: {
+    textAlign: "center",
+    fontSize: 10,
+    lineHeight: 15,
+    fontWeight: "600",
+  },
+  footerBrand: { alignItems: "center", marginTop: 22, marginBottom: 2 },
+  footerBrandName: { fontSize: 12, lineHeight: 17, fontWeight: "900" },
   stats: { padding: 12, flexDirection: "row", gap: 8 },
   stat: { flex: 1, borderRadius: 18, padding: 13, alignItems: "center" },
   statV: { fontSize: 21, fontWeight: "900" },

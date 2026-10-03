@@ -3,9 +3,9 @@ PODS:
   - DoubleConversion (1.1.6)
   - EXApplication (57.0.3):
     - ExpoModulesCore
-  - EXConstants (57.0.19):
+  - EXConstants (57.0.20):
     - ExpoModulesCore
-  - Expo (57.0.25):
+  - Expo (57.0.26):
     - boost
     - DoubleConversion
     - ExpoModulesCore
@@ -43,7 +43,7 @@ PODS:
     - ExpoModulesCore
   - ExpoDevice (57.0.2):
     - ExpoModulesCore
-  - ExpoDocumentPicker (57.0.2):
+  - ExpoDocumentPicker (57.0.3):
     - ExpoModulesCore
   - ExpoDomWebView (57.0.1):
     - ExpoModulesCore
@@ -63,7 +63,7 @@ PODS:
     - ExpoModulesCore
   - ExpoLogBox (57.0.4):
     - React-Core
-  - ExpoModulesCore (57.0.19):
+  - ExpoModulesCore (57.0.20):
     - boost
     - DoubleConversion
     - ExpoModulesJSI
@@ -96,17 +96,17 @@ PODS:
   - ExpoModulesJSI (57.1.1):
     - React-Core
     - ReactCommon
-  - ExpoModulesWorklets (57.0.19):
+  - ExpoModulesWorklets (57.0.20):
     - ExpoModulesCore
     - ExpoModulesJSI
-  - ExpoModulesWorkletsAdapter (57.0.19):
+  - ExpoModulesWorkletsAdapter (57.0.20):
     - ExpoModulesCore
     - ExpoModulesJSI
     - ExpoModulesWorklets
     - RNWorklets
   - ExpoNotifications (57.0.21):
     - ExpoModulesCore
-  - ExpoRouter (57.0.23):
+  - ExpoRouter (57.0.24):
     - ExpoModulesCore
     - RNScreens
   - ExpoSharing (57.0.22):
@@ -117,16 +117,16 @@ PODS:
     - ExpoModulesCore
   - ExpoSymbols (57.0.3):
     - ExpoModulesCore
-  - ExpoTaskManager (57.0.20):
+  - ExpoTaskManager (57.0.21):
     - ExpoModulesCore
     - UMAppLoader
-  - ExpoUI (57.0.20):
+  - ExpoUI (57.0.21):
     - ExpoModulesCore
     - ExpoModulesWorklets
     - React-RCTFabric
   - ExpoWebBrowser (57.0.3):
     - ExpoModulesCore
-  - ExpoWidgets (57.0.21):
+  - ExpoWidgets (57.0.22):
     - ExpoModulesCore
     - ExpoUI
   - fast_float (8.0.0)
@@ -3572,12 +3572,12 @@ SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   EXApplication: a727f05eb8592f0bc764f6ab8d51eacc158652ec
-  EXConstants: 2dc4473aff5574eccaccb9f3eefe6d95247e5d38
-  Expo: 0c91b2d3a517238a255f101bc552211b1e3d07dd
+  EXConstants: fdc6f92b1559e5bd69df9e684e8c7ba5d912890e
+  Expo: d30b9c386735e21fbe883b12f68e4d0114e21a1a
   ExpoAsset: a917b756b2e4fe12cef1ac3bca5fd849ddb2b919
   ExpoBlur: 975b78b65b3c8f475c44bd8f8b53948146b1ff9b
   ExpoDevice: 5c638e530304a51992263ab5c1cab726f992b9dc
-  ExpoDocumentPicker: fe03a24855e39af0f9b5aee17e7eb4813f6e44a6
+  ExpoDocumentPicker: 3cb0c283969538c03ced2b405e519c91abf39f8e
   ExpoDomWebView: beaec034e51bd028428b98bb1f2633ab79c6d095
   ExpoFileSystem: 28778f942725170102f7c6cf4dee05a526ddacd0
   ExpoFont: f8198a952ba2ff53c9b393b5269ea435f232cfc3
@@ -3587,20 +3587,20 @@ SPEC CHECKSUMS:
   ExpoLinking: 52819633a2225a0c2a3cd3de64056b021bb55202
   ExpoLocation: 52c126a493087ac247cf213ef9f737c5b298c1d4
   ExpoLogBox: 80957303325cd4439137765c90a87d7f22aaf2ff
-  ExpoModulesCore: 369a0d951c4892096cd5720218f568e8496f7aec
+  ExpoModulesCore: ed7453bbed4467b0d2043ef519468031d3ae899e
   ExpoModulesJSI: 383849017851b1ebacbd78cfaa32b18b6152585e
-  ExpoModulesWorklets: 8c9a7e3572a420e3e7f93f98453da9c9175edf88
-  ExpoModulesWorkletsAdapter: 06948bf7cd8f2946f78f69a4c872863abca3d42f
+  ExpoModulesWorklets: 40d29262efc034e4357f2713e6037a41a27218d6
+  ExpoModulesWorkletsAdapter: ea5b8916e2fdf8647e8543dbcd81a665e070e74a
   ExpoNotifications: d432d5b2904f700a6a2dc29eca52e531c4cc1611
-  ExpoRouter: e94e22e9806d0a731d8636bddd882ac2039e4f74
+  ExpoRouter: fa0e119f32bdc83dcccfa2b08859e8e582c233d2
   ExpoSharing: 5cc46810cfba71e331f649d947660213082094c1
   ExpoSplashScreen: e771da4f26d550ea4fd067d8fb942657e47bb846
   ExpoSQLite: 72e6ada0504a27cd043eb1bf172db70485a761b6
   ExpoSymbols: 37a3a6e5847edb08b83a5ee04d3b46525e205f00
-  ExpoTaskManager: 51f760ba437e018be2ca1ce97942c1762946a1ac
-  ExpoUI: d99ab879624d247bf4e19659a3b3c3e01bd3b428
+  ExpoTaskManager: ede265f5b4a6e075b422eb4d45c8cb393b0dc465
+  ExpoUI: 9cc4762adb625c875850b69a66451dd9c6bb7767
   ExpoWebBrowser: a4d7c382116fbe33c1ec7f60293f02b7e97042e4
-  ExpoWidgets: 14e1ac4f0a30ed971992e133aa3e712b1f96e8ad
+  ExpoWidgets: d72a2267b9988a03c62fe52156df25d5673e218f
   fast_float: b32c788ed9c6a8c584d114d0047beda9664e7cc6
   FBLazyVector: 94a9e5b949d0f65bbc1a741f8a7c72499da32567
   fmt: 530618a01105dae0fa3a2f27c81ae11fa8f67eac
